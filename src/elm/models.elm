@@ -1,11 +1,18 @@
 module Models exposing (..)
 
+import Date exposing (Date)
+import Time exposing (Time)
+import Maybe exposing (Maybe(..))
+
+
 -- our top level model for entire state.
 
 
 type alias Model =
     { todos : List Todo
     , thing : Bool
+    , timeAtLoad : Time
+    , dateAtLoad : Maybe Date
     }
 
 
@@ -16,6 +23,8 @@ initialModel =
         , Todo "2" "Do Thing" False
         ]
     , thing = True
+    , timeAtLoad = 0
+    , dateAtLoad = Nothing
     }
 
 

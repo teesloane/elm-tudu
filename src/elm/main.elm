@@ -4,11 +4,15 @@ import Html exposing (Html, button, div, text, program)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (Model, initialModel, Todo)
+import Maybe exposing (Maybe(..))
+import Date exposing (Date)
+import Time exposing (Time)
+import Task exposing (Task)
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.none )
+    ( initialModel, getDate )
 
 
 
@@ -17,6 +21,8 @@ init =
 
 type Msg
     = ToggleTodo String Bool
+    | TimeUpdate Time
+    | SetDateOnLoad (Maybe Date)
 
 
 
@@ -26,6 +32,10 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        TimeUpdate time ->
+            { model | timeAtLoad = time }
+                ! []
+
         ToggleTodo id isCompleted ->
             let
                 todoNew t =
@@ -35,7 +45,11 @@ update msg model =
                         t
             in
                 { model | todos = List.map todoNew model.todos }
-                    {- what is this again? > -} ! []
+                    ! []
+
+        SetDateOnLoad date ->
+            { model | dateAtLoad = date }
+                ! []
 
 
 
@@ -49,14 +63,20 @@ view model =
         [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
         , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
         , viewTodoList model
+        , viewWeek model
         ]
 
 
+{-| Display a list of Todos.
+-}
 viewTodoList : Model -> Html Msg
 viewTodoList model =
     div [] (List.map viewTodo model.todos)
 
 
+{-| Display a single Todo. Conditionally styles it.
+Updates: ToggleTodo
+-}
 viewTodo : Todo -> Html Msg
 viewTodo todo =
     let
@@ -76,8 +96,11 @@ viewTodo todo =
             [ text todo.name ]
 
 
-
--- SUBSCRIPTIONS
+{-| Displays the current week
+-}
+viewWeek : Model -> Html Msg
+viewWeek model =
+    div [] [ text (dateString model.dateAtLoad) ]
 
 
 subscriptions : Model -> Sub Msg
@@ -97,3 +120,37 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+
+
+
+-- Functions
+
+
+getTime : Cmd Msg
+getTime =
+    -- Task.perform (Just >> TimeUpdate) Date.now
+    Task.perform TimeUpdate Time.now
+
+
+{-| what the...
+<https://stackoverflow.com/questions/37910613/how-do-i-get-the-current-date-in-elm>
+-}
+getDate : Cmd Msg
+getDate =
+    Task.perform (Just >> SetDateOnLoad) Date.now
+
+
+dateString date =
+    case date of
+        Nothing ->
+            "No date here"
+
+        Just date ->
+            "the date is "
+                ++ (toString <| Date.dayOfWeek date)
+                ++ " "
+                ++ (toString <| Date.day date)
+                ++ " "
+                ++ (toString <| Date.month date)
+                ++ " "
+                ++ (toString <| Date.year date)

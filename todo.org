@@ -1,0 +1,5 @@
+#+TITLE: todo
+
+A todolist in here? Ironic.
+
+* [ ] Build week view. Display 7 days at a time.
