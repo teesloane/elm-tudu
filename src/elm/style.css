@@ -1,0 +1,27 @@
+body {
+  background: #333;
+  color: #dfdfdf;
+  font-family: arial;
+  padding: 32px;
+}
+
+
+/* viewTodo Styles ; ie: a single todo entry.*/
+
+.todo {
+  width: 250px;
+  background: #444;
+  padding
+}
+
+.todo-completed {
+  text-decoration: line-through;
+}
+
+
+
+
+/* utilities */
+.pointer {
+  cursor: pointer;
+}
