@@ -3,3 +3,12 @@
 A todolist in here? Ironic.
 
 * [ ] Build week view. Display 7 days at a time.
+
+
+* Ability to render a week
+- get the current day,
+- get 4 or 5 days after that and one day before
+  - possibly just adding or subtracting date->millis and figuring out hard coded
+    for 24 hours.
+- for each day, iterate over the todolist and if the todo date falls inside the
+  todo, put it in a ul underneath the date.

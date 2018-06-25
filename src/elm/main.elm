@@ -12,7 +12,7 @@ import Task exposing (Task)
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, getDate )
+    ( initialModel, Cmd.batch [ getDate, getTime ] )
 
 
 
