@@ -8,6 +8,7 @@ import Maybe exposing (Maybe(..))
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
+import Dict exposing (..)
 
 
 init : ( Model, Cmd Msg )
@@ -139,7 +140,7 @@ getDate : Cmd Msg
 getDate =
     Task.perform (Just >> SetDateOnLoad) Date.now
 
-
+Maybe Date -> String
 dateString date =
     case date of
         Nothing ->
@@ -154,3 +155,8 @@ dateString date =
                 ++ (toString <| Date.month date)
                 ++ " "
                 ++ (toString <| Date.year date)
+
+
+
+-- TODO: build record or a list of Days and then add 24 hrs in ms x 5~ days.
+-- buildWeek date =
