@@ -3,6 +3,7 @@ module Models exposing (..)
 import Date exposing (Date)
 import Time exposing (Time)
 import Maybe exposing (Maybe(..))
+import Dict exposing (..)
 
 
 -- our top level model for entire state.
@@ -13,6 +14,7 @@ type alias Model =
     , timeAtLoad : Time
     , dateAtLoad : Maybe Date
     , currentWeek : List Day
+    , inputFieldsByDate : Dict Date String
     }
 
 
@@ -25,6 +27,7 @@ initialModel =
     , timeAtLoad = 0
     , dateAtLoad = Nothing
     , currentWeek = []
+    , inputFieldsByDate = Dict.empty
     }
 
 

@@ -25,7 +25,7 @@ getTime =
 
 
 
--- MESSAGES
+-- MESSAGES (possibly move this to  `models`)
 
 
 type Msg
@@ -49,6 +49,7 @@ update msg model =
     in
         case msg of
             SetTimeAndWeek time ->
+                -- todo - set the inputFieldsByDate
                 { model | timeAtLoad = time, currentWeek = (buildWeek time) }
                     ! []
 
@@ -107,7 +108,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ class "flex flex-auto pt4 justify-center" ]
         -- hack to add a stylesheet for elm reactor.
         [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
         , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
@@ -154,6 +155,9 @@ viewTodo todo =
         div [ class styleClasses ] [ todoEl ]
 
 
+{-| Creates a new todo; on render, creates a controlled input in inputFieldsByDate
+-}
+viewTodoNew : Date -> Html Msg
 viewTodoNew date =
     div [ class "todo flex flex-auto justify-between" ]
         [ input
@@ -214,7 +218,3 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
-
-
-
--- Functions
