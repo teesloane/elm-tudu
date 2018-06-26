@@ -108,10 +108,25 @@ update msg model =
                         ! []
 
             TodoCreate day ->
-                { model
-                    | todos = model.todos ++ [ (Todo "3" False day.field False (Date.toTime day.date)) ]
-                }
-                    ! []
+                let
+                    newTodo =
+                        (Todo "3" False day.field False (Date.toTime day.date))
+
+                    clearDayField d =
+                        if d.date == day.date then
+                            { d | field = "" }
+                        else
+                            d
+                in
+                    { model
+                        | todos =
+                            if String.isEmpty day.field then
+                                model.todos
+                            else
+                                model.todos ++ [ newTodo ]
+                        , currentWeek = List.map clearDayField model.currentWeek
+                    }
+                        ! []
 
             TodoUpdateNewField date newChar ->
                 let
@@ -185,6 +200,7 @@ viewTodoNew day =
     div [ class "todo flex flex-auto justify-between" ]
         [ input
             [ onEnter (TodoCreate day)
+            , value day.field
             , onInput (TodoUpdateNewField day.date)
             , class "todo-input"
             ]

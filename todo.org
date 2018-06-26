@@ -2,7 +2,9 @@
 * [ ] Replace edit icon with pencil
 * [ ] Current day should be styled differently
 * [ ] If removing name/string of todo, it should delete it from the list.
-* [ ] Create Todo
+* [ ] remove unecessary id from todo model
+* [X] Create Todo
+CLOSED: [2018-06-26 Tue 19:28]
 - controlled inputs : dict> key date | value: input
 
   
