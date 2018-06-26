@@ -15,6 +15,7 @@ type alias Model =
     , thing : Bool
     , timeAtLoad : Time
     , dateAtLoad : Maybe Date
+    , currentWeek : List Day
     }
 
 
@@ -27,7 +28,7 @@ initialModel =
             1529932761990
         , Todo "2"
             "Do Thing"
-            False
+            True
             1529932761998
         ]
     , todomap =
@@ -38,6 +39,7 @@ initialModel =
     , thing = True
     , timeAtLoad = 0
     , dateAtLoad = Nothing
+    , currentWeek = []
     }
 
 
@@ -55,4 +57,5 @@ type alias Todo =
 
 type alias Day =
     { hasTodos : Bool
+    , date : Date
     }

@@ -1,19 +1,44 @@
 module App exposing (..)
 
-import Html exposing (Html, button, div, text, program)
+import Html exposing (Html, button, div, ul, text, program)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Models exposing (Model, initialModel, Todo)
+import Models exposing (Model, initialModel, Todo, Day)
 import Maybe exposing (Maybe(..))
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
-import Dict exposing (..)
+import Debug exposing (..)
+
+
+-- Constants
+
+
+msInADay : Int
+msInADay =
+    86400000
+
+
+
+-- Boot up, on load commands
 
 
 init : ( Model, Cmd Msg )
 init =
     ( initialModel, Cmd.batch [ getDate, getTime ] )
+
+
+getTime : Cmd Msg
+getTime =
+    Task.perform SetTimeAndWeek Time.now
+
+
+{-| what the...
+<https://stackoverflow.com/questions/37910613/how-do-i-get-the-current-date-in-elm>
+-}
+getDate : Cmd Msg
+getDate =
+    Task.perform (Just >> SetDateOnLoad) Date.now
 
 
 
@@ -22,7 +47,7 @@ init =
 
 type Msg
     = ToggleTodo String Bool
-    | TimeUpdate Time
+    | SetTimeAndWeek Time
     | SetDateOnLoad (Maybe Date)
 
 
@@ -32,25 +57,29 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        TimeUpdate time ->
-            { model | timeAtLoad = time }
-                ! []
-
-        ToggleTodo id isCompleted ->
-            let
-                todoNew t =
-                    if t.id == id then
-                        { t | complete = isCompleted }
-                    else
-                        t
-            in
-                { model | todos = List.map todoNew model.todos }
+    let
+        _ =
+            Debug.log "yo" (buildWeek model.timeAtLoad)
+    in
+        case msg of
+            SetTimeAndWeek time ->
+                { model | timeAtLoad = time, currentWeek = (buildWeek time) }
                     ! []
 
-        SetDateOnLoad date ->
-            { model | dateAtLoad = date }
-                ! []
+            ToggleTodo id isCompleted ->
+                let
+                    todoNew t =
+                        if t.id == id then
+                            { t | complete = isCompleted }
+                        else
+                            t
+                in
+                    { model | todos = List.map todoNew model.todos }
+                        ! []
+
+            SetDateOnLoad date ->
+                { model | dateAtLoad = date }
+                    ! []
 
 
 
@@ -101,7 +130,11 @@ viewTodo todo =
 -}
 viewWeek : Model -> Html Msg
 viewWeek model =
-    div [] [ text (dateString model.dateAtLoad) ]
+    div [] (List.map (\d -> div [] [ text (toString d.date) ]) model.currentWeek)
+
+
+
+-- Subs
 
 
 subscriptions : Model -> Sub Msg
@@ -127,20 +160,7 @@ main =
 -- Functions
 
 
-getTime : Cmd Msg
-getTime =
-    -- Task.perform (Just >> TimeUpdate) Date.now
-    Task.perform TimeUpdate Time.now
-
-
-{-| what the...
-<https://stackoverflow.com/questions/37910613/how-do-i-get-the-current-date-in-elm>
--}
-getDate : Cmd Msg
-getDate =
-    Task.perform (Just >> SetDateOnLoad) Date.now
-
-Maybe Date -> String
+dateString : Maybe Date -> String
 dateString date =
     case date of
         Nothing ->
@@ -157,6 +177,15 @@ dateString date =
                 ++ (toString <| Date.year date)
 
 
+{-| Construct a list of days
+-}
+buildWeek : Time -> List Day
+buildWeek timestamp =
+    let
+        days =
+            [ 1, 2, 3, 4, 5 ]
 
--- TODO: build record or a list of Days and then add 24 hrs in ms x 5~ days.
--- buildWeek date =
+        transformDays num =
+            (Day False (Date.fromTime (timestamp + (toFloat (num * msInADay)))))
+    in
+        List.map transformDays days
