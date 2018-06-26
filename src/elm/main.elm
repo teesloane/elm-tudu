@@ -4,21 +4,11 @@ import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (Model, initialModel, Todo, Day)
-import Json.Decode as Json
-import Maybe exposing (Maybe(..))
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
 import Debug exposing (..)
-
-
--- Constants
-
-
-msInADay : Int
-msInADay =
-    86400000
-
+import Utils exposing (..)
 
 
 -- Boot up, on load commands
@@ -44,6 +34,7 @@ type Msg
     | TodoToggleEditing String Bool
     | TodoStopEditing String Bool
     | TodoEditName String String
+    | TodoCreate Date
 
 
 
@@ -105,9 +96,13 @@ update msg model =
                     { model | todos = List.map updateTodos model.todos }
                         ! []
 
+            TodoCreate date ->
+                { model | todos = model.todos ++ [ (Todo "3" False "name" False (Date.toTime date)) ] }
+                    ! []
 
 
--- VIEW
+
+-- View
 
 
 view : Model -> Html Msg
@@ -143,7 +138,7 @@ viewTodo todo =
                     [ value todo.name
                     , onInput (TodoEditName todo.id)
                     , onEnter (TodoStopEditing todo.id (not todo.isEditing))
-                    , class "todo todo-editing"
+                    , class "todo-input"
                     ]
                     []
             else
@@ -159,6 +154,21 @@ viewTodo todo =
         div [ class styleClasses ] [ todoEl ]
 
 
+viewTodoNew date =
+    div [ class "todo flex flex-auto justify-between" ]
+        [ input
+            [ onEnter (TodoCreate date)
+            , class "todo-input"
+            ]
+            []
+        ]
+
+
+viewTodoEmpty : Html msg
+viewTodoEmpty =
+    div [ class "todo" ] [ text "" ]
+
+
 {-| Displays the current week... should be able to partially apply the map...
 -}
 viewWeek : Model -> Html Msg
@@ -167,7 +177,7 @@ viewWeek model =
     div [ class "flex mx3" ] (List.map (\d -> div [] [ (viewDay model d.date) ]) model.currentWeek)
 
 
-{-| Renders a day: the date, and the todos for the date.
+{-| Renders a day: the date, the todos for the date, empty slots for new todos.
 -}
 viewDay : Model -> Date -> Html Msg
 viewDay model date =
@@ -178,6 +188,8 @@ viewDay model date =
         div [ class "m2" ]
             [ span [ class "h5 caps" ] [ text (dateFmt date) ]
             , div [] (List.map viewTodo todosByDay)
+            , viewTodoNew date
+            , viewTodoEmpty -- make a bunch of empty ones of this
             ]
 
 
@@ -206,61 +218,3 @@ main =
 
 
 -- Functions
-
-
-dateFmt : Date -> String
-dateFmt date =
-    (toString <| Date.dayOfWeek date)
-        ++ " "
-        ++ (toString <| Date.day date)
-        ++ " "
-        ++ (toString <| Date.month date)
-        ++ " "
-        ++ (toString <| Date.year date)
-
-
-{-| Construct a list of days
--}
-buildWeek : Time -> List Day
-buildWeek timestamp =
-    let
-        days =
-            [ 0, 1, 2, 3, 4, 5 ]
-
-        transformDays num =
-            (Day False (Date.fromTime (timestamp + (toFloat (num * msInADay)))))
-    in
-        List.map transformDays days
-
-
-{-| Return true if a todo's due date belongs to a Day
--}
-taskInDate : Date -> Todo -> Bool
-taskInDate date todo =
-    let
-        todoYear =
-            todo.ts |> Date.fromTime |> Date.year
-
-        todoMonth =
-            todo.ts |> Date.fromTime |> Date.month
-
-        todoDay =
-            todo.ts |> Date.fromTime |> Date.day
-    in
-        if todoDay == (Date.day date) && (Date.year date) == todoYear && (Date.month date) == todoMonth then
-            True
-        else
-            False
-
-
-onEnter : Msg -> Html.Attribute Msg
-onEnter msg =
-    -- stolen from https://github.com/evancz/elm-todomvc/blob/166e5f2afc704629ee6d03de00deac892dfaeed0/Todo.elm#L237-L246
-    let
-        isEnter code =
-            if code == 13 then
-                Json.succeed msg
-            else
-                Json.fail "not ENTER"
-    in
-        on "keydown" (Json.andThen isEnter keyCode)

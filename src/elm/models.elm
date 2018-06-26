@@ -3,7 +3,6 @@ module Models exposing (..)
 import Date exposing (Date)
 import Time exposing (Time)
 import Maybe exposing (Maybe(..))
-import Dict exposing (..)
 
 
 -- our top level model for entire state.

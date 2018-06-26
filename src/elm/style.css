@@ -16,16 +16,16 @@ body {
   margin: 8px 0;
   display: flex;
   padding: 4px 8px;
-
   align-items: center;
 }
 
-.todo-editing {
+.todo-input  {
+  width: 200px;
+  background: #444;
+  font-size: 13px;
   border: none;
   outline: none;
   color: white;
-  padding: 0;
-  margin: 0;
 }
 
 .todo-completed {
