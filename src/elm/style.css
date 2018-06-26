@@ -33,6 +33,17 @@ body {
 }
 
 
+.todo-edit-btn {
+  opacity: 0.1;
+  cursor: pointer; 
+}
+
+.todo-edit-btn:hover {
+  opacity: 0.5;
+  cursor: pointer; 
+}
+
+
 /* ---------------------------------------------------------------------------*/
 
 /* utilities */

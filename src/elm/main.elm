@@ -186,7 +186,9 @@ viewTodo todo =
                         [ onClick (TodoToggleComplete todo.id (not todo.complete)) ]
                         [ text todo.name ]
                     , span
-                        [ onClick (TodoToggleEditing todo.id (not todo.isEditing)) ]
+                        [ class "todo-edit-btn"
+                        , onClick (TodoToggleEditing todo.id (not todo.isEditing))
+                        ]
                         [ text "edit" ]
                     ]
     in
