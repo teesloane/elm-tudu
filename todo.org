@@ -1,8 +1,15 @@
-* [ ] Create stack of todo entries up to N max per day.
 * [ ] Replace edit icon with pencil
 * [ ] Current day should be styled differently
 * [ ] If removing name/string of todo, it should delete it from the list.
 * [ ] remove unecessary id from todo model
+* [ ] clicking on viewTodoEmpty should focus viewTodoNew
+* [ ] clicking outside input should set editing to false
+* [ ] Feature: Drag and Drop
+* [ ] Feature: Future Weeks 
+* [ ] Feature: Previous Todo's roll over
+* [ ] Feature: Generic Lists at the bottom
+* [X] Create stack of todo entries up to N max per day.
+CLOSED: [2018-06-26 Tue 22:34]
 * [X] Create Todo
 CLOSED: [2018-06-26 Tue 19:28]
 - controlled inputs : dict> key date | value: input
@@ -23,3 +30,8 @@ We work around this by using List (Field, String) as a fake Dict and then filter
 errors : Dict String comparable -> Decoder (Dict comparable (List String))
 Right now we can't do that, because if we did we couldn't use union types for our fields.
     #+END_QUOTE
+
+* Links
+- [[http://package.elm-lang.org/packages/elm-lang/core/5.1.1/Date][elm core date]]
+- [[https://stackoverflow.com/questions/37910613/how-do-i-get-the-current-date-in-elm][get current date in elm]]
+- [[https://github.com/evancz/elm-todomvc/blob/master/Todo.elm][elm todo mvc (of course)]]

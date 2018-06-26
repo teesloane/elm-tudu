@@ -181,7 +181,10 @@ viewTodo todo =
                     ]
                     []
             else
-                div [ class "flex flex-auto justify-between" ]
+                div
+                    [ class "flex flex-auto justify-between pointer"
+                    , onClick (TodoToggleComplete todo.id (not todo.complete))
+                    ]
                     [ span
                         [ onClick (TodoToggleComplete todo.id (not todo.complete)) ]
                         [ text todo.name ]
@@ -210,9 +213,32 @@ viewTodoNew day =
         ]
 
 
-viewTodoEmpty : Html msg
-viewTodoEmpty =
-    div [ class "todo" ] [ text "" ]
+
+-- viewTodoFiller : Html msg
+-- viewTodoFiller model =
+
+
+{-| Fill empty todo space up to max (N).
+For the current day, see how many todos (t) there are, and then add N - t empty todos.
+-}
+viewTodoEmpty : { a | todos : List Todo } -> Date -> Html msg
+viewTodoEmpty model date =
+    let
+        maxRows =
+            10
+
+        todosPerDay =
+            model.todos
+                |> List.filter (taskInDate date)
+                |> List.length
+
+        renderRow _ =
+            div [ class "todo" ] [ text "" ]
+
+        _ =
+            Debug.log "todos per day " todosPerDay
+    in
+        div [] (List.map renderRow (List.range 0 (maxRows - todosPerDay)))
 
 
 {-| Displays the current week... should be able to partially apply the map...
@@ -235,7 +261,7 @@ viewDay model day =
             [ span [ class "h5 caps" ] [ text (dateFmt day.date) ]
             , div [] (List.map viewTodo todosByDay)
             , viewTodoNew day
-            , viewTodoEmpty -- make a bunch of empty ones of this
+            , viewTodoEmpty model day.date -- make a bunch of empty ones of this
             ]
 
 

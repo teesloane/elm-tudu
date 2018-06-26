@@ -13,9 +13,6 @@ type alias Model =
     , timeAtLoad : Time
     , dateAtLoad : Maybe Date
     , currentWeek : List Day
-
-    -- , inputFieldsByDate : Dict Date String
-    , inputFieldsByDateTwo : List ( Date, String )
     }
 
 
@@ -28,9 +25,6 @@ initialModel =
     , timeAtLoad = 0
     , dateAtLoad = Nothing
     , currentWeek = []
-
-    -- , inputFieldsByDate = Dict.empty
-    , inputFieldsByDateTwo = []
     }
 
 

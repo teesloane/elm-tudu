@@ -70,8 +70,6 @@ dateFmt date =
         ++ (toString <| Date.day date)
         ++ " "
         ++ (toString <| Date.month date)
-        ++ " "
-        ++ (toString <| Date.year date)
 
 
 onEnter : a -> Html.Attribute a
