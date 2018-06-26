@@ -20,8 +20,8 @@ type alias Model =
 initialModel : Model
 initialModel =
     { todos =
-        [ Todo "1" "Get milk" False 1530020370009
-        , Todo "2" "Do Thing" True 1529932761998
+        [ Todo "1" False "Get milk" False 1530020370009
+        , Todo "2" False "Do Thing" False 1530120370009
         ]
     , timeAtLoad = 0
     , dateAtLoad = Nothing
@@ -35,6 +35,7 @@ initialModel =
 
 type alias Todo =
     { id : String
+    , isEditing : Bool
     , name : String
     , complete : Bool
     , ts : Time

@@ -1,9 +1,10 @@
 module App exposing (..)
 
-import Html exposing (Html, button, div, ul, text, program, span)
+import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (Model, initialModel, Todo, Day)
+import Json.Decode as Json
 import Maybe exposing (Maybe(..))
 import Date exposing (Date)
 import Time exposing (Time)
@@ -38,8 +39,11 @@ getTime =
 
 
 type Msg
-    = ToggleTodo String Bool
+    = TodoToggleComplete String Bool
     | SetTimeAndWeek Time
+    | TodoToggleEditing String Bool
+    | TodoStopEditing String Bool
+    | TodoEditName String String
 
 
 
@@ -57,7 +61,7 @@ update msg model =
                 { model | timeAtLoad = time, currentWeek = (buildWeek time) }
                     ! []
 
-            ToggleTodo id isCompleted ->
+            TodoToggleComplete id isCompleted ->
                 let
                     todoNew t =
                         if t.id == id then
@@ -66,6 +70,39 @@ update msg model =
                             t
                 in
                     { model | todos = List.map todoNew model.todos }
+                        ! []
+
+            TodoToggleEditing id isEditing ->
+                let
+                    updateTodos t =
+                        if t.id == id then
+                            { t | isEditing = isEditing }
+                        else
+                            t
+                in
+                    { model | todos = List.map updateTodos model.todos }
+                        ! []
+
+            TodoStopEditing id isEditing ->
+                let
+                    updateTodos t =
+                        if t.id == id then
+                            { t | isEditing = isEditing }
+                        else
+                            t
+                in
+                    { model | todos = List.map updateTodos model.todos }
+                        ! []
+
+            TodoEditName id newChar ->
+                let
+                    updateTodos t =
+                        if t.id == id then
+                            { t | name = newChar }
+                        else
+                            t
+                in
+                    { model | todos = List.map updateTodos model.todos }
                         ! []
 
 
@@ -85,8 +122,8 @@ view model =
         ]
 
 
-{-| Display a single Todo. Conditionally styles it.
-Updates: ToggleTodo
+{-| Display a single Todo. Handles conditional styling, editing state, completion state.
+Updates: TodoToggleComplete, TodoToggleEditing, TodoEditName, TodoStopEditing
 -}
 viewTodo : Todo -> Html Msg
 viewTodo todo =
@@ -98,13 +135,28 @@ viewTodo todo =
                 "todo-incomplete"
 
         styleClasses =
-            String.concat [ "todo mt2 p1 pointer", " ", styleState ]
+            String.concat [ "todo ", styleState ]
+
+        todoEl =
+            if todo.isEditing then
+                input
+                    [ value todo.name
+                    , onInput (TodoEditName todo.id)
+                    , onEnter (TodoStopEditing todo.id (not todo.isEditing))
+                    , class "todo todo-editing"
+                    ]
+                    []
+            else
+                div [ class "flex flex-auto justify-between" ]
+                    [ span
+                        [ onClick (TodoToggleComplete todo.id (not todo.complete)) ]
+                        [ text todo.name ]
+                    , span
+                        [ onClick (TodoToggleEditing todo.id (not todo.isEditing)) ]
+                        [ text "edit" ]
+                    ]
     in
-        div
-            [ class styleClasses
-            , onClick (ToggleTodo todo.id (not todo.complete))
-            ]
-            [ text todo.name ]
+        div [ class styleClasses ] [ todoEl ]
 
 
 {-| Displays the current week... should be able to partially apply the map...
@@ -116,7 +168,6 @@ viewWeek model =
 
 
 {-| Renders a day: the date, and the todos for the date.
-TODO: run a filter with function that checks: if the todo timestamp matches the day using Date.day, Date.year
 -}
 viewDay : Model -> Date -> Html Msg
 viewDay model date =
@@ -125,7 +176,7 @@ viewDay model date =
             List.filter (taskInDate date) model.todos
     in
         div [ class "m2" ]
-            [ span [ class "caps" ] [ text (dateFmt date) ]
+            [ span [ class "h5 caps" ] [ text (dateFmt date) ]
             , div [] (List.map viewTodo todosByDay)
             ]
 
@@ -200,3 +251,16 @@ taskInDate date todo =
             True
         else
             False
+
+
+onEnter : Msg -> Html.Attribute Msg
+onEnter msg =
+    -- stolen from https://github.com/evancz/elm-todomvc/blob/166e5f2afc704629ee6d03de00deac892dfaeed0/Todo.elm#L237-L246
+    let
+        isEnter code =
+            if code == 13 then
+                Json.succeed msg
+            else
+                Json.fail "not ENTER"
+    in
+        on "keydown" (Json.andThen isEnter keyCode)
