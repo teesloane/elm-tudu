@@ -18,16 +18,29 @@ msInADay =
 
 {-| Creates a List of Day Types.
 -}
-buildWeek : Time -> List Day
+
+
+
+-- buildWeek : Time -> List Day
+
+
 buildWeek timestamp =
     let
         days =
-            [ 0, 1, 2, 3, 4, 5 ]
+            [ 0, 1, 2, 3, 4 ]
 
         transformDays num =
-            (Day False (Date.fromTime (timestamp + (toFloat (num * msInADay)))))
+            (Day False "" (Date.fromTime (timestamp + (toFloat (num * msInADay)))))
     in
         List.map transformDays days
+
+
+
+-- takes a list of days and returns a dict of day to strings.
+-- buildInputs currentWeek =
+--     List.map (\day -> ( day, "" )) currentWeek
+--         |> Dict.fromList
+-- Dict.fromList ( currentWeek, "" )
 
 
 {-| Return true if a todo's due date belongs to a Day

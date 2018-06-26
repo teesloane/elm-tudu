@@ -4,3 +4,20 @@
 * [ ] If removing name/string of todo, it should delete it from the list.
 * [ ] Create Todo
 - controlled inputs : dict> key date | value: input
+
+  
+* Notes
+** Comparable Dict.fromList 
+interesting: https://github.com/elm/compiler/issues/774
+  - ran into this  when trying to map over a list of DAYs but it wouldn't let me
+    do a Dict.fromList because Day wasn't comparable.
+    #+BEGIN_QUOTE
+    We've run into this a lot with validation errors.
+
+Specifically we want to enumerate all the fields on a form as a union type (e.g. type Field = Username | Password | Email), and then to represent validation errors as a Dict Field String so we can easily look up whether there is an error on a given field with things like Dict.get.
+
+We work around this by using List (Field, String) as a fake Dict and then filter it a lot. You can see a public example of where we're doing this here: http://package.elm-lang.org/packages/NoRedInk/elm-rails/1.1.0/Rails-Decode - we'd definitely prefer if that function had the following signature:
+
+errors : Dict String comparable -> Decoder (Dict comparable (List String))
+Right now we can't do that, because if we did we couldn't use union types for our fields.
+    #+END_QUOTE

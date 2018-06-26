@@ -34,7 +34,8 @@ type Msg
     | TodoToggleEditing String Bool
     | TodoStopEditing String Bool
     | TodoEditName String String
-    | TodoCreate Date
+    | TodoCreate Day
+    | TodoUpdateNewField Date String
 
 
 
@@ -50,8 +51,17 @@ update msg model =
         case msg of
             SetTimeAndWeek time ->
                 -- todo - set the inputFieldsByDate
-                { model | timeAtLoad = time, currentWeek = (buildWeek time) }
-                    ! []
+                let
+                    newWeek =
+                        (buildWeek time)
+                in
+                    { model
+                        | timeAtLoad = time
+                        , currentWeek = newWeek
+
+                        -- , inputFieldsByDate = (buildInputs newWeek)
+                    }
+                        ! []
 
             TodoToggleComplete id isCompleted ->
                 let
@@ -97,9 +107,22 @@ update msg model =
                     { model | todos = List.map updateTodos model.todos }
                         ! []
 
-            TodoCreate date ->
-                { model | todos = model.todos ++ [ (Todo "3" False "name" False (Date.toTime date)) ] }
+            TodoCreate day ->
+                { model
+                    | todos = model.todos ++ [ (Todo "3" False day.field False (Date.toTime day.date)) ]
+                }
                     ! []
+
+            TodoUpdateNewField date newChar ->
+                let
+                    updateDay t =
+                        if t.date == date then
+                            { t | field = newChar }
+                        else
+                            t
+                in
+                    { model | currentWeek = List.map updateDay model.currentWeek }
+                        ! []
 
 
 
@@ -157,11 +180,12 @@ viewTodo todo =
 
 {-| Creates a new todo; on render, creates a controlled input in inputFieldsByDate
 -}
-viewTodoNew : Date -> Html Msg
-viewTodoNew date =
+viewTodoNew : Day -> Html Msg
+viewTodoNew day =
     div [ class "todo flex flex-auto justify-between" ]
         [ input
-            [ onEnter (TodoCreate date)
+            [ onEnter (TodoCreate day)
+            , onInput (TodoUpdateNewField day.date)
             , class "todo-input"
             ]
             []
@@ -178,21 +202,21 @@ viewTodoEmpty =
 viewWeek : Model -> Html Msg
 viewWeek model =
     -- div [] (List.map (viewDay model) model.currentWeek) -- this should work?
-    div [ class "flex mx3" ] (List.map (\d -> div [] [ (viewDay model d.date) ]) model.currentWeek)
+    div [ class "flex mx3" ] (List.map (\d -> div [] [ (viewDay model d) ]) model.currentWeek)
 
 
 {-| Renders a day: the date, the todos for the date, empty slots for new todos.
 -}
-viewDay : Model -> Date -> Html Msg
-viewDay model date =
+viewDay : Model -> Day -> Html Msg
+viewDay model day =
     let
         todosByDay =
-            List.filter (taskInDate date) model.todos
+            List.filter (taskInDate day.date) model.todos
     in
         div [ class "m2" ]
-            [ span [ class "h5 caps" ] [ text (dateFmt date) ]
+            [ span [ class "h5 caps" ] [ text (dateFmt day.date) ]
             , div [] (List.map viewTodo todosByDay)
-            , viewTodoNew date
+            , viewTodoNew day
             , viewTodoEmpty -- make a bunch of empty ones of this
             ]
 
