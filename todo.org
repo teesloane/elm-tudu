@@ -2,7 +2,7 @@
 * [ ] Current day should be styled differently
 * [ ] If removing name/string of todo, it should delete it from the list.
 * [ ] remove unecessary id from todo model
-* [ ] clicking on viewTodoEmpty should focus viewTodoNew
+* [ ] clicking on viewTodoEmpty should focus viewTodoNew - [[https://ellie-app.com/embed/kqLTvMXJj3a1][example]]
 * [ ] clicking outside input should set editing to false
 * [ ] Feature: Drag and Drop
 * [ ] Feature: Future Weeks 
@@ -35,3 +35,5 @@ Right now we can't do that, because if we did we couldn't use union types for ou
 - [[http://package.elm-lang.org/packages/elm-lang/core/5.1.1/Date][elm core date]]
 - [[https://stackoverflow.com/questions/37910613/how-do-i-get-the-current-date-in-elm][get current date in elm]]
 - [[https://github.com/evancz/elm-todomvc/blob/master/Todo.elm][elm todo mvc (of course)]]
+- [[https://ellie-app.com/embed/kqLTvMXJj3a1][programmatic input focus]]
+- [[https://benpaulhanna.com/basic-html5-drag-and-drop-with-elm.html][drag and drop]]  

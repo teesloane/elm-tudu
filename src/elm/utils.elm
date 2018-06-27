@@ -8,7 +8,6 @@ import Html.Events exposing (..)
 import Models exposing (Model, initialModel, Todo, Day)
 import Json.Decode as Json
 import Date exposing (Date)
-import Time exposing (Time)
 
 
 msInADay : Int
@@ -24,6 +23,7 @@ msInADay =
 -- buildWeek : Time -> List Day
 
 
+buildWeek : Float -> List Day
 buildWeek timestamp =
     let
         days =

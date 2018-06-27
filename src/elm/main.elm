@@ -9,6 +9,7 @@ import Time exposing (Time)
 import Task exposing (Task)
 import Debug exposing (..)
 import Utils exposing (..)
+import Json.Decode as Json
 
 
 -- Boot up, on load commands
@@ -36,6 +37,9 @@ type Msg
     | TodoEditName String String
     | TodoCreate Day
     | TodoUpdateNewField Date String
+    | DragStart Todo
+    | DragEnd
+    | Drop
 
 
 
@@ -139,8 +143,37 @@ update msg model =
                     { model | currentWeek = List.map updateDay model.currentWeek }
                         ! []
 
+            DragStart x ->
+                let
+                    _ =
+                        Debug.log "dragging" x
+                in
+                    model
+                        ! []
+
+            DragEnd ->
+                let
+                    _ =
+                        Debug.log "drag end"
+                in
+                    { model | beingDragged = Nothing }
+                        ! []
+
+            Drop ->
+                let
+                    _ =
+                        Debug.log "dropping item"
+                in
+                    case model.beingDragged of
+                        Nothing ->
+                            model
+
+                        Just todo ->
+                            model
 
 
+
+-- goal: not adding to another list, but changing the ts.
 -- View
 
 
@@ -182,11 +215,17 @@ viewTodo todo =
                     []
             else
                 div
-                    [ class "flex flex-auto justify-between pointer"
-                    , onClick (TodoToggleComplete todo.id (not todo.complete))
+                    [ class "flex flex-auto justify-between cursor-drag"
+                    , draggable "true"
+                    , onDragStart <| DragStart todo
+
+                    -- , onClick (TodoToggleComplete todo.id (not todo.complete))
                     ]
                     [ span
-                        [ onClick (TodoToggleComplete todo.id (not todo.complete)) ]
+                        [ onClick (TodoToggleComplete todo.id (not todo.complete))
+                        , class "todo-draggable"
+                        , onDragStart <| DragStart todo
+                        ]
                         [ text todo.name ]
                     , span
                         [ class "todo-edit-btn"
@@ -286,3 +325,12 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+
+
+
+-- Custom Event message for dragging
+
+
+onDragStart msg =
+    on "dragstart" <|
+        Json.succeed msg

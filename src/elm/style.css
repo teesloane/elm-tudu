@@ -32,6 +32,10 @@ body {
   text-decoration: line-through;
 }
 
+.todo-draggable {
+  cursor: drag;
+}
+
 
 .todo-edit-btn {
   opacity: 0.1;
@@ -49,4 +53,9 @@ body {
 /* utilities */
 .pointer {
   cursor: pointer;
+}
+
+.cursor-drag {
+  cursor: move;
+  cursor: drag;
 }
