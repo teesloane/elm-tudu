@@ -30,11 +30,11 @@ getTime =
 
 
 type Msg
-    = TodoToggleComplete String Bool
+    = TodoToggleComplete Int Bool
     | SetTimeAndWeek Time
-    | TodoToggleEditing String Bool
-    | TodoStopEditing String Bool
-    | TodoEditName String String
+    | TodoToggleEditing Int Bool
+    | TodoStopEditing Int Bool
+    | TodoEditName Int String
     | TodoCreate Day
     | TodoUpdateNewField Date String
     | DragStart Todo
@@ -111,7 +111,7 @@ update msg model =
         TodoCreate day ->
             let
                 newTodo =
-                    (Todo "3" False day.field False (Date.toTime day.date))
+                    (Todo (model.uuid + 1) False day.field False (Date.toTime day.date))
 
                 clearDayField d =
                     if d.date == day.date then
@@ -126,6 +126,7 @@ update msg model =
                         else
                             model.todos ++ [ newTodo ]
                     , currentWeek = List.map clearDayField model.currentWeek
+                    , uuid = model.uuid + 1
                 }
                     ! []
 

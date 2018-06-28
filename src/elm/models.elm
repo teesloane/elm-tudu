@@ -12,6 +12,7 @@ type alias Model =
     { todos : List Todo
 
     -- , beingDragged : Maybe Todo
+    , uuid : Int
     , beingDragged : Bool
     , draggedTodo : Maybe Todo
     , dragTarget : Maybe Day
@@ -23,10 +24,8 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { todos =
-        [ Todo "1" False "Get milk" False 1530020370009
-        , Todo "2" False "Do Thing" False 1530120370009
-        ]
+    { todos = []
+    , uuid = 0
     , beingDragged = False
     , dragTarget = Nothing
     , draggedTodo = Nothing
@@ -41,7 +40,7 @@ initialModel =
 
 
 type alias Todo =
-    { id : String
+    { id : Int
     , isEditing : Bool
     , name : String
     , complete : Bool
