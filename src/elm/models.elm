@@ -10,7 +10,11 @@ import Maybe exposing (Maybe(..))
 
 type alias Model =
     { todos : List Todo
-    , beingDragged : Maybe Todo
+
+    -- , beingDragged : Maybe Todo
+    , beingDragged : Bool
+    , draggedTodo : Maybe Todo
+    , dragTarget : Maybe Day
     , timeAtLoad : Time
     , dateAtLoad : Maybe Date
     , currentWeek : List Day
@@ -23,7 +27,9 @@ initialModel =
         [ Todo "1" False "Get milk" False 1530020370009
         , Todo "2" False "Do Thing" False 1530120370009
         ]
-    , beingDragged = Nothing
+    , beingDragged = False
+    , dragTarget = Nothing
+    , draggedTodo = Nothing
     , timeAtLoad = 0
     , dateAtLoad = Nothing
     , currentWeek = []

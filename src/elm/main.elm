@@ -2,7 +2,7 @@ module App exposing (..)
 
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html.Events as Events exposing (..)
 import Models exposing (Model, initialModel, Todo, Day)
 import Date exposing (Date)
 import Time exposing (Time)
@@ -39,7 +39,8 @@ type Msg
     | TodoUpdateNewField Date String
     | DragStart Todo
     | DragEnd
-    | Drop
+    | DragOver Day
+    | Drop Day
 
 
 
@@ -48,128 +49,137 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        _ =
-            Debug.log "yo" (buildWeek model.timeAtLoad)
-    in
-        case msg of
-            SetTimeAndWeek time ->
-                -- todo - set the inputFieldsByDate
-                let
-                    newWeek =
-                        (buildWeek time)
-                in
-                    { model
-                        | timeAtLoad = time
-                        , currentWeek = newWeek
+    case msg of
+        SetTimeAndWeek time ->
+            -- todo - set the inputFieldsByDate
+            let
+                newWeek =
+                    (buildWeek time)
+            in
+                { model
+                    | timeAtLoad = time
+                    , currentWeek = newWeek
 
-                        -- , inputFieldsByDate = (buildInputs newWeek)
-                    }
-                        ! []
+                    -- , inputFieldsByDate = (buildInputs newWeek)
+                }
+                    ! []
 
-            TodoToggleComplete id isCompleted ->
-                let
-                    todoNew t =
-                        if t.id == id then
-                            { t | complete = isCompleted }
+        TodoToggleComplete id isCompleted ->
+            let
+                todoNew t =
+                    if t.id == id then
+                        { t | complete = isCompleted }
+                    else
+                        t
+            in
+                { model | todos = List.map todoNew model.todos }
+                    ! []
+
+        TodoToggleEditing id isEditing ->
+            let
+                updateTodos t =
+                    if t.id == id then
+                        { t | isEditing = isEditing }
+                    else
+                        t
+            in
+                { model | todos = List.map updateTodos model.todos }
+                    ! []
+
+        TodoStopEditing id isEditing ->
+            let
+                updateTodos t =
+                    if t.id == id then
+                        { t | isEditing = isEditing }
+                    else
+                        t
+            in
+                { model | todos = List.map updateTodos model.todos }
+                    ! []
+
+        TodoEditName id newChar ->
+            let
+                updateTodos t =
+                    if t.id == id then
+                        { t | name = newChar }
+                    else
+                        t
+            in
+                { model | todos = List.map updateTodos model.todos }
+                    ! []
+
+        TodoCreate day ->
+            let
+                newTodo =
+                    (Todo "3" False day.field False (Date.toTime day.date))
+
+                clearDayField d =
+                    if d.date == day.date then
+                        { d | field = "" }
+                    else
+                        d
+            in
+                { model
+                    | todos =
+                        if String.isEmpty day.field then
+                            model.todos
                         else
-                            t
-                in
-                    { model | todos = List.map todoNew model.todos }
-                        ! []
+                            model.todos ++ [ newTodo ]
+                    , currentWeek = List.map clearDayField model.currentWeek
+                }
+                    ! []
 
-            TodoToggleEditing id isEditing ->
-                let
-                    updateTodos t =
-                        if t.id == id then
-                            { t | isEditing = isEditing }
-                        else
-                            t
-                in
-                    { model | todos = List.map updateTodos model.todos }
-                        ! []
+        TodoUpdateNewField date newChar ->
+            let
+                updateDay t =
+                    if t.date == date then
+                        { t | field = newChar }
+                    else
+                        t
+            in
+                { model | currentWeek = List.map updateDay model.currentWeek }
+                    ! []
 
-            TodoStopEditing id isEditing ->
-                let
-                    updateTodos t =
-                        if t.id == id then
-                            { t | isEditing = isEditing }
-                        else
-                            t
-                in
-                    { model | todos = List.map updateTodos model.todos }
-                        ! []
+        DragStart todo ->
+            { model
+                | draggedTodo = Just todo
+                , beingDragged = True
+            }
+                ! []
 
-            TodoEditName id newChar ->
-                let
-                    updateTodos t =
-                        if t.id == id then
-                            { t | name = newChar }
-                        else
-                            t
-                in
-                    { model | todos = List.map updateTodos model.todos }
-                        ! []
+        DragEnd ->
+            { model | beingDragged = False }
+                ! []
 
-            TodoCreate day ->
-                let
-                    newTodo =
-                        (Todo "3" False day.field False (Date.toTime day.date))
+        DragOver date ->
+            { model | dragTarget = Just date }
+                ! []
 
-                    clearDayField d =
-                        if d.date == day.date then
-                            { d | field = "" }
-                        else
-                            d
-                in
-                    { model
-                        | todos =
-                            if String.isEmpty day.field then
-                                model.todos
-                            else
-                                model.todos ++ [ newTodo ]
-                        , currentWeek = List.map clearDayField model.currentWeek
-                    }
-                        ! []
+        Drop todo ->
+            -- hmmmm. nested cases.
+            case model.draggedTodo of
+                Nothing ->
+                    ( model, Cmd.none )
 
-            TodoUpdateNewField date newChar ->
-                let
-                    updateDay t =
-                        if t.date == date then
-                            { t | field = newChar }
-                        else
-                            t
-                in
-                    { model | currentWeek = List.map updateDay model.currentWeek }
-                        ! []
-
-            DragStart x ->
-                let
-                    _ =
-                        Debug.log "dragging" x
-                in
-                    model
-                        ! []
-
-            DragEnd ->
-                let
-                    _ =
-                        Debug.log "drag end"
-                in
-                    { model | beingDragged = Nothing }
-                        ! []
-
-            Drop ->
-                let
-                    _ =
-                        Debug.log "dropping item"
-                in
-                    case model.beingDragged of
+                Just todo ->
+                    case model.dragTarget of
                         Nothing ->
-                            model
+                            ( model, Cmd.none )
 
-                        Just todo ->
-                            model
+                        Just targetDay ->
+                            let
+                                updateTodos t =
+                                    if t.id == todo.id then
+                                        { t | ts = (Date.toTime targetDay.date) }
+                                    else
+                                        t
+                            in
+                                { model
+                                    | todos = List.map updateTodos model.todos
+                                    , dragTarget = Nothing
+                                    , beingDragged = False
+                                }
+                                    ! []
 
 
 
@@ -273,11 +283,13 @@ viewTodoEmpty model date =
 
         renderRow _ =
             div [ class "todo" ] [ text "" ]
-
-        _ =
-            Debug.log "todos per day " todosPerDay
     in
         div [] (List.map renderRow (List.range 0 (maxRows - todosPerDay)))
+
+
+viewTodoDropZone : Day -> Html Msg
+viewTodoDropZone day =
+    div [ class "todo", onDragOver (DragOver day), onDrop (Drop day) ] [ text "" ]
 
 
 {-| Displays the current week... should be able to partially apply the map...
@@ -298,6 +310,10 @@ viewDay model day =
     in
         div [ class "m2" ]
             [ span [ class "h5 caps" ] [ text (dateFmt day.date) ]
+            , if model.beingDragged then
+                viewTodoDropZone day
+              else
+                div [] []
             , div [] (List.map viewTodo todosByDay)
             , viewTodoNew day
             , viewTodoEmpty model day.date -- make a bunch of empty ones of this
@@ -331,6 +347,27 @@ main =
 -- Custom Event message for dragging
 
 
+onDragStart : a -> Html.Attribute a
 onDragStart msg =
     on "dragstart" <|
+        Json.succeed msg
+
+
+onDragOver : a -> Html.Attribute a
+onDragOver msg =
+    Events.onWithOptions "dragover"
+        { stopPropagation = False
+        , preventDefault = True
+        }
+    <|
+        Json.succeed msg
+
+
+onDrop : a -> Html.Attribute a
+onDrop msg =
+    Events.onWithOptions "drop"
+        { stopPropagation = False
+        , preventDefault = True
+        }
+    <|
         Json.succeed msg
