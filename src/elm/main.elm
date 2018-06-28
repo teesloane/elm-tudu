@@ -224,6 +224,7 @@ viewTodo todo =
                     , class "todo-input"
                     ]
                     []
+                -- div [ class "todo", onDragOver (DragOver day), onDrop (Drop day) ] [ text "" ]
             else
                 div
                     [ class "flex flex-auto justify-between cursor-drag"
@@ -263,19 +264,17 @@ viewTodoNew day =
         ]
 
 
-
--- viewTodoFiller : Html msg
--- viewTodoFiller model =
-
-
 {-| Fill empty todo space up to max (N).
 For the current day, see how many todos (t) there are, and then add N - t empty todos.
 -}
-viewTodoEmpty : { a | todos : List Todo } -> Date -> Html msg
+viewTodoEmpty : Model -> Date -> Html msg
 viewTodoEmpty model date =
     let
         maxRows =
-            10
+            if model.beingDragged then
+                6
+            else
+                7
 
         todosPerDay =
             model.todos
