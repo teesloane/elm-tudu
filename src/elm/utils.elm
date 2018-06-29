@@ -2,10 +2,9 @@ module Utils exposing (..)
 
 import Date exposing (Date)
 import Time exposing (Time)
-import Models exposing (Model, initialModel, Todo, Day)
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events exposing (..)
-import Models exposing (Model, initialModel, Todo, Day)
+import Models exposing (Model, initialModel, Todo)
 import Json.Decode as Json
 import Date exposing (Date)
 
@@ -21,26 +20,30 @@ msInADay =
 
 
 -- buildWeek : Time -> List Day
+-- buildWeek : Float -> List Day
 
 
-buildWeek : Float -> List Day
 buildWeek timestamp =
     let
         days =
             [ 0, 1, 2, 3, 4 ]
 
-        transformDays num =
-            (Day False "" (Date.fromTime (timestamp + (toFloat (num * msInADay)))))
+        buildTodoLists num =
+            let
+                n_date =
+                    (Date.fromTime (timestamp + (toFloat (num * msInADay))))
+
+                newTodoList =
+                    { hasTodos = False
+                    , inputField = ""
+                    , name = (dateFmt n_date)
+                    , date = n_date
+                    , ts = (Date.toTime n_date)
+                    }
+            in
+                newTodoList
     in
-        List.map transformDays days
-
-
-
--- takes a list of days and returns a dict of day to strings.
--- buildInputs currentWeek =
---     List.map (\day -> ( day, "" )) currentWeek
---         |> Dict.fromList
--- Dict.fromList ( currentWeek, "" )
+        List.map buildTodoLists days
 
 
 {-| Return true if a todo's due date belongs to a Day

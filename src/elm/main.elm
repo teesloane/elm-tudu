@@ -1,15 +1,14 @@
 module App exposing (..)
 
 import Html exposing (Html, button, input, div, ul, text, program, span)
-import Html.Attributes exposing (..)
 import Html.Events as Events exposing (..)
-import Models exposing (Model, initialModel, Todo, Day)
+import Html.Attributes exposing (..)
+import Models exposing (Model, initialModel, Todo, TodoList)
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
 import Debug exposing (..)
 import Utils exposing (..)
-import Json.Decode as Json
 import Drag as Drag exposing (..)
 
 
@@ -36,12 +35,12 @@ type Msg
     | TodoToggleEditing Int Bool
     | TodoStopEditing Int Bool
     | TodoEditName Int String
-    | TodoCreate Day
-    | TodoUpdateNewField Date String
+    | TodoCreate TodoList
+    | TodoUpdateNewField TodoList String
     | DragStart Todo
     | DragEnd
-    | DragOver Day
-    | Drop Day
+    | DragOver TodoList
+    | Drop TodoList
 
 
 
@@ -106,37 +105,43 @@ update msg model =
                 { model | todos = List.map updateTodos model.todos }
                     ! []
 
-        TodoCreate day ->
+        TodoCreate todoList ->
             let
                 newTodo =
-                    (Todo (model.uuid + 1) False day.field False (Date.toTime day.date))
+                    { id = model.uuid + 1
+                    , isEditing = False
+                    , name = todoList.inputField
+                    , complete = False
+                    , parentList = todoList.name
+                    , ts = (Date.toTime todoList.date)
+                    }
 
-                clearDayField d =
-                    if d.date == day.date then
-                        { d | field = "" }
+                cleartodoListField d =
+                    if d.name == todoList.name then
+                        { d | inputField = "" }
                     else
                         d
             in
                 { model
                     | todos =
-                        if String.isEmpty day.field then
+                        if String.isEmpty todoList.inputField then
                             model.todos
                         else
                             model.todos ++ [ newTodo ]
-                    , currentWeek = List.map clearDayField model.currentWeek
+                    , currentWeek = List.map cleartodoListField model.currentWeek
                     , uuid = model.uuid + 1
                 }
                     ! []
 
-        TodoUpdateNewField date newChar ->
+        TodoUpdateNewField todoList newChar ->
             let
-                updateDay t =
-                    if t.date == date then
-                        { t | field = newChar }
+                updateTodoList t =
+                    if t.name == todoList.name then
+                        { t | inputField = newChar }
                     else
                         t
             in
-                { model | currentWeek = List.map updateDay model.currentWeek }
+                { model | currentWeek = List.map updateTodoList model.currentWeek }
                     ! []
 
         DragStart todo ->
@@ -192,14 +197,11 @@ viewTodo todo =
                     , class "todo-input"
                     ]
                     []
-                -- div [ class "todo", Drag.onDragOver (DragOver day), Drag.onDrop (Drop day) ] [ text "" ]
             else
                 div
                     [ class "flex flex-auto justify-between cursor-drag"
                     , draggable "true"
                     , Drag.onStart <| DragStart todo
-
-                    -- , onClick (TodoToggleComplete todo.id (not todo.complete))
                     ]
                     [ span
                         [ onClick (TodoToggleComplete todo.id (not todo.complete))
@@ -219,13 +221,13 @@ viewTodo todo =
 
 {-| Creates a new todo; on render, creates a controlled input in inputFieldsByDate
 -}
-viewTodoNew : Day -> Html Msg
-viewTodoNew day =
+viewTodoNew : TodoList -> Html Msg
+viewTodoNew todoList =
     div [ class "todo flex flex-auto justify-between" ]
         [ input
-            [ onEnter (TodoCreate day)
-            , value day.field
-            , onInput (TodoUpdateNewField day.date)
+            [ onEnter (TodoCreate todoList)
+            , value todoList.inputField
+            , onInput (TodoUpdateNewField todoList)
             , class "todo-input"
             ]
             []
@@ -233,7 +235,7 @@ viewTodoNew day =
 
 
 {-| Fill empty todo space up to max (N).
-For the current day, see how many todos (t) there are, and then add N - t empty todos.
+For the current todoList , see how many todos (t) there are, and then add N - t empty todos.
 -}
 viewTodoEmpty : Model -> Date -> Html msg
 viewTodoEmpty model date =
@@ -244,7 +246,7 @@ viewTodoEmpty model date =
             else
                 7
 
-        todosPerDay =
+        todosPerTodoList =
             model.todos
                 |> List.filter (taskInDate date)
                 |> List.length
@@ -252,39 +254,39 @@ viewTodoEmpty model date =
         renderRow _ =
             div [ class "todo" ] [ text "" ]
     in
-        div [] (List.map renderRow (List.range 0 (maxRows - todosPerDay)))
+        div [] (List.map renderRow (List.range 0 (maxRows - todosPerTodoList)))
 
 
-viewTodoDropZone : Day -> Html Msg
-viewTodoDropZone day =
-    div [ class "todo", Drag.onOver (DragOver day), Drag.onDrop (Drop day) ] [ text "" ]
+viewTodoDropZone : TodoList -> Html Msg
+viewTodoDropZone todoList =
+    div [ class "todo", Drag.onOver (DragOver todoList), Drag.onDrop (Drop todoList) ] [ text "" ]
 
 
 {-| Displays the current week... should be able to partially apply the map...
 -}
 viewWeek : Model -> Html Msg
 viewWeek model =
-    -- div [] (List.map (viewDay model) model.currentWeek) -- this should work?
-    div [ class "flex mx3" ] (List.map (\d -> div [] [ (viewDay model d) ]) model.currentWeek)
+    -- div [] (List.map (viewTodoList model) model.currentWeek) -- this should work?
+    div [ class "flex mx3" ] (List.map (\d -> div [] [ (viewTodoList model d) ]) model.currentWeek)
 
 
 {-| Renders a day: the date, the todos for the date, empty slots for new todos.
 -}
-viewDay : Model -> Day -> Html Msg
-viewDay model day =
+viewTodoList : Model -> TodoList -> Html Msg
+viewTodoList model todoList =
     let
-        todosByDay =
-            List.filter (taskInDate day.date) model.todos
+        todosByTodoList =
+            List.filter (taskInDate todoList.date) model.todos
     in
         div [ class "m2" ]
-            [ span [ class "h5 caps" ] [ text (dateFmt day.date) ]
+            [ span [ class "h5 caps" ] [ text (dateFmt todoList.date) ]
             , if model.beingDragged then
-                viewTodoDropZone day
+                viewTodoDropZone todoList
               else
                 div [] []
-            , div [] (List.map viewTodo todosByDay)
-            , viewTodoNew day
-            , viewTodoEmpty model day.date -- make a bunch of empty ones of this
+            , div [] (List.map viewTodo todosByTodoList)
+            , viewTodoNew todoList
+            , viewTodoEmpty model todoList.date -- make a bunch of empty ones of this
             ]
 
 

@@ -15,10 +15,10 @@ type alias Model =
     , uuid : Int
     , beingDragged : Bool
     , draggedTodo : Maybe Todo
-    , dragTarget : Maybe Day
+    , dragTarget : Maybe TodoList
     , timeAtLoad : Time
     , dateAtLoad : Maybe Date
-    , currentWeek : List Day
+    , currentWeek : List TodoList
     }
 
 
@@ -44,12 +44,19 @@ type alias Todo =
     , isEditing : Bool
     , name : String
     , complete : Bool
+    , parentList : TodoListName
     , ts : Time
     }
 
 
-type alias Day =
+type alias TodoListName =
+    String
+
+
+type alias TodoList =
     { hasTodos : Bool
-    , field : String
+    , inputField : String
     , date : Date
+    , name : TodoListName
+    , ts : Time
     }
