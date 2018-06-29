@@ -10,6 +10,7 @@ import Task exposing (Task)
 import Debug exposing (..)
 import Utils exposing (..)
 import Json.Decode as Json
+import Drag as Drag exposing (..)
 
 
 -- Boot up, on load commands
@@ -51,7 +52,6 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetTimeAndWeek time ->
-            -- todo - set the inputFieldsByDate
             let
                 newWeek =
                     (buildWeek time)
@@ -59,8 +59,6 @@ update msg model =
                 { model
                     | timeAtLoad = time
                     , currentWeek = newWeek
-
-                    -- , inputFieldsByDate = (buildInputs newWeek)
                 }
                     ! []
 
@@ -142,49 +140,19 @@ update msg model =
                     ! []
 
         DragStart todo ->
-            { model
-                | draggedTodo = Just todo
-                , beingDragged = True
-            }
-                ! []
+            Drag.start model todo
 
         DragEnd ->
-            { model | beingDragged = False }
-                ! []
+            Drag.end model
 
         DragOver date ->
-            { model | dragTarget = Just date }
-                ! []
+            Drag.over model date
 
         Drop todo ->
-            -- hmmmm. nested cases.
-            case model.draggedTodo of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just todo ->
-                    case model.dragTarget of
-                        Nothing ->
-                            ( model, Cmd.none )
-
-                        Just targetDay ->
-                            let
-                                updateTodos t =
-                                    if t.id == todo.id then
-                                        { t | ts = (Date.toTime targetDay.date) }
-                                    else
-                                        t
-                            in
-                                { model
-                                    | todos = List.map updateTodos model.todos
-                                    , dragTarget = Nothing
-                                    , beingDragged = False
-                                }
-                                    ! []
+            Drag.drop model todo
 
 
 
--- goal: not adding to another list, but changing the ts.
 -- View
 
 
@@ -224,19 +192,19 @@ viewTodo todo =
                     , class "todo-input"
                     ]
                     []
-                -- div [ class "todo", onDragOver (DragOver day), onDrop (Drop day) ] [ text "" ]
+                -- div [ class "todo", Drag.onDragOver (DragOver day), Drag.onDrop (Drop day) ] [ text "" ]
             else
                 div
                     [ class "flex flex-auto justify-between cursor-drag"
                     , draggable "true"
-                    , onDragStart <| DragStart todo
+                    , Drag.onStart <| DragStart todo
 
                     -- , onClick (TodoToggleComplete todo.id (not todo.complete))
                     ]
                     [ span
                         [ onClick (TodoToggleComplete todo.id (not todo.complete))
                         , class "todo-draggable"
-                        , onDragStart <| DragStart todo
+                        , Drag.onStart <| DragStart todo
                         ]
                         [ text todo.name ]
                     , span
@@ -289,7 +257,7 @@ viewTodoEmpty model date =
 
 viewTodoDropZone : Day -> Html Msg
 viewTodoDropZone day =
-    div [ class "todo", onDragOver (DragOver day), onDrop (Drop day) ] [ text "" ]
+    div [ class "todo", Drag.onOver (DragOver day), Drag.onDrop (Drop day) ] [ text "" ]
 
 
 {-| Displays the current week... should be able to partially apply the map...
@@ -341,33 +309,3 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
-
-
-
--- Custom Event message for dragging
-
-
-onDragStart : a -> Html.Attribute a
-onDragStart msg =
-    on "dragstart" <|
-        Json.succeed msg
-
-
-onDragOver : a -> Html.Attribute a
-onDragOver msg =
-    Events.onWithOptions "dragover"
-        { stopPropagation = False
-        , preventDefault = True
-        }
-    <|
-        Json.succeed msg
-
-
-onDrop : a -> Html.Attribute a
-onDrop msg =
-    Events.onWithOptions "drop"
-        { stopPropagation = False
-        , preventDefault = True
-        }
-    <|
-        Json.succeed msg
