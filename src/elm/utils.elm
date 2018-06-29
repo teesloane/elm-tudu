@@ -2,12 +2,12 @@ module Utils exposing (..)
 
 import Date exposing (Date)
 import Time exposing (Time)
-import Models exposing (Model, initialModel, Todo, TodoList)
+import Models exposing (Model, initialModel, Todo, Day)
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events exposing (..)
+import Models exposing (Model, initialModel, Todo, Day)
 import Json.Decode as Json
 import Date exposing (Date)
-import Dict exposing (..)
 
 
 msInADay : Int
@@ -15,40 +15,52 @@ msInADay =
     86400000
 
 
-{-| Creates multiple TodoList that is treated as days in a week.
-Maps over N days, creating a list of dateString/TodoList tuples
-This gets turned into a dict. FIXME: refactor.
+{-| Creates a List of Day Types.
 -}
+
+
+
+-- buildWeek : Time -> List Day
+
+
+buildWeek : Float -> List Day
 buildWeek timestamp =
     let
         days =
             [ 0, 1, 2, 3, 4 ]
 
-        buildTodoLists num =
-            let
-                n_date =
-                    (Date.fromTime (timestamp + (toFloat (num * msInADay))))
-
-                newTodoList =
-                    { hasTodos = False
-                    , inputField = ""
-                    , name = (dateFmt n_date)
-                    , date = n_date
-                    , ts = (Date.toTime n_date)
-                    , todos = []
-                    }
-            in
-                ( (dateFmt n_date), newTodoList )
+        transformDays num =
+            (Day False "" (Date.fromTime (timestamp + (toFloat (num * msInADay)))))
     in
-        days
-            |> List.map buildTodoLists
-            |> Dict.fromList
+        List.map transformDays days
 
 
-getSortedWeek week =
-    week
-        |> Dict.values
-        |> List.sortBy .ts
+
+-- takes a list of days and returns a dict of day to strings.
+-- buildInputs currentWeek =
+--     List.map (\day -> ( day, "" )) currentWeek
+--         |> Dict.fromList
+-- Dict.fromList ( currentWeek, "" )
+
+
+{-| Return true if a todo's due date belongs to a Day
+-}
+taskInDate : Date -> Todo -> Bool
+taskInDate date todo =
+    let
+        todoYear =
+            todo.ts |> Date.fromTime |> Date.year
+
+        todoMonth =
+            todo.ts |> Date.fromTime |> Date.month
+
+        todoDay =
+            todo.ts |> Date.fromTime |> Date.day
+    in
+        if todoDay == (Date.day date) && (Date.year date) == todoYear && (Date.month date) == todoMonth then
+            True
+        else
+            False
 
 
 dateFmt : Date -> String
