@@ -3,6 +3,7 @@ module Models exposing (..)
 import Date exposing (Date)
 import Time exposing (Time)
 import Maybe exposing (Maybe(..))
+import Dict exposing (..)
 
 
 -- our top level model for entire state.
@@ -15,10 +16,10 @@ type alias Model =
     , uuid : Int
     , beingDragged : Bool
     , draggedTodo : Maybe Todo
-    , dragTarget : Maybe Day
+    , dragTarget : Maybe TodoList
     , timeAtLoad : Time
     , dateAtLoad : Maybe Date
-    , currentWeek : List Day
+    , todoLists : Dict String TodoList
     }
 
 
@@ -31,7 +32,7 @@ initialModel =
     , draggedTodo = Nothing
     , timeAtLoad = 0
     , dateAtLoad = Nothing
-    , currentWeek = []
+    , todoLists = Dict.empty
     }
 
 
@@ -44,12 +45,20 @@ type alias Todo =
     , isEditing : Bool
     , name : String
     , complete : Bool
+    , parentList : TodoListName
     , ts : Time
     }
 
 
-type alias Day =
+type alias TodoListName =
+    String
+
+
+type alias TodoList =
     { hasTodos : Bool
-    , field : String
+    , inputField : String
+    , name : TodoListName
     , date : Date
+    , ts : Time
+    , todos : List Todo
     }
