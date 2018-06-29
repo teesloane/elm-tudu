@@ -11,6 +11,7 @@ import Utils exposing (..)
 import Json.Decode as Json
 import Dict exposing (..)
 import Debug exposing (..)
+import Maybe exposing (..)
 
 
 -- Boot up, on load commands
@@ -160,7 +161,7 @@ update msg model =
                 ! []
 
         Drop todo ->
-            -- hmmmm. nested cases.
+            -- FIXME hmmmm. nested cases.
             case model.draggedTodo of
                 Nothing ->
                     ( model, Cmd.none )
@@ -170,25 +171,32 @@ update msg model =
                         Nothing ->
                             ( model, Cmd.none )
 
-                        Just targetDay ->
-                            let
-                                updateTodos t =
-                                    if t.id == todo.id then
-                                        { t | ts = (Date.toTime targetDay.date) }
-                                    else
-                                        t
-                            in
-                                { model
-                                    | todos = List.map updateTodos model.todos
-                                    , dragTarget = Nothing
-                                    , beingDragged = False
-                                }
-                                    ! []
+                        Just targetList ->
+                            case (Dict.get todo.parentList model.todoLists) of
+                                Nothing ->
+                                    ( model, Cmd.none )
 
+                                Just oldList ->
+                                    let
+                                        -- explore filterMap + Dict.update maybe instead of this kludge.
+                                        oldTodoListWithRemovedTodo =
+                                            { oldList | todos = List.filter (\t -> t.id /= todo.id) oldList.todos }
 
+                                        newTodoList =
+                                            { targetList | todos = targetList.todos ++ [ todo ] }
 
--- goal: not adding to another list, but changing the ts.
--- View
+                                        newModel =
+                                            { model
+                                                | dragTarget = Nothing
+                                                , beingDragged = False
+                                                , draggedTodo = Nothing
+                                                , todoLists =
+                                                    model.todoLists
+                                                        |> Dict.insert targetList.name newTodoList
+                                                        |> Dict.insert todo.parentList oldTodoListWithRemovedTodo
+                                            }
+                                    in
+                                        ( newModel, Cmd.none )
 
 
 view : Model -> Html Msg
