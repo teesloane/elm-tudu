@@ -68,26 +68,28 @@ over model targetTodo =
             ( model, Cmd.none )
 
         Just draggedTodo_ ->
-            let
-                _ =
-                    Debug.log "Target todo is " targetTodo
-            in
-                case targetTodo of
-                    Nothing ->
-                        ( model, Cmd.none )
+            case targetTodo of
+                Nothing ->
+                    ( model, Cmd.none )
 
-                    Just targetTodo_ ->
-                        let
-                            todoWithNewOrder =
-                                { draggedTodo_ | order = targetTodo_.order }
-                        in
-                            ( { model
-                                | draggedTodo = (Just todoWithNewOrder)
-                                , dragTarget = (Just targetTodo_)
-                                , dragTargetExists = True
-                              }
-                            , Cmd.none
-                            )
+                Just targetTodo_ ->
+                    let
+                        todoWithNewOrder =
+                            { draggedTodo_ | order = targetTodo_.order }
+                    in
+                        ( { model
+                            | draggedTodo = (Just todoWithNewOrder)
+                            , dragTarget =
+                                if targetTodo_.id /= draggedTodo_.id then
+                                    (Just targetTodo_)
+                                else
+                                    Nothing
+
+                            -- Nothing
+                            , dragTargetExists = True
+                          }
+                        , Cmd.none
+                        )
 
 
 {-| Changes timestamp of a todo when it's dropped

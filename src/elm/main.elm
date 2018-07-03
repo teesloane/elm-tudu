@@ -190,30 +190,22 @@ Updates: TodoToggleComplete, TodoToggleEditing, TodoEditName, TodoStopEditing
 
 
 viewTodo model todo =
-    let
-        styleState =
-            if todo.complete then
-                "todo-completed"
-            else
-                "todo-incomplete"
+    case model.draggedTodo of
+        Nothing ->
+            viewTodoState_Default model todo
 
-        styleClasses =
-            String.concat [ "todo ", styleState ]
+        Just draggedTodo_ ->
+            case model.dragTarget of
+                Nothing ->
+                    viewTodoState_Default model todo
 
-        todoEl =
-            -- The todo is being edited
-            if todo.isEditing then
-                viewTodoState_Editing model todo
-            else if model.beingDragged && model.dragTargetExists then
-                -- AND... the order is within +- 1 of the dragTarget
-                viewTodoDropZone model todo
-                --     div
-                --         [ class "todo", Drag.onOver (DragOver todo), Drag.onDrop (Drop todo) ]
-                --         [ text "Drop Here" ]
-            else
-                viewTodoState_Default model todo
-    in
-        div [ class styleClasses ] [ todoEl ]
+                Just targetTodo_ ->
+                    if todo.isEditing then
+                        viewTodoState_Editing model todo
+                    else if targetTodo_.id == todo.id && targetTodo_.id /= draggedTodo_.id then
+                        viewTodoDropZone model todo
+                    else
+                        viewTodoState_Default model todo
 
 
 viewTodoState_Editing model todo =
@@ -227,24 +219,36 @@ viewTodoState_Editing model todo =
 
 
 viewTodoState_Default model todo =
-    div
-        [ class "flex flex-auto justify-between cursor-drag"
-        , draggable "true"
-        , Drag.onStart <| DragStart todo
-        , Drag.onOver (DragOver todo)
-        ]
-        [ span
-            [ onClick (TodoToggleComplete todo.id (not todo.complete))
-            , class "todo-draggable"
-            , Drag.onStart <| DragStart todo
+    let
+        styleState =
+            if todo.complete then
+                "todo-completed"
+            else
+                "todo-incomplete"
+
+        styleClasses =
+            String.concat [ "todo ", styleState ]
+    in
+        div [ class styleClasses ]
+            [ div
+                [ class "flex flex-auto justify-between cursor-drag"
+                , draggable "true"
+                , Drag.onStart <| DragStart todo
+                , Drag.onOver (DragOver todo)
+                ]
+                [ span
+                    [ onClick (TodoToggleComplete todo.id (not todo.complete))
+                    , class "todo-draggable"
+                    , Drag.onStart <| DragStart todo
+                    ]
+                    [ text todo.name ]
+                , span
+                    [ class "todo-edit-btn"
+                    , onClick (TodoToggleEditing todo.id (not todo.isEditing))
+                    ]
+                    [ text "edit" ]
+                ]
             ]
-            [ text todo.name ]
-        , span
-            [ class "todo-edit-btn"
-            , onClick (TodoToggleEditing todo.id (not todo.isEditing))
-            ]
-            [ text "edit" ]
-        ]
 
 
 {-| Creates a new todo; on render, creates a controlled input in inputFieldsByDate
@@ -286,36 +290,14 @@ viewTodoEmpty model date =
 
 
 viewTodoDropZone model todo =
-    let
-        _ =
-            Debug.log "drag target is" model.dragTarget
-
-        _ =
-            Debug.log "draggedTodo is" model.draggedTodo
-    in
-        case model.draggedTodo of
-            Nothing ->
-                div [] []
-
-            draggedTodo_ ->
-                case model.dragTarget of
-                    Nothing ->
-                        div [] []
-
-                    dragTarget_ ->
-                        let
-                            _ =
-                                Debug.log "drag target is" dragTarget_
-
-                            _ =
-                                Debug.log "draggedTodo is" draggedTodo_
-                        in
-                            -- if draggedTodo_.order == dragTarget.order then
-                            if model.draggedTodo.order == model.dragTarget.order then
-                                div [] [ text "IM REAL DORP ZONE" ]
-                            else
-                                --     div [] [ text "not same order" ]
-                                viewTodoState_Default model todo
+    div [ class "todo todo-incomplete" ]
+        [ div
+            [ class "flex flex-auto justify-between cursor-drag"
+            , Drag.onOver (DragOver todo)
+            , Drag.onDrop (Drop todo)
+            ]
+            [ text "waiting" ]
+        ]
 
 
 {-| Displays the current week... should be able to partially apply the map...
@@ -336,11 +318,6 @@ viewTodoList model todoList =
     in
         div [ class "m2" ]
             [ span [ class "h5 caps" ] [ text (dateFmt todoList.date) ]
-
-            -- , if model.beingDragged then
-            --     viewTodoDropZone todoList
-            --   else
-            --     div [] []
             , div [] (List.map (viewTodo model) todosByTodoList)
             , viewTodoNew todoList
             , viewTodoEmpty model todoList.date -- make a bunch of empty ones of this
