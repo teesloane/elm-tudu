@@ -41,7 +41,7 @@ type Msg
     | TodoCreate TodoList
     | TodoUpdateNewField TodoList String
     | DragStart Todo
-    | DragEnd
+    | DragEnd Todo
     | DragOver Todo
     | Drop Todo
 
@@ -154,8 +154,8 @@ update msg model =
         DragStart todo ->
             Drag.start model (Just todo)
 
-        DragEnd ->
-            Drag.end model
+        DragEnd todo ->
+            Drag.end model (Just todo)
 
         DragOver todo ->
             Drag.over model (Just todo)
@@ -183,12 +183,6 @@ view model =
 {-| Display a single Todo. Handles conditional styling, editing state, completion state.
 Updates: TodoToggleComplete, TodoToggleEditing, TodoEditName, TodoStopEditing
 -}
-
-
-
--- viewTodo : Todo -> Html Msg
-
-
 viewTodo model todo =
     case model.draggedTodo of
         Nothing ->
@@ -233,8 +227,9 @@ viewTodoState_Default model todo =
             [ div
                 [ class "flex flex-auto justify-between cursor-drag"
                 , draggable "true"
-                , Drag.onStart <| DragStart todo
+                , Drag.onStart (DragStart todo)
                 , Drag.onOver (DragOver todo)
+                , Drag.onEnd (DragEnd todo)
                 ]
                 [ span
                     [ onClick (TodoToggleComplete todo.id (not todo.complete))
@@ -290,21 +285,26 @@ viewTodoEmpty model date =
 
 
 viewTodoDropZone model todo =
-    div [ class "todo todo-incomplete" ]
-        [ div
-            [ class "flex flex-auto justify-between cursor-drag"
-            , Drag.onOver (DragOver todo)
-            , Drag.onDrop (Drop todo)
+    let
+        dropZone =
+            div
+                [ class "todo todo-dropzone"
+                , Drag.onOver (DragOver todo)
+                , Drag.onDrop (Drop todo)
+                ]
+                []
+    in
+        div []
+            [ dropZone
+            , viewTodoState_Default model todo
             ]
-            [ text "waiting" ]
-        ]
 
 
 {-| Displays the current week... should be able to partially apply the map...
+FIXME: remove lambda
 -}
 viewWeek : Model -> Html Msg
 viewWeek model =
-    -- div [] (List.map (viewTodoList model) model.currentWeek) -- this should work?
     div [ class "flex mx3" ] (List.map (\d -> div [] [ (viewTodoList model d) ]) model.currentWeek)
 
 
@@ -313,12 +313,14 @@ viewWeek model =
 viewTodoList : Model -> TodoList -> Html Msg
 viewTodoList model todoList =
     let
-        todosByTodoList =
-            List.filter (taskInDate todoList.date) model.todos
+        todosSortedAndFiltered =
+            model.todos
+                |> List.filter (taskInDate todoList.date)
+                |> List.sortBy .order
     in
         div [ class "m2" ]
             [ span [ class "h5 caps" ] [ text (dateFmt todoList.date) ]
-            , div [] (List.map (viewTodo model) todosByTodoList)
+            , div [] (List.map (viewTodo model) todosSortedAndFiltered)
             , viewTodoNew todoList
             , viewTodoEmpty model todoList.date -- make a bunch of empty ones of this
             ]

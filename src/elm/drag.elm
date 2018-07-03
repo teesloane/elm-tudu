@@ -24,6 +24,11 @@ onOver msg =
         Json.succeed msg
 
 
+onEnd msg =
+    Events.on "dragend" <|
+        Json.succeed msg
+
+
 onDrop : a -> Html.Attribute a
 onDrop msg =
     Events.onWithOptions "drop"
@@ -54,12 +59,27 @@ start model todo =
 
 
 -- FIXME - could do something useful here.
+-- end : Model -> ( Model, Cmd a )
 
 
-end : Model -> ( Model, Cmd a )
-end model =
-    { model | beingDragged = False }
-        ! []
+end model todoTarget =
+    case model.draggedTodo of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just draggedTodo_ ->
+            case todoTarget of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just todoTarget_ ->
+                    { model
+                        | beingDragged = False
+                        , dragTarget = Nothing
+                        , draggedTodo = Nothing
+                        , dragTargetExists = False
+                    }
+                        ! []
 
 
 over model targetTodo =

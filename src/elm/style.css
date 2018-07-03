@@ -19,6 +19,12 @@ body {
   align-items: center;
 }
 
+
+.todo-dropzone {
+  padding: 2px 6px;
+  border: 2px dotted #dfdfdf;
+}
+
 .todo-input  {
   width: 200px;
   background: #444;
@@ -35,6 +41,7 @@ body {
 .todo-draggable {
   cursor: drag;
 }
+
 
 
 .todo-edit-btn {
