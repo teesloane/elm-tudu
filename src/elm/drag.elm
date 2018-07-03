@@ -4,6 +4,8 @@ import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Json.Decode as Json
 import Date exposing (..)
+import Debug exposing (..)
+import Models exposing (..)
 
 
 onStart : a -> Html.Attribute a
@@ -34,47 +36,92 @@ onDrop msg =
 
 
 -- Update functions
+-- intended as `import Drag as Drag` => drag.start, drag.over, drag.drop etc.
 
 
 start model todo =
-    { model
-        | draggedTodo = Just todo
-        , beingDragged = True
-    }
-        ! []
+    case todo of
+        Nothing ->
+            ( model, Cmd.none )
+
+        todo_ ->
+            { model
+                | draggedTodo = todo_
+                , beingDragged = True
+            }
+                ! []
 
 
+
+-- FIXME - could do something useful here.
+
+
+end : Model -> ( Model, Cmd a )
 end model =
     { model | beingDragged = False }
         ! []
 
 
-over model date =
-    { model | dragTarget = Just date }
-        ! []
-
-
-drop model todo =
+over model targetTodo =
     case model.draggedTodo of
         Nothing ->
             ( model, Cmd.none )
 
-        Just todo ->
-            case model.dragTarget of
-                Nothing ->
-                    ( model, Cmd.none )
+        Just draggedTodo_ ->
+            let
+                _ =
+                    Debug.log "Target todo is " targetTodo
+            in
+                case targetTodo of
+                    Nothing ->
+                        ( model, Cmd.none )
 
-                Just targetDay ->
-                    let
-                        updateTodos t =
-                            if t.id == todo.id then
-                                { t | ts = (Date.toTime targetDay.date) }
-                            else
-                                t
-                    in
-                        { model
-                            | todos = List.map updateTodos model.todos
-                            , dragTarget = Nothing
-                            , beingDragged = False
-                        }
-                            ! []
+                    Just targetTodo_ ->
+                        let
+                            todoWithNewOrder =
+                                { draggedTodo_ | order = targetTodo_.order }
+                        in
+                            ( { model
+                                | draggedTodo = (Just todoWithNewOrder)
+                                , dragTarget = (Just targetTodo_)
+                                , dragTargetExists = True
+                              }
+                            , Cmd.none
+                            )
+
+
+{-| Changes timestamp of a todo when it's dropped
+Causes it to be re-rendered in a different List.
+-}
+drop model todo =
+    let
+        _ =
+            Debug.log "Test what dragged todo is " model.draggedTodo
+
+        _ =
+            Debug.log "model drag target is " model.dragTarget
+    in
+        case model.draggedTodo of
+            Nothing ->
+                ( model, Cmd.none )
+
+            Just draggedTodo_ ->
+                case model.dragTarget of
+                    Nothing ->
+                        ( { model | beingDragged = False }, Cmd.none )
+
+                    Just dragTarget_ ->
+                        let
+                            updateTodos t =
+                                if t.id == draggedTodo_.id then
+                                    { t | ts = dragTarget_.ts }
+                                else
+                                    t
+                        in
+                            { model
+                                | todos = List.map updateTodos model.todos
+                                , dragTarget = Nothing
+                                , draggedTodo = Nothing
+                                , beingDragged = False
+                            }
+                                ! []

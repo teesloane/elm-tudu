@@ -66,6 +66,11 @@ taskInDate date todo =
             False
 
 
+
+-- getTodosInList listName model =
+--     List.filter (\t -> t.parentList == listName) model.todos
+
+
 dateFmt : Date -> String
 dateFmt date =
     (toString <| Date.dayOfWeek date)

@@ -14,10 +14,10 @@ type alias Model =
     -- , beingDragged : Maybe Todo
     , uuid : Int
     , beingDragged : Bool
+    , dragTargetExists : Bool
     , draggedTodo : Maybe Todo
-    , dragTarget : Maybe TodoList
+    , dragTarget : Maybe Todo
     , timeAtLoad : Time
-    , dateAtLoad : Maybe Date
     , currentWeek : List TodoList
     }
 
@@ -28,15 +28,15 @@ initialModel =
     , uuid = 0
     , beingDragged = False
     , dragTarget = Nothing
+    , dragTargetExists = False
     , draggedTodo = Nothing
     , timeAtLoad = 0
-    , dateAtLoad = Nothing
     , currentWeek = []
     }
 
 
 
--- A single todo type
+-- Todo:  Type + Funcs:
 
 
 type alias Todo =
@@ -45,6 +45,7 @@ type alias Todo =
     , name : String
     , complete : Bool
     , parentList : TodoListName
+    , order : Int
     , ts : Time
     }
 
@@ -60,3 +61,11 @@ type alias TodoList =
     , name : TodoListName
     , ts : Time
     }
+
+
+getTodosInList :
+    { b | name : a }
+    -> { d | todos : List { c | parentList : a } }
+    -> List { c | parentList : a }
+getTodosInList todoList model =
+    List.filter (\t -> t.parentList == todoList.name) model.todos
