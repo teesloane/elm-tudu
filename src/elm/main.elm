@@ -241,7 +241,7 @@ viewTodoState_Default model todo =
                     , class "todo-draggable"
                     , Drag.onStart <| DragStart todo
                     ]
-                    [ text todo.name ]
+                    [ text (todo.name ++ " (" ++ (toString todo.order) ++ ")") ]
                 , span
                     [ class "todo-edit-btn"
                     , onClick (TodoToggleEditing todo.id (not todo.isEditing))

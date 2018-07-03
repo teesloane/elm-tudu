@@ -96,34 +96,32 @@ over model targetTodo =
 Causes it to be re-rendered in a different List.
 -}
 drop model todo =
-    let
-        _ =
-            Debug.log "Test what dragged todo is " model.draggedTodo
+    case model.draggedTodo of
+        Nothing ->
+            ( model, Cmd.none )
 
-        _ =
-            Debug.log "model drag target is " model.dragTarget
-    in
-        case model.draggedTodo of
-            Nothing ->
-                ( model, Cmd.none )
+        Just draggedTodo_ ->
+            case model.dragTarget of
+                Nothing ->
+                    ( { model | beingDragged = False }, Cmd.none )
 
-            Just draggedTodo_ ->
-                case model.dragTarget of
-                    Nothing ->
-                        ( { model | beingDragged = False }, Cmd.none )
-
-                    Just dragTarget_ ->
-                        let
-                            updateTodos t =
-                                if t.id == draggedTodo_.id then
-                                    { t | ts = dragTarget_.ts }
-                                else
-                                    t
-                        in
-                            { model
-                                | todos = List.map updateTodos model.todos
-                                , dragTarget = Nothing
-                                , draggedTodo = Nothing
-                                , beingDragged = False
-                            }
-                                ! []
+                Just dragTarget_ ->
+                    let
+                        updateTodos t =
+                            -- TODO - when todo gets new order, need to update all other todos
+                            -- in teh same list, and sort out the orders properly.
+                            if t.id == draggedTodo_.id then
+                                { t
+                                    | ts = dragTarget_.ts
+                                    , order = dragTarget_.order
+                                }
+                            else
+                                t
+                    in
+                        { model
+                            | todos = List.map updateTodos model.todos
+                            , dragTarget = Nothing
+                            , draggedTodo = Nothing
+                            , beingDragged = False
+                        }
+                            ! []
