@@ -128,13 +128,15 @@ drop model todo =
                 Just dragTarget_ ->
                     let
                         updateTodos t =
-                            -- TODO - when todo gets new order, need to update all other todos
-                            -- in teh same list, and sort out the orders properly.
+                            -- moves dropped todo into correct list / updates order.
                             if t.id == draggedTodo_.id then
                                 { t
                                     | ts = dragTarget_.ts
                                     , order = dragTarget_.order
                                 }
+                                -- updates order for every other todo.
+                            else if t.parentList == dragTarget_.parentList && t.order >= draggedTodo_.order then
+                                { t | order = t.order + 1 }
                             else
                                 t
                     in
