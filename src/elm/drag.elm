@@ -24,6 +24,7 @@ onOver msg =
         Json.succeed msg
 
 
+onEnd : a -> Html.Attribute a
 onEnd msg =
     Events.on "dragend" <|
         Json.succeed msg
@@ -40,10 +41,11 @@ onDrop msg =
 
 
 
--- Update functions
+-- Update functions -------------------------------------------------------------
 -- intended as `import Drag as Drag` => drag.start, drag.over, drag.drop etc.
 
 
+start : Model -> Maybe Todo -> ( Model, Cmd a )
 start model todo =
     case todo of
         Nothing ->
@@ -57,11 +59,7 @@ start model todo =
                 ! []
 
 
-
--- FIXME - could do something useful here.
--- end : Model -> ( Model, Cmd a )
-
-
+end : Model -> Maybe Todo -> ( Model, Cmd a )
 end model todoTarget =
     case model.draggedTodo of
         Nothing ->
@@ -82,6 +80,11 @@ end model todoTarget =
                         ! []
 
 
+{-| On dragging over, we copy the dragTarget's order to the draggedTodo's order
+This way, when it's dropped we can just have every item after it in the list update + 1.
+FIXME: use maybe.map instead of having two switch cases.
+-}
+over : Model -> Maybe Todo -> ( Model, Cmd a )
 over model targetTodo =
     case model.draggedTodo of
         Nothing ->
@@ -112,9 +115,11 @@ over model targetTodo =
                         )
 
 
-{-| Changes timestamp of a todo when it's dropped
+{-| Changes timestamp of dropped todo
 Causes it to be re-rendered in a different List.
+FIXME: use maybe.map instead of having two switch cases.
 -}
+drop : Model -> Todo -> ( Model, Cmd a )
 drop model todo =
     case model.draggedTodo of
         Nothing ->
@@ -127,21 +132,22 @@ drop model todo =
 
                 Just dragTarget_ ->
                     let
-                        updateTodos t =
-                            -- moves dropped todo into correct list / updates order.
+                        updateTodos i t =
+                            -- if iterated t.id is the dragged todo, we need to update order, ts, and parentlist
                             if t.id == draggedTodo_.id then
                                 { t
                                     | ts = dragTarget_.ts
                                     , order = dragTarget_.order
+                                    , parentList = dragTarget_.parentList
                                 }
-                                -- updates order for every other todo.
+                                -- if todos are in list where draggedTodo was Dropped, update the order for them.
                             else if t.parentList == dragTarget_.parentList && t.order >= draggedTodo_.order then
                                 { t | order = t.order + 1 }
                             else
                                 t
                     in
                         { model
-                            | todos = List.map updateTodos model.todos
+                            | todos = List.indexedMap updateTodos (List.sortBy .parentList model.todos)
                             , dragTarget = Nothing
                             , draggedTodo = Nothing
                             , beingDragged = False

@@ -113,13 +113,20 @@ update msg model =
                 newTodoOrder =
                     List.length (Models.getTodosInList todoList model)
 
-                newTodo =
+                lastItemOrder : Maybe Todo
+                lastItemOrder =
+                    (Models.getTodosInList todoList model)
+                        |> List.sortBy .order
+                        |> List.reverse
+                        |> List.head
+
+                buildNewTodo n =
                     { id = model.uuid + 1
                     , isEditing = False
                     , name = todoList.inputField
                     , complete = False
                     , parentList = todoList.name
-                    , order = newTodoOrder
+                    , order = n
                     , ts = (Date.toTime todoList.date)
                     }
 
@@ -129,16 +136,30 @@ update msg model =
                     else
                         d
             in
-                { model
-                    | todos =
-                        if String.isEmpty todoList.inputField then
-                            model.todos
-                        else
-                            model.todos ++ [ newTodo ]
-                    , currentWeek = List.map cleartodoListField model.currentWeek
-                    , uuid = model.uuid + 1
-                }
-                    ! []
+                case lastItemOrder of
+                    Nothing ->
+                        { model
+                            | todos =
+                                if String.isEmpty todoList.inputField then
+                                    model.todos
+                                else
+                                    model.todos ++ [ (buildNewTodo 0) ]
+                            , currentWeek = List.map cleartodoListField model.currentWeek
+                            , uuid = model.uuid + 1
+                        }
+                            ! []
+
+                    Just lastItemOrder_ ->
+                        { model
+                            | todos =
+                                if String.isEmpty todoList.inputField then
+                                    model.todos
+                                else
+                                    model.todos ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]
+                            , currentWeek = List.map cleartodoListField model.currentWeek
+                            , uuid = model.uuid + 1
+                        }
+                            ! []
 
         TodoUpdateNewField todoList newChar ->
             let
@@ -246,44 +267,55 @@ viewTodoState_Default model todo =
             ]
 
 
-{-| Creates a new todo; on render, creates a controlled input in inputFieldsByDate
+{-| TodoBlock capable of creating new Todos.
+on render, corresponds to the inputField for the parent todolist.
+If user is dragging, will instead show an empty Drop zone.
 -}
-viewTodoNew : TodoList -> Html Msg
-viewTodoNew todoList =
-    div [ class "todo flex flex-auto justify-between" ]
-        [ input
-            [ onEnter (TodoCreate todoList)
-            , value todoList.inputField
-            , onInput (TodoUpdateNewField todoList)
-            , class "todo-input"
+viewTodoNew : Model -> TodoList -> Html Msg
+viewTodoNew model todoList =
+    if model.beingDragged then
+        viewTodoDropZoneEmpty model todoList
+    else
+        div [ class "todo flex flex-auto justify-between" ]
+            [ input
+                [ onEnter (TodoCreate todoList)
+                , value todoList.inputField
+                , onInput (TodoUpdateNewField todoList)
+                , class "todo-input"
+                ]
+                []
             ]
-            []
-        ]
 
 
 {-| Fill empty todo space up to max (N).
 For the current todoList , see how many todos (t) there are, and then add N - t empty todos.
 -}
-viewTodoEmpty : Model -> Date -> Html msg
-viewTodoEmpty model date =
+viewTodoEmpty : Model -> TodoList -> Html Msg
+viewTodoEmpty model todolist =
     let
         maxRows =
-            if model.beingDragged then
-                6
-            else
-                7
+            7
 
         todosPerTodoList =
             model.todos
-                |> List.filter (taskInDate date)
+                |> List.filter (taskInDate todolist.date)
                 |> List.length
 
+        rowsToCreate =
+            (List.range 0 (maxRows - todosPerTodoList))
+
         renderRow _ =
-            div [ class "todo" ] [ text "" ]
+            if model.beingDragged then
+                viewTodoDropZoneEmpty model todolist
+            else
+                div [ class "todo" ] [ text "" ]
     in
-        div [] (List.map renderRow (List.range 0 (maxRows - todosPerTodoList)))
+        div [] (List.map renderRow rowsToCreate)
 
 
+{-| for dropping todos on top of other todos and replacing them.
+-}
+viewTodoDropZone : Model -> Todo -> Html Msg
 viewTodoDropZone model todo =
     let
         dropZone =
@@ -298,6 +330,49 @@ viewTodoDropZone model todo =
             [ dropZone
             , viewTodoState_Default model todo
             ]
+
+
+{-| for dropping todos over empty space at top / end of lists.
+-}
+viewTodoDropZoneEmpty model todoList =
+    let
+        lastItem : Maybe Todo
+        lastItem =
+            (Models.getTodosInList todoList model)
+                |> List.sortBy .order
+                |> List.reverse
+                |> List.head
+
+        buildNewTodo order =
+            { id = model.uuid + 1
+            , isEditing = False
+            , name = "fake!"
+            , complete = False
+            , parentList = todoList.name
+            , order = order
+            , ts = (Date.toTime todoList.date)
+            }
+
+        dropZone order =
+            div
+                [ class "todo todo-dropzone"
+                , Drag.onOver (DragOver (buildNewTodo order))
+                , Drag.onDrop (Drop (buildNewTodo order))
+                ]
+                []
+
+        _ =
+            Debug.log "order is " lastItem
+    in
+        case lastItem of
+            Nothing ->
+                div []
+                    [ (dropZone 0) ]
+
+            Just lastItem_ ->
+                div []
+                    -- hack
+                    [ (dropZone (lastItem_.order + 1)) ]
 
 
 {-| Displays the current week... should be able to partially apply the map...
@@ -321,8 +396,8 @@ viewTodoList model todoList =
         div [ class "m2" ]
             [ span [ class "h5 caps" ] [ text (dateFmt todoList.date) ]
             , div [] (List.map (viewTodo model) todosSortedAndFiltered)
-            , viewTodoNew todoList
-            , viewTodoEmpty model todoList.date -- make a bunch of empty ones of this
+            , viewTodoNew model todoList
+            , viewTodoEmpty model todoList -- make a bunch of empty ones of this
             ]
 
 

@@ -22,7 +22,7 @@ body {
 
 .todo-dropzone {
   padding: 2px 6px;
-  border: 2px dotted #dfdfdf;
+  border: 2px dotted #333;
 }
 
 .todo-input  {
