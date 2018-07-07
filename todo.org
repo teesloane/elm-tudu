@@ -1,15 +1,20 @@
-* [ ] Replace edit icon with pencil
-* [ ] Current day should be styled differently
-* [ ] If removing name/string of todo, it should delete it from the list.
-* [ ] remove unecessary id from todo model
-* [ ] clicking on viewTodoEmpty should focus viewTodoNew - [[https://ellie-app.com/embed/kqLTvMXJj3a1][example]]
-* [ ] clicking outside input should set editing to false
-* [ ] Feature: Drag and Drop
-* [ ] Feature: Future Weeks 
+* [ ] [#A] Delete Todos
+- when checked they can be deleted
+- if you remove the text of a todo and hit enter and there's nothing there,
+  delete it.
+- going to have to resort everything when you delete something.
 * [ ] Feature: Previous Todo's roll over
+* [ ] Feature: Future Weeks 
 * [ ] Feature: Generic Lists at the bottom
+* [ ] [#C] Replace edit icon with pencil
+* [ ] [#C] Current day should be styled differently
+* [ ] [#C] clicking outside input should set editing to false
 * [X] Create stack of todo entries up to N max per day.
 CLOSED: [2018-06-26 Tue 22:34]
+* [X] [#A] clicking on viewTodoEmpty should focus viewTodoNew - [[https://ellie-app.com/embed/kqLTvMXJj3a1][example]]
+CLOSED: [2018-07-07 Sat 10:21]
+* [X] Feature: Drag and Drop
+CLOSED: [2018-07-07 Sat 09:51]
 * [X] Create Todo
 CLOSED: [2018-06-26 Tue 19:28]
 - controlled inputs : dict> key date | value: input

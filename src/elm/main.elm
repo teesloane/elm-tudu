@@ -4,6 +4,7 @@ import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Html.Attributes exposing (..)
 import Models as Models exposing (Model, initialModel, Todo, TodoList)
+import Dom exposing (focus)
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
@@ -33,9 +34,11 @@ getTime =
 
 
 type Msg
-    = TodoToggleComplete Int Bool
-    | SetTimeAndWeek Time
+    = SetTimeAndWeek Time
+    | TodoToggleComplete Int Bool
     | TodoToggleEditing Int Bool
+    | TodoFocusInputFromEmpty TodoList
+    | TodoFocusInputResult (Result Dom.Error ())
     | TodoStopEditing Int Bool
     | TodoEditName Int String
     | TodoCreate TodoList
@@ -161,6 +164,22 @@ update msg model =
                         }
                             ! []
 
+        TodoFocusInputFromEmpty todoList ->
+            let
+                id =
+                    todoList.name ++ "focus-id"
+            in
+                model ! [ Task.attempt TodoFocusInputResult (focus id) ]
+
+        TodoFocusInputResult res ->
+            case res of
+                -- could do error handling here.
+                Err (Dom.NotFound id) ->
+                    model ! []
+
+                Ok () ->
+                    model ! []
+
         TodoUpdateNewField todoList newChar ->
             let
                 updateTodoList t =
@@ -223,6 +242,7 @@ viewTodo model todo =
                         viewTodoState_Default model todo
 
 
+viewTodoState_Editing : Model -> Todo -> Html Msg
 viewTodoState_Editing model todo =
     input
         [ value todo.name
@@ -233,6 +253,7 @@ viewTodoState_Editing model todo =
         []
 
 
+viewTodoState_Default : Model -> Todo -> Html Msg
 viewTodoState_Default model todo =
     let
         styleState =
@@ -280,6 +301,7 @@ viewTodoNew model todoList =
             [ input
                 [ onEnter (TodoCreate todoList)
                 , value todoList.inputField
+                , id (todoList.name ++ "focus-id")
                 , onInput (TodoUpdateNewField todoList)
                 , class "todo-input"
                 ]
@@ -308,7 +330,11 @@ viewTodoEmpty model todolist =
             if model.beingDragged then
                 viewTodoDropZoneEmpty model todolist
             else
-                div [ class "todo" ] [ text "" ]
+                div
+                    [ class "todo"
+                    , onClick (TodoFocusInputFromEmpty todolist)
+                    ]
+                    [ text "" ]
     in
         div [] (List.map renderRow rowsToCreate)
 
