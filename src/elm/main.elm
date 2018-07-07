@@ -5,6 +5,7 @@ import Html.Events as Events exposing (..)
 import Html.Attributes exposing (..)
 import Models as Models exposing (Model, initialModel, Todo, TodoList)
 import Dom exposing (focus)
+import Maybe exposing (..)
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
@@ -37,13 +38,14 @@ type Msg
     = SetTimeAndWeek Time
     | TodoToggleComplete Int Bool
     | TodoToggleEditing Int Bool
+    | TodoStopEditing Todo Bool
     | TodoFocusInputFromEmpty TodoList
     | TodoDelete Todo
     | TodoFocusInputResult (Result Dom.Error ())
-    | TodoStopEditing Int Bool
     | TodoEditName Int String
     | TodoCreate TodoList
     | TodoUpdateNewField TodoList String
+    | OffsetDay Int
     | DragStart Todo
     | DragEnd Todo
     | DragOver Todo
@@ -60,7 +62,7 @@ update msg model =
         SetTimeAndWeek time ->
             let
                 newWeek =
-                    (buildWeek time)
+                    (buildWeek model.dayOffset time)
             in
                 { model
                     | timeAtLoad = time
@@ -90,15 +92,25 @@ update msg model =
                 { model | todos = List.map updateTodos model.todos }
                     ! []
 
-        TodoStopEditing id isEditing ->
+        TodoStopEditing todo isEditing ->
+            -- capable of editing or deleting if the edited string is empty.
             let
+                isEmpty =
+                    String.isEmpty todo.name
+
                 updateTodos t =
-                    if t.id == id then
+                    if t.id == todo.id then
                         { t | isEditing = isEditing }
                     else
                         t
+
+                finalUpdate todos =
+                    if isEmpty then
+                        List.filter (\t -> t.id /= todo.id) todos
+                    else
+                        List.map updateTodos todos
             in
-                { model | todos = List.map updateTodos model.todos }
+                { model | todos = finalUpdate model.todos }
                     ! []
 
         TodoEditName id newChar ->
@@ -196,6 +208,18 @@ update msg model =
                 { model | currentWeek = List.map updateTodoList model.currentWeek }
                     ! []
 
+        OffsetDay day ->
+            let
+                -- todo handle +/-
+                newOffset =
+                    model.dayOffset + day
+            in
+                { model
+                    | dayOffset = newOffset
+                    , currentWeek = (buildWeek newOffset model.timeAtLoad)
+                }
+                    ! []
+
         DragStart todo ->
             Drag.start model (Just todo)
 
@@ -221,52 +245,42 @@ view model =
         , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
 
         -- , viewTodoList model
+        , div []
+            [ div [ onClick (OffsetDay -1) ] [ text "<" ]
+            , div [ onClick (OffsetDay -5) ] [ text "<<" ]
+            ]
         , viewWeek model
+        , div []
+            [ div [ onClick (OffsetDay 1) ] [ text ">" ]
+            , div [ onClick (OffsetDay 5) ] [ text ">>" ]
+            ]
         ]
 
 
-{-| Display a single Todo. Handles conditional styling, editing state, completion state.
-
--- FIXME BAD BAD ANNOYING BAD.
--- Todos can be many states - incomplete, editing, complete etc. I'm pattern matching like
-3x, when I could probably do it once with maybe.map, etc.
-
-If a todo is being dragged don't show the editing state todo.
-
-Updates: TodoToggleComplete, TodoToggleEditing, TodoEditName, TodoStopEditing
-
+{-| Display a single Todo, in whatever state it may be in.
 -}
 viewTodo : Model -> Todo -> Html Msg
 viewTodo model todo =
-    case model.draggedTodo of
-        Nothing ->
+    let
+        defaultRenderState =
             if todo.isEditing then
                 viewTodoState_Editing model todo
             else if todo.complete == False then
                 viewTodoState_Incomplete model todo
             else
                 viewTodoState_Complete model todo
+    in
+        case ( model.dragTarget, model.draggedTodo ) of
+            ( Just dragTarget_, Just draggedTodo_ ) ->
+                if dragTarget_.id == todo.id && dragTarget_.id /= draggedTodo_.id then
+                    -- if branch for maybe: this is how we display drop zones
+                    -- if the dragged todo is over another todo
+                    viewTodoDropZone model todo
+                else
+                    defaultRenderState
 
-        Just draggedTodo_ ->
-            case model.dragTarget of
-                Nothing ->
-                    -- viewTodoState_Incomplete model todo
-                    if todo.complete == False then
-                        viewTodoState_Incomplete model todo
-                    else if todo.isEditing then
-                        viewTodoState_Editing model todo
-                    else
-                        viewTodoState_Complete model todo
-
-                Just targetTodo_ ->
-                    if todo.isEditing then
-                        viewTodoState_Editing model todo
-                    else if targetTodo_.id == todo.id && targetTodo_.id /= draggedTodo_.id then
-                        viewTodoDropZone model todo
-                    else if todo.complete == False then
-                        viewTodoState_Incomplete model todo
-                    else
-                        viewTodoState_Complete model todo
+            _ ->
+                defaultRenderState
 
 
 viewTodoState_Editing : Model -> Todo -> Html Msg
@@ -274,7 +288,7 @@ viewTodoState_Editing model todo =
     input
         [ value todo.name
         , onInput (TodoEditName todo.id)
-        , onEnter (TodoStopEditing todo.id (not todo.isEditing))
+        , onEnter (TodoStopEditing todo (not todo.isEditing))
         , class "todo todo-input"
         ]
         []
@@ -295,7 +309,7 @@ viewTodoState_Incomplete model todo =
                 , class "todo-draggable"
                 , Drag.onStart <| DragStart todo
                 ]
-                [ text (todo.name ++ " (" ++ (toString todo.order) ++ ")") ]
+                [ text todo.name ]
             , span
                 [ class "todo-edit-btn"
                 , onClick (TodoToggleEditing todo.id (not todo.isEditing))
@@ -322,7 +336,7 @@ viewTodoState_Complete model todo =
                 , class "todo-draggable todo-completed"
                 , Drag.onStart <| DragStart todo
                 ]
-                [ text (todo.name ++ " (" ++ (toString todo.order) ++ ")") ]
+                [ text todo.name ]
             , span
                 [ class "todo-delete-btn"
                 , onClick (TodoDelete todo)
@@ -404,6 +418,7 @@ viewTodoDropZone model todo =
 
 {-| for dropping todos over empty space at top / end of lists.
 -}
+viewTodoDropZoneEmpty : Model -> TodoList -> Html Msg
 viewTodoDropZoneEmpty model todoList =
     let
         lastItem : Maybe Todo
@@ -430,9 +445,6 @@ viewTodoDropZoneEmpty model todoList =
                 , Drag.onDrop (Drop (buildNewTodo order))
                 ]
                 []
-
-        _ =
-            Debug.log "order is " lastItem
     in
         case lastItem of
             Nothing ->

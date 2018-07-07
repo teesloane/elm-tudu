@@ -23,15 +23,18 @@ msInADay =
 -- buildWeek : Float -> List Day
 
 
-buildWeek timestamp =
+buildWeek dayOffset timestamp =
     let
         days =
             [ 0, 1, 2, 3, 4 ]
 
         buildTodoLists num =
             let
+                daysOffset =
+                    toFloat (dayOffset * msInADay)
+
                 n_date =
-                    (Date.fromTime (timestamp + (toFloat (num * msInADay))))
+                    (Date.fromTime (timestamp + (toFloat (num * msInADay)) + daysOffset))
 
                 newTodoList =
                     { hasTodos = False

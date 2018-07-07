@@ -10,28 +10,28 @@ import Maybe exposing (Maybe(..))
 
 type alias Model =
     { todos : List Todo
-
-    -- , beingDragged : Maybe Todo
-    , uuid : Int
     , beingDragged : Bool
+    , currentWeek : List TodoList
+    , dayOffset : Int
+    , dragTarget : Maybe Todo
     , dragTargetExists : Bool
     , draggedTodo : Maybe Todo
-    , dragTarget : Maybe Todo
     , timeAtLoad : Time
-    , currentWeek : List TodoList
+    , uuid : Int
     }
 
 
 initialModel : Model
 initialModel =
     { todos = []
-    , uuid = 0
     , beingDragged = False
+    , currentWeek = []
+    , dayOffset = 0
     , dragTarget = Nothing
     , dragTargetExists = False
     , draggedTodo = Nothing
     , timeAtLoad = 0
-    , currentWeek = []
+    , uuid = 0
     }
 
 
