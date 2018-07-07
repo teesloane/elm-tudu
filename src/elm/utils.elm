@@ -39,7 +39,7 @@ buildWeek dayOffset timestamp =
                 newTodoList =
                     { hasTodos = False
                     , inputField = ""
-                    , name = (dateFmt n_date)
+                    , name = (parseDate n_date "Full")
                     , date = n_date
                     , ts = (Date.toTime n_date)
                     }
@@ -74,13 +74,32 @@ taskInDate date todo =
 --     List.filter (\t -> t.parentList == listName) model.todos
 
 
-dateFmt : Date -> String
-dateFmt date =
-    (toString <| Date.dayOfWeek date)
-        ++ " "
-        ++ (toString <| Date.day date)
-        ++ " "
-        ++ (toString <| Date.month date)
+parseDate : Date -> String -> String
+parseDate date shape =
+    case shape of
+        "DayOfWeek" ->
+            (toString <| Date.dayOfWeek date)
+
+        "DayNum" ->
+            (toString <| Date.day date)
+
+        "MoDayYear" ->
+            ""
+                ++ (toString <| Date.day date)
+                ++ " "
+                ++ (toString <| Date.month date)
+                ++ " "
+                ++ (toString <| Date.year date)
+
+        "Full" ->
+            (toString <| Date.dayOfWeek date)
+                ++ " "
+                ++ (toString <| Date.day date)
+                ++ " "
+                ++ (toString <| Date.month date)
+
+        _ ->
+            ""
 
 
 onEnter : a -> Html.Attribute a

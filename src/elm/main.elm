@@ -9,14 +9,11 @@ import Maybe exposing (..)
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
-
-
--- import Debug exposing (..)
-
 import Utils exposing (..)
 import Drag as Drag exposing (..)
 
 
+-- import Debug exposing (..)
 -- Boot up, on load commands
 
 
@@ -239,20 +236,20 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "flex flex-auto pt4 justify-center" ]
+    div [ class "flex flex-auto pt2 justify-center" ]
         -- hack to add a stylesheet for elm reactor.
         [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
         , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
 
         -- , viewTodoList model
         , div []
-            [ div [ onClick (OffsetDay -1) ] [ text "<" ]
-            , div [ onClick (OffsetDay -5) ] [ text "<<" ]
+            [ div [ class "day-advance", onClick (OffsetDay -1) ] [ text "<" ]
+            , div [ class "week-advance", onClick (OffsetDay -5) ] [ text "<<" ]
             ]
         , viewWeek model
         , div []
-            [ div [ onClick (OffsetDay 1) ] [ text ">" ]
-            , div [ onClick (OffsetDay 5) ] [ text ">>" ]
+            [ div [ class "day-advance", onClick (OffsetDay 1) ] [ text ">" ]
+            , div [ class "week-advance", onClick (OffsetDay 5) ] [ text ">>" ]
             ]
         ]
 
@@ -474,9 +471,23 @@ viewTodoList model todoList =
             model.todos
                 |> List.filter (taskInDate todoList.date)
                 |> List.sortBy .order
+
+        -- if todolist is currentDay style it nicely.
+        styles =
+            if todoList.date == (Date.fromTime model.timeAtLoad) then
+                { day = "date-dayOfWeek--active"
+                , moDayYear = "date-moDayYear--active"
+                }
+            else
+                { day = "date-dayOfWeek"
+                , moDayYear = "date-moDayYear"
+                }
     in
         div [ class "m2" ]
-            [ span [ class "h5 caps" ] [ text (dateFmt todoList.date) ]
+            [ div [ class "todoListName" ]
+                [ div [ class styles.day ] [ text (parseDate todoList.date "DayOfWeek") ]
+                , div [ class styles.moDayYear ] [ text (parseDate todoList.date "MoDayYear") ]
+                ]
             , div [] (List.map (viewTodo model) todosSortedAndFiltered)
             , viewTodoNew model todoList
             , viewTodoEmpty model todoList -- make a bunch of empty ones of this

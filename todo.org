@@ -1,19 +1,22 @@
-* ACTIVE [#A] Delete Todos
+* [ ] Feature: Generic Lists at the bottom
+* [ ] Feature: Previous Todo's roll over
+* [ ] Feature: Date Picker
+* [ ] [#C] Replace edit icon with pencil
+* [ ] [#C] Current day should be styled differently
+* [ ] [#C] clicking outside input should set editing to false
+* [X] [#A] Delete Todos
+CLOSED: [2018-07-07 Sat 13:55]
 - [X] when checked they can be deleted
 - [X] if you remove the text of a todo and hit enter and there's nothing there,
   delete it.
 - [?]going to have to resort everything when you delete something.
-* [ ] Feature: Previous Todo's roll over
-* [ ] Feature: Future Weeks 
+* [X] Feature: Future Weeks 
+CLOSED: [2018-07-07 Sat 13:55]
 ** [ ] add timeoffset to model (in days?
 ** [ ] clicking on a ~>~ ~<~ will offset.
 ** [ ] set currentWeek to be offset * ms ...
 ** [ ] 
 ** [ ] 
-* [ ] Feature: Generic Lists at the bottom
-* [ ] [#C] Replace edit icon with pencil
-* [ ] [#C] Current day should be styled differently
-* [ ] [#C] clicking outside input should set editing to false
 * [X] Create stack of todo entries up to N max per day.
 CLOSED: [2018-06-26 Tue 22:34]
 * [X] [#A] clicking on viewTodoEmpty should focus viewTodoNew - [[https://ellie-app.com/embed/kqLTvMXJj3a1][example]]
@@ -49,3 +52,8 @@ Right now we can't do that, because if we did we couldn't use union types for ou
 - [[https://benpaulhanna.com/basic-html5-drag-and-drop-with-elm.html][drag and drop]]  
 - [[https://stackoverflow.com/questions/40600296/is-there-a-less-verbose-way-to-unwrap-maybe-values-in-elm][elm nested maybe stuff]] 
 - [[https://robots.thoughtbot.com/maybe-mechanics][elm mechanics of maybe]]
+
+* Things this app deals with 
+- Drag and Drop
+- Dealing with maybes
+- 
