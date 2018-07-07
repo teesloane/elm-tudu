@@ -38,6 +38,7 @@ type Msg
     | TodoToggleComplete Int Bool
     | TodoToggleEditing Int Bool
     | TodoFocusInputFromEmpty TodoList
+    | TodoDelete Todo
     | TodoFocusInputResult (Result Dom.Error ())
     | TodoStopEditing Int Bool
     | TodoEditName Int String
@@ -110,6 +111,10 @@ update msg model =
             in
                 { model | todos = List.map updateTodos model.todos }
                     ! []
+
+        TodoDelete todo ->
+            { model | todos = List.filter (\t -> t.id /= todo.id) model.todos }
+                ! []
 
         TodoCreate todoList ->
             let
@@ -221,25 +226,47 @@ view model =
 
 
 {-| Display a single Todo. Handles conditional styling, editing state, completion state.
+
+-- FIXME BAD BAD ANNOYING BAD.
+-- Todos can be many states - incomplete, editing, complete etc. I'm pattern matching like
+3x, when I could probably do it once with maybe.map, etc.
+
+If a todo is being dragged don't show the editing state todo.
+
 Updates: TodoToggleComplete, TodoToggleEditing, TodoEditName, TodoStopEditing
+
 -}
+viewTodo : Model -> Todo -> Html Msg
 viewTodo model todo =
     case model.draggedTodo of
         Nothing ->
-            viewTodoState_Default model todo
+            if todo.isEditing then
+                viewTodoState_Editing model todo
+            else if todo.complete == False then
+                viewTodoState_Incomplete model todo
+            else
+                viewTodoState_Complete model todo
 
         Just draggedTodo_ ->
             case model.dragTarget of
                 Nothing ->
-                    viewTodoState_Default model todo
+                    -- viewTodoState_Incomplete model todo
+                    if todo.complete == False then
+                        viewTodoState_Incomplete model todo
+                    else if todo.isEditing then
+                        viewTodoState_Editing model todo
+                    else
+                        viewTodoState_Complete model todo
 
                 Just targetTodo_ ->
                     if todo.isEditing then
                         viewTodoState_Editing model todo
                     else if targetTodo_.id == todo.id && targetTodo_.id /= draggedTodo_.id then
                         viewTodoDropZone model todo
+                    else if todo.complete == False then
+                        viewTodoState_Incomplete model todo
                     else
-                        viewTodoState_Default model todo
+                        viewTodoState_Complete model todo
 
 
 viewTodoState_Editing : Model -> Todo -> Html Msg
@@ -248,44 +275,61 @@ viewTodoState_Editing model todo =
         [ value todo.name
         , onInput (TodoEditName todo.id)
         , onEnter (TodoStopEditing todo.id (not todo.isEditing))
-        , class "todo-input"
+        , class "todo todo-input"
         ]
         []
 
 
-viewTodoState_Default : Model -> Todo -> Html Msg
-viewTodoState_Default model todo =
-    let
-        styleState =
-            if todo.complete then
-                "todo-completed"
-            else
-                "todo-incomplete"
-
-        styleClasses =
-            String.concat [ "todo ", styleState ]
-    in
-        div [ class styleClasses ]
-            [ div
-                [ class "flex flex-auto justify-between cursor-drag"
-                , draggable "true"
-                , Drag.onStart (DragStart todo)
-                , Drag.onOver (DragOver todo)
-                , Drag.onEnd (DragEnd todo)
-                ]
-                [ span
-                    [ onClick (TodoToggleComplete todo.id (not todo.complete))
-                    , class "todo-draggable"
-                    , Drag.onStart <| DragStart todo
-                    ]
-                    [ text (todo.name ++ " (" ++ (toString todo.order) ++ ")") ]
-                , span
-                    [ class "todo-edit-btn"
-                    , onClick (TodoToggleEditing todo.id (not todo.isEditing))
-                    ]
-                    [ text "edit" ]
-                ]
+viewTodoState_Incomplete : Model -> Todo -> Html Msg
+viewTodoState_Incomplete model todo =
+    div [ class "todo todo-incomplete" ]
+        [ div
+            [ class "flex flex-auto justify-between cursor-drag"
+            , draggable "true"
+            , Drag.onStart (DragStart todo)
+            , Drag.onOver (DragOver todo)
+            , Drag.onEnd (DragEnd todo)
             ]
+            [ span
+                [ onClick (TodoToggleComplete todo.id (not todo.complete))
+                , class "todo-draggable"
+                , Drag.onStart <| DragStart todo
+                ]
+                [ text (todo.name ++ " (" ++ (toString todo.order) ++ ")") ]
+            , span
+                [ class "todo-edit-btn"
+                , onClick (TodoToggleEditing todo.id (not todo.isEditing))
+                ]
+                [ text "edit" ]
+            ]
+        ]
+
+
+{-| A todo that can be deleted because it is complete
+-}
+viewTodoState_Complete : Model -> Todo -> Html Msg
+viewTodoState_Complete model todo =
+    div [ class "todo " ]
+        [ div
+            [ class "flex flex-auto justify-between cursor-drag"
+            , draggable "true"
+            , Drag.onStart (DragStart todo)
+            , Drag.onOver (DragOver todo)
+            , Drag.onEnd (DragEnd todo)
+            ]
+            [ span
+                [ onClick (TodoToggleComplete todo.id (not todo.complete))
+                , class "todo-draggable todo-completed"
+                , Drag.onStart <| DragStart todo
+                ]
+                [ text (todo.name ++ " (" ++ (toString todo.order) ++ ")") ]
+            , span
+                [ class "todo-delete-btn"
+                , onClick (TodoDelete todo)
+                ]
+                [ text "delete" ]
+            ]
+        ]
 
 
 {-| TodoBlock capable of creating new Todos.
@@ -354,7 +398,7 @@ viewTodoDropZone model todo =
     in
         div []
             [ dropZone
-            , viewTodoState_Default model todo
+            , viewTodoState_Incomplete model todo
             ]
 
 

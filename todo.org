@@ -1,4 +1,4 @@
-* [ ] [#A] Delete Todos
+* ACTIVE [#A] Delete Todos
 - when checked they can be deleted
 - if you remove the text of a todo and hit enter and there's nothing there,
   delete it.
