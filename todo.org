@@ -1,4 +1,5 @@
 
+* ACTIVE Connect to mock json backend.
 * NEXT Feature: Previous Todo's roll over
 ** [ ] build "created_at" ts for todos, incase orig ts's are needed.
 ** [ ] When rendering a list in which todos are < date.now, change the date.
