@@ -6,6 +6,7 @@ import Json.Decode as Json
 import Date exposing (..)
 import Debug exposing (..)
 import Models exposing (..)
+import RemoteData exposing (WebData)
 
 
 onStart : a -> Html.Attribute a
@@ -131,25 +132,40 @@ drop model todo =
                     ( { model | beingDragged = False }, Cmd.none )
 
                 Just dragTarget_ ->
-                    let
-                        updateTodos i t =
-                            -- if iterated t.id is the dragged todo, we need to update order, ts, and parentlist
-                            if t.id == draggedTodo_.id then
-                                { t
-                                    | ts = dragTarget_.ts
-                                    , order = dragTarget_.order
-                                    , parentList = dragTarget_.parentList
-                                }
-                                -- if todos are in list where draggedTodo was Dropped, update the order for them.
-                            else if t.parentList == dragTarget_.parentList && t.order >= draggedTodo_.order then
-                                { t | order = t.order + 1 }
-                            else
-                                t
-                    in
-                        { model
-                            | todos = List.indexedMap updateTodos (List.sortBy .parentList model.todos)
-                            , dragTarget = Nothing
-                            , draggedTodo = Nothing
-                            , beingDragged = False
-                        }
-                            ! []
+                    case model.todos of
+                        RemoteData.NotAsked ->
+                            model ! []
+
+                        RemoteData.Loading ->
+                            model ! []
+
+                        RemoteData.Failure err ->
+                            model ! []
+
+                        RemoteData.Success todos_ ->
+                            let
+                                updateTodos i t =
+                                    -- if iterated t.id is the dragged todo, we need to update order, ts, and parentlist
+                                    if t.id == draggedTodo_.id then
+                                        { t
+                                            | ts = dragTarget_.ts
+                                            , order = dragTarget_.order
+                                            , parentList = dragTarget_.parentList
+                                        }
+                                        -- if todos are in list where draggedTodo was Dropped, update the order for them.
+                                    else if t.parentList == dragTarget_.parentList && t.order >= draggedTodo_.order then
+                                        { t | order = t.order + 1 }
+                                    else
+                                        t
+                            in
+                                model ! []
+
+
+
+-- { model
+--     | todos = List.indexedMap updateTodos (List.sortBy .parentList todos_)
+--     , dragTarget = Nothing
+--     , draggedTodo = Nothing
+--     , beingDragged = False
+-- }
+--     ! []

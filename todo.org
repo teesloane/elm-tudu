@@ -61,6 +61,7 @@ Right now we can't do that, because if we did we couldn't use union types for ou
 - [[https://benpaulhanna.com/basic-html5-drag-and-drop-with-elm.html][drag and drop]]  
 - [[https://stackoverflow.com/questions/40600296/is-there-a-less-verbose-way-to-unwrap-maybe-values-in-elm][elm nested maybe stuff]] 
 - [[https://robots.thoughtbot.com/maybe-mechanics][elm mechanics of maybe]]
+- [[elm remote data http://blog.jenkster.com/2016/06/how-elm-slays-a-ui-antipattern.html][elm remote data]]
 
 * Things this app deals with 
 - Drag and Drop

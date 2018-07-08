@@ -3,13 +3,14 @@ module Models exposing (..)
 import Date exposing (Date)
 import Time exposing (Time)
 import Maybe exposing (Maybe(..))
+import RemoteData exposing (WebData)
 
 
 -- our top level model for entire state.
 
 
 type alias Model =
-    { todos : List Todo
+    { todos : WebData (List Todo)
     , beingDragged : Bool
     , currentWeek : List TodoList
     , dayOffset : Int
@@ -23,7 +24,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { todos = []
+    { todos = RemoteData.Loading
     , beingDragged = False
     , currentWeek = []
     , dayOffset = 0
@@ -44,10 +45,30 @@ type alias Todo =
     , isEditing : Bool
     , name : String
     , complete : Bool
-    , parentList : TodoListName
+    , parentList : String
     , order : Int
     , ts : Time
     }
+
+
+
+-- maybeTodos : WebData (List Todo) -> Html Msg
+-- maybeTodos : RemoteData.RemoteData e (List a) -> List a
+
+
+maybeTodos response =
+    case response of
+        RemoteData.NotAsked ->
+            []
+
+        RemoteData.Loading ->
+            []
+
+        RemoteData.Success todos ->
+            []
+
+        RemoteData.Failure error ->
+            []
 
 
 type alias TodoListName =
@@ -58,14 +79,14 @@ type alias TodoList =
     { hasTodos : Bool
     , inputField : String
     , date : Date
-    , name : TodoListName
+    , name : String
     , ts : Time
     }
 
 
 getTodosInList :
     { b | name : a }
-    -> { d | todos : List { c | parentList : a } }
+    -> { d | todos : RemoteData.RemoteData e (List { c | parentList : a }) }
     -> List { c | parentList : a }
 getTodosInList todoList model =
-    List.filter (\t -> t.parentList == todoList.name) model.todos
+    List.filter (\t -> t.parentList == todoList.name) (maybeTodos model.todos)

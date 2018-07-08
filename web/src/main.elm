@@ -11,6 +11,11 @@ import Time exposing (Time)
 import Task exposing (Task)
 import Utils exposing (..)
 import Drag as Drag exposing (..)
+import RemoteData exposing (WebData)
+import Http
+import Json.Decode as Decode
+import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
+import Models
 
 
 -- import Debug exposing (..)
@@ -19,12 +24,7 @@ import Drag as Drag exposing (..)
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.batch [ getTime ] )
-
-
-getTime : Cmd Msg
-getTime =
-    Task.perform SetTimeAndWeek Time.now
+    ( initialModel, Cmd.batch [ getTime, fetchTodos ] )
 
 
 
@@ -42,6 +42,7 @@ type Msg
     | TodoEditName Int String
     | TodoCreate TodoList
     | TodoUpdateNewField TodoList String
+    | HttpOnFetchTodos (WebData (List Todo))
     | OffsetDay Int
     | DragStart Todo
     | DragEnd Todo
@@ -75,7 +76,7 @@ update msg model =
                     else
                         t
             in
-                { model | todos = List.map todoNew model.todos }
+                { model | todos = List.map todoNew (Models.maybeTodos model.todos) }
                     ! []
 
         TodoToggleEditing id isEditing ->
@@ -86,7 +87,7 @@ update msg model =
                     else
                         t
             in
-                { model | todos = List.map updateTodos model.todos }
+                { model | todos = List.map updateTodos (Models.maybeTodos model.todos) }
                     ! []
 
         TodoStopEditing todo isEditing ->
@@ -107,7 +108,7 @@ update msg model =
                     else
                         List.map updateTodos todos
             in
-                { model | todos = finalUpdate model.todos }
+                { model | todos = finalUpdate (Models.maybeTodos model.todos) }
                     ! []
 
         TodoEditName id newChar ->
@@ -118,11 +119,11 @@ update msg model =
                     else
                         t
             in
-                { model | todos = List.map updateTodos model.todos }
+                { model | todos = List.map updateTodos (Models.maybeTodos model.todos) }
                     ! []
 
         TodoDelete todo ->
-            { model | todos = List.filter (\t -> t.id /= todo.id) model.todos }
+            { model | todos = List.filter (\t -> t.id /= todo.id) (Models.maybeTodos model.todos) }
                 ! []
 
         TodoCreate todoList ->
@@ -158,9 +159,9 @@ update msg model =
                         { model
                             | todos =
                                 if String.isEmpty todoList.inputField then
-                                    model.todos
+                                    (Models.maybeTodos model.todos)
                                 else
-                                    model.todos ++ [ (buildNewTodo 0) ]
+                                    (Models.maybeTodos model.todos) ++ [ (buildNewTodo 0) ]
                             , currentWeek = List.map cleartodoListField model.currentWeek
                             , uuid = model.uuid + 1
                         }
@@ -170,9 +171,9 @@ update msg model =
                         { model
                             | todos =
                                 if String.isEmpty todoList.inputField then
-                                    model.todos
+                                    (Models.maybeTodos model.todos)
                                 else
-                                    model.todos ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]
+                                    (Models.maybeTodos model.todos) ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]
                             , currentWeek = List.map cleartodoListField model.currentWeek
                             , uuid = model.uuid + 1
                         }
@@ -204,6 +205,9 @@ update msg model =
             in
                 { model | currentWeek = List.map updateTodoList model.currentWeek }
                     ! []
+
+        HttpOnFetchTodos res ->
+            ( { model | todos = res }, Cmd.none )
 
         OffsetDay day ->
             let
@@ -379,6 +383,7 @@ viewTodoEmpty model todolist =
 
         todosPerTodoList =
             model.todos
+                |> Models.maybeTodos
                 |> List.filter (taskInDate todolist.date)
                 |> List.length
 
@@ -473,6 +478,7 @@ viewTodoList model todoList =
     let
         todosSortedAndFiltered =
             model.todos
+                |> Models.maybeTodos
                 |> List.filter (taskInDate todoList.date)
                 |> List.sortBy .order
 
@@ -519,3 +525,40 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+
+
+
+-- COMMANDS ---
+
+
+getTime : Cmd Msg
+getTime =
+    Task.perform SetTimeAndWeek Time.now
+
+
+fetchTodos : Cmd Msg
+fetchTodos =
+    Http.get "localhost:3000/todos" todosDecoder
+        |> RemoteData.sendRequest
+        |> Cmd.map HttpOnFetchTodos
+
+
+todosDecoder : Decode.Decoder (List Todo)
+todosDecoder =
+    Decode.list todoDecoder
+
+
+
+-- TODO FIXME THIS THING
+
+
+todoDecoder : Decode.Decoder Todo
+todoDecoder =
+    JsonPipe.decode Todo
+        |> JsonPipe.required "id" Decode.string
+        |> JsonPipe.required "isEditing" Decode.bool
+        |> JsonPipe.required "name" Decode.string
+        |> JsonPipe.required "complete" Decode.bool
+        |> JsonPipe.required "parentList" Decode.string
+        |> JsonPipe.required "order" Decode.int
+        |> JsonPipe.required "ts" Decode.int
