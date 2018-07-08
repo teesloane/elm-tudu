@@ -14,15 +14,6 @@ msInADay =
     86400000
 
 
-{-| Creates a List of Day Types.
--}
-
-
-
--- buildWeek : Time -> List Day
--- buildWeek : Float -> List Day
-
-
 buildWeek dayOffset timestamp =
     let
         days =

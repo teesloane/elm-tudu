@@ -1,6 +1,12 @@
-* [ ] Feature: Generic Lists at the bottom
-* [ ] Feature: Previous Todo's roll over
+
+* NEXT Feature: Previous Todo's roll over
+** [ ] build "created_at" ts for todos, incase orig ts's are needed.
+** [ ] When rendering a list in which todos are < date.now, change the date.
 * [ ] Feature: Date Picker
+https://github.com/elm-community/elm-datepicker
+* [ ] Feature: Recurring Tasks
+* [ ] Feature: Markdown parsing
+* [ ] Feature: Generic Lists at the bottom
 * [ ] [#C] Replace edit icon with pencil
 * [ ] [#C] Current day should be styled differently
 * [ ] [#C] clicking outside input should set editing to false
@@ -10,6 +16,8 @@ CLOSED: [2018-07-07 Sat 13:55]
 - [X] if you remove the text of a todo and hit enter and there's nothing there,
   delete it.
 - [?]going to have to resort everything when you delete something.
+* [X] Feature: Return to current day.
+CLOSED: [2018-07-07 Sat 23:45]
 * [X] Feature: Future Weeks 
 CLOSED: [2018-07-07 Sat 13:55]
 ** [ ] add timeoffset to model (in days?

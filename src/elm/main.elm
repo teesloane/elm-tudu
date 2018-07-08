@@ -207,9 +207,12 @@ update msg model =
 
         OffsetDay day ->
             let
-                -- todo handle +/-
                 newOffset =
-                    model.dayOffset + day
+                    if day == 0 then
+                        -- "0" == "return home via offsets."
+                        0
+                    else
+                        model.dayOffset + day
             in
                 { model
                     | dayOffset = newOffset
@@ -245,6 +248,7 @@ view model =
         , div []
             [ div [ class "day-advance", onClick (OffsetDay -1) ] [ text "<" ]
             , div [ class "week-advance", onClick (OffsetDay -5) ] [ text "<<" ]
+            , div [ class "go-home-week", onClick (OffsetDay 0) ] [ text "home" ]
             ]
         , viewWeek model
         , div []
