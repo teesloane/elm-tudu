@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Models as Models exposing (Model, initialModel, Todo, TodoList)
 import Dom exposing (focus)
 import Maybe exposing (..)
+import Update as Msgs exposing (Msg, update)
 import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
@@ -18,7 +19,6 @@ import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
 import Models
 
 
--- import Debug exposing (..)
 -- Boot up, on load commands
 
 
@@ -29,230 +29,6 @@ init =
 
 
 -- MESSAGES (possibly move this to  `models`)
-
-
-type Msg
-    = SetTimeAndWeek Time
-    | TodoToggleComplete Int Bool
-    | TodoToggleEditing Int Bool
-    | TodoStopEditing Todo Bool
-    | TodoFocusInputFromEmpty TodoList
-    | TodoDelete Todo
-    | TodoFocusInputResult (Result Dom.Error ())
-    | TodoEditName Int String
-    | TodoCreate TodoList
-    | TodoUpdateNewField TodoList String
-    | HttpOnFetchTodos (WebData (List Todo))
-    | OffsetDay Int
-    | DragStart Todo
-    | DragEnd Todo
-    | DragOver Todo
-    | Drop Todo
-
-
-
--- UPDATE
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        SetTimeAndWeek time ->
-            let
-                newWeek =
-                    (buildWeek model.dayOffset time)
-            in
-                { model
-                    | timeAtLoad = time
-                    , currentWeek = newWeek
-                }
-                    ! []
-
-        TodoToggleComplete id isCompleted ->
-            let
-                todoNew t =
-                    if t.id == id then
-                        { t | complete = isCompleted }
-                    else
-                        t
-            in
-                -- FIXME - refactor the RemoteDatamap -> list map for todos
-                { model | todos = RemoteData.map (\d -> List.map todoNew d) model.todos }
-                    ! []
-
-        TodoToggleEditing id isEditing ->
-            let
-                updateTodos t =
-                    if t.id == id then
-                        { t | isEditing = isEditing }
-                    else
-                        t
-            in
-                { model | todos = RemoteData.map (\d -> List.map updateTodos d) model.todos }
-                    ! []
-
-        TodoStopEditing todo isEditing ->
-            -- capable of editing or deleting if the edited string is empty.
-            let
-                isEmpty =
-                    String.isEmpty todo.name
-
-                updateTodos t =
-                    if t.id == todo.id then
-                        { t | isEditing = isEditing }
-                    else
-                        t
-
-                finalUpdate todos =
-                    if isEmpty then
-                        List.filter (\t -> t.id /= todo.id) todos
-                    else
-                        List.map updateTodos todos
-            in
-                { model | todos = RemoteData.map (\d -> (finalUpdate d)) model.todos }
-                    ! []
-
-        TodoEditName id newChar ->
-            let
-                updateTodos t =
-                    if t.id == id then
-                        { t | name = newChar }
-                    else
-                        t
-            in
-                { model | todos = RemoteData.map (\l -> List.map updateTodos l) model.todos }
-                    ! []
-
-        TodoDelete todo ->
-            let
-                filterTodos todoList =
-                    List.filter (\t -> t.id /= todo.id) todoList
-            in
-                { model | todos = RemoteData.map filterTodos model.todos }
-                    ! []
-
-        TodoCreate todoList ->
-            let
-                -- create the order to assign to the new todo.
-                newTodoOrder =
-                    List.length (Models.getTodosInList todoList model)
-
-                lastItemOrder : Maybe Todo
-                lastItemOrder =
-                    (Models.getTodosInList todoList model)
-                        |> List.sortBy .order
-                        |> List.reverse
-                        |> List.head
-
-                buildNewTodo n =
-                    { id = model.uuid + 1 -- no good, change to uuid soon
-                    , isEditing = False
-                    , name = todoList.inputField
-                    , complete = False
-                    , parentList = todoList.name
-                    , order = n
-                    , ts = (Date.toTime todoList.date)
-                    }
-
-                cleartodoListField d =
-                    if d.name == todoList.name then
-                        { d | inputField = "" }
-                    else
-                        d
-            in
-                case lastItemOrder of
-                    Nothing ->
-                        { model
-                            | todos =
-                                if String.isEmpty todoList.inputField then
-                                    RemoteData.map (\d -> d) model.todos
-                                else
-                                    (RemoteData.map (\d -> d ++ [ (buildNewTodo 0) ]) model.todos)
-                            , currentWeek = List.map cleartodoListField model.currentWeek
-                            , uuid = model.uuid + 1
-                        }
-                            ! []
-
-                    Just lastItemOrder_ ->
-                        { model
-                            | todos =
-                                if String.isEmpty todoList.inputField then
-                                    RemoteData.map (\d -> d) model.todos
-                                else
-                                    (RemoteData.map (\d -> d ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]) model.todos)
-                            , currentWeek = List.map cleartodoListField model.currentWeek
-                            , uuid = model.uuid + 1
-                        }
-                            ! []
-
-        TodoFocusInputFromEmpty todoList ->
-            let
-                id =
-                    todoList.name ++ "focus-id"
-            in
-                model ! [ Task.attempt TodoFocusInputResult (focus id) ]
-
-        TodoFocusInputResult res ->
-            case res of
-                -- could do error handling here.
-                Err (Dom.NotFound id) ->
-                    model ! []
-
-                Ok () ->
-                    model ! []
-
-        TodoUpdateNewField todoList newChar ->
-            let
-                updateTodoList t =
-                    if t.name == todoList.name then
-                        { t | inputField = newChar }
-                    else
-                        t
-            in
-                { model | currentWeek = List.map updateTodoList model.currentWeek }
-                    ! []
-
-        HttpOnFetchTodos res ->
-            let
-                newWeek =
-                    (buildWeek model.dayOffset model.timeAtLoad)
-            in
-                { model
-                    | todos = res
-                    , uuid = List.length (Models.maybeTodos res) + 1
-                    , currentWeek = newWeek
-                }
-                    ! []
-
-        OffsetDay day ->
-            let
-                newOffset =
-                    if day == 0 then
-                        -- "0" == "return home via offsets."
-                        0
-                    else
-                        model.dayOffset + day
-            in
-                { model
-                    | dayOffset = newOffset
-                    , currentWeek = (buildWeek newOffset model.timeAtLoad)
-                }
-                    ! []
-
-        DragStart todo ->
-            Drag.start model (Just todo)
-
-        DragEnd todo ->
-            Drag.end model (Just todo)
-
-        DragOver todo ->
-            Drag.over model (Just todo)
-
-        Drop todo ->
-            Drag.drop model todo
-
-
-
 -- View
 
 
@@ -265,14 +41,14 @@ view model =
 
         -- , viewTodoList model
         , div []
-            [ div [ class "day-advance", onClick (OffsetDay -1) ] [ text "<" ]
-            , div [ class "week-advance", onClick (OffsetDay -5) ] [ text "<<" ]
-            , div [ class "go-home-week", onClick (OffsetDay 0) ] [ text "home" ]
+            [ div [ class "day-advance", onClick (Msgs.OffsetDay -1) ] [ text "<" ]
+            , div [ class "week-advance", onClick (Msgs.OffsetDay -5) ] [ text "<<" ]
+            , div [ class "go-home-week", onClick (Msgs.OffsetDay 0) ] [ text "home" ]
             ]
         , viewWeek model
         , div []
-            [ div [ class "day-advance", onClick (OffsetDay 1) ] [ text ">" ]
-            , div [ class "week-advance", onClick (OffsetDay 5) ] [ text ">>" ]
+            [ div [ class "day-advance", onClick (Msgs.OffsetDay 1) ] [ text ">" ]
+            , div [ class "week-advance", onClick (Msgs.OffsetDay 5) ] [ text ">>" ]
             ]
         ]
 
@@ -307,8 +83,8 @@ viewTodoState_Editing : Model -> Todo -> Html Msg
 viewTodoState_Editing model todo =
     input
         [ value todo.name
-        , onInput (TodoEditName todo.id)
-        , onEnter (TodoStopEditing todo (not todo.isEditing))
+        , onInput (Msgs.TodoEditName todo.id)
+        , onEnter (Msgs.TodoStopEditing todo (not todo.isEditing))
         , class "todo todo-input"
         ]
         []
@@ -320,19 +96,19 @@ viewTodoState_Incomplete model todo =
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
             , draggable "true"
-            , Drag.onStart (DragStart todo)
-            , Drag.onOver (DragOver todo)
-            , Drag.onEnd (DragEnd todo)
+            , Drag.onStart (Msgs.DragStart todo)
+            , Drag.onOver (Msgs.DragOver todo)
+            , Drag.onEnd (Msgs.DragEnd todo)
             ]
             [ span
-                [ onClick (TodoToggleComplete todo.id (not todo.complete))
+                [ onClick (Msgs.TodoToggleComplete todo.id (not todo.complete))
                 , class "todo-draggable"
-                , Drag.onStart <| DragStart todo
+                , Drag.onStart <| Msgs.DragStart todo
                 ]
                 [ text todo.name ]
             , span
                 [ class "todo-edit-btn"
-                , onClick (TodoToggleEditing todo.id (not todo.isEditing))
+                , onClick (Msgs.TodoToggleEditing todo.id (not todo.isEditing))
                 ]
                 [ text "edit" ]
             ]
@@ -347,19 +123,19 @@ viewTodoState_Complete model todo =
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
             , draggable "true"
-            , Drag.onStart (DragStart todo)
-            , Drag.onOver (DragOver todo)
-            , Drag.onEnd (DragEnd todo)
+            , Drag.onStart (Msgs.DragStart todo)
+            , Drag.onOver (Msgs.DragOver todo)
+            , Drag.onEnd (Msgs.DragEnd todo)
             ]
             [ span
-                [ onClick (TodoToggleComplete todo.id (not todo.complete))
+                [ onClick (Msgs.TodoToggleComplete todo.id (not todo.complete))
                 , class "todo-draggable todo-completed"
-                , Drag.onStart <| DragStart todo
+                , Drag.onStart <| Msgs.DragStart todo
                 ]
                 [ text todo.name ]
             , span
                 [ class "todo-delete-btn"
-                , onClick (TodoDelete todo)
+                , onClick (Msgs.TodoDelete todo)
                 ]
                 [ text "delete" ]
             ]
@@ -377,10 +153,10 @@ viewTodoNew model todoList =
     else
         div [ class "todo flex flex-auto justify-between" ]
             [ input
-                [ onEnter (TodoCreate todoList)
+                [ onEnter (Msgs.TodoCreate todoList)
                 , value todoList.inputField
                 , id (todoList.name ++ "focus-id")
-                , onInput (TodoUpdateNewField todoList)
+                , onInput (Msgs.TodoUpdateNewField todoList)
                 , class "todo-input"
                 ]
                 []
@@ -411,7 +187,7 @@ viewTodoEmpty model todolist =
             else
                 div
                     [ class "todo"
-                    , onClick (TodoFocusInputFromEmpty todolist)
+                    , onClick (Msgs.TodoFocusInputFromEmpty todolist)
                     ]
                     [ text "" ]
     in
@@ -426,8 +202,8 @@ viewTodoDropZone model todo =
         dropZone =
             div
                 [ class "todo todo-dropzone"
-                , Drag.onOver (DragOver todo)
-                , Drag.onDrop (Drop todo)
+                , Drag.onOver (Msgs.DragOver todo)
+                , Drag.onDrop (Msgs.Drop todo)
                 ]
                 []
     in
@@ -462,8 +238,8 @@ viewTodoDropZoneEmpty model todoList =
         dropZone order =
             div
                 [ class "todo todo-dropzone"
-                , Drag.onOver (DragOver (buildNewTodo order))
-                , Drag.onDrop (Drop (buildNewTodo order))
+                , Drag.onOver (Msgs.DragOver (buildNewTodo order))
+                , Drag.onDrop (Msgs.Drop (buildNewTodo order))
                 ]
                 []
     in
@@ -548,14 +324,14 @@ main =
 
 getTime : Cmd Msg
 getTime =
-    Task.perform SetTimeAndWeek Time.now
+    Task.perform Msgs.SetTimeAndWeek Time.now
 
 
 fetchTodos : Cmd Msg
 fetchTodos =
     Http.get "http://localhost:3000/todos" todosDecoder
         |> RemoteData.sendRequest
-        |> Cmd.map HttpOnFetchTodos
+        |> Cmd.map Msgs.HttpOnFetchTodos
 
 
 todosDecoder : Decode.Decoder (List Todo)

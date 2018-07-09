@@ -1,6 +1,12 @@
 
 * [X] Connect to mock json backend.
 CLOSED: [2018-07-09 Mon 08:13]
+* Basics: Crud Ops
+** [ ] on drag/drop, send todo list  back.
+** [ ] on new
+** [ ] on delete
+** [ ] on edit
+** [ ] on strikethrough
 * NEXT Feature: Previous Todo's roll over
 ** [ ] build "created_at" ts for todos, incase orig ts's are needed.
 ** [ ] When rendering a list in which todos are < date.now, change the date.
