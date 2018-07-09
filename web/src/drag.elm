@@ -1,5 +1,7 @@
 module Drag exposing (..)
 
+-- FIXME: move this to todo/
+
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Json.Decode as Json

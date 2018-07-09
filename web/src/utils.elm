@@ -15,6 +15,7 @@ msInADay =
 
 
 buildWeek dayOffset timestamp =
+    -- FIXME: move this to todo/
     let
         days =
             [ 0, 1, 2, 3, 4 ]
