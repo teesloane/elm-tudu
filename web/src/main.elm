@@ -11,7 +11,7 @@ import Time exposing (Time)
 import Task exposing (Task)
 import Utils exposing (..)
 import Drag as Drag exposing (..)
-import RemoteData exposing (WebData)
+import RemoteData exposing (WebData, map)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
@@ -24,7 +24,8 @@ import Models
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.batch [ getTime, fetchTodos ] )
+    -- ( initialModel, Cmd.batch [ getTime, fetchTodos ] )
+    ( initialModel, Cmd.batch [ getTime ] )
 
 
 
@@ -42,7 +43,7 @@ type Msg
     | TodoEditName Int String
     | TodoCreate TodoList
     | TodoUpdateNewField TodoList String
-    | HttpOnFetchTodos (WebData (List Todo))
+      -- | HttpOnFetchTodos (WebData (List Todo))
     | OffsetDay Int
     | DragStart Todo
     | DragEnd Todo
@@ -76,7 +77,8 @@ update msg model =
                     else
                         t
             in
-                { model | todos = List.map todoNew (Models.maybeTodos model.todos) }
+                -- FIXME - refactor the RemoteDatamap -> list map for todos
+                { model | todos = RemoteData.map (\d -> List.map todoNew d) model.todos }
                     ! []
 
         TodoToggleEditing id isEditing ->
@@ -87,7 +89,7 @@ update msg model =
                     else
                         t
             in
-                { model | todos = List.map updateTodos (Models.maybeTodos model.todos) }
+                { model | todos = RemoteData.map (\d -> List.map updateTodos d) model.todos }
                     ! []
 
         TodoStopEditing todo isEditing ->
@@ -108,7 +110,7 @@ update msg model =
                     else
                         List.map updateTodos todos
             in
-                { model | todos = finalUpdate (Models.maybeTodos model.todos) }
+                { model | todos = RemoteData.map (\d -> (finalUpdate d)) model.todos }
                     ! []
 
         TodoEditName id newChar ->
@@ -119,15 +121,20 @@ update msg model =
                     else
                         t
             in
-                { model | todos = List.map updateTodos (Models.maybeTodos model.todos) }
+                { model | todos = RemoteData.map (\l -> List.map updateTodos l) model.todos }
                     ! []
 
         TodoDelete todo ->
-            { model | todos = List.filter (\t -> t.id /= todo.id) (Models.maybeTodos model.todos) }
-                ! []
+            let
+                filterTodos todoList =
+                    List.filter (\t -> t.id /= todo.id) todoList
+            in
+                { model | todos = RemoteData.map filterTodos model.todos }
+                    ! []
 
         TodoCreate todoList ->
             let
+                -- create the order to assign to the new todo.
                 newTodoOrder =
                     List.length (Models.getTodosInList todoList model)
 
@@ -153,15 +160,42 @@ update msg model =
                         { d | inputField = "" }
                     else
                         d
+
+                _ =
+                    Debug.log "last item order is " lastItemOrder
+
+                _ =
+                    Debug.log "Is empty" (String.isEmpty todoList.inputField)
             in
                 case lastItemOrder of
                     Nothing ->
                         { model
                             | todos =
                                 if String.isEmpty todoList.inputField then
-                                    (Models.maybeTodos model.todos)
+                                    -- (Models.maybeTodos model.todos)
+                                    -- RemoteData.map (\d -> d) model.todos
+                                    (RemoteData.map
+                                        (\d ->
+                                            let
+                                                _ =
+                                                    Debug.log "d is " d
+                                            in
+                                                d ++ [ (buildNewTodo 0) ]
+                                        )
+                                        model.todos
+                                    )
                                 else
-                                    (Models.maybeTodos model.todos) ++ [ (buildNewTodo 0) ]
+                                    -- (Models.maybeTodos model.todos) ++ [ (buildNewTodo 0) ]
+                                    (RemoteData.map
+                                        (\d ->
+                                            let
+                                                _ =
+                                                    Debug.log "d is " d
+                                            in
+                                                d ++ [ (buildNewTodo 0) ]
+                                        )
+                                        model.todos
+                                    )
                             , currentWeek = List.map cleartodoListField model.currentWeek
                             , uuid = model.uuid + 1
                         }
@@ -171,9 +205,32 @@ update msg model =
                         { model
                             | todos =
                                 if String.isEmpty todoList.inputField then
-                                    (Models.maybeTodos model.todos)
+                                    -- (Models.maybeTodos model.todos)
+                                    -- RemoteData.map (\d -> d) model.todos
+                                    (RemoteData.map
+                                        (\d ->
+                                            let
+                                                _ =
+                                                    Debug.log "d is " d
+                                            in
+                                                d ++ [ (buildNewTodo 0) ]
+                                        )
+                                        model.todos
+                                    )
                                 else
-                                    (Models.maybeTodos model.todos) ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]
+                                    -- (RemoteData.map (\d -> d ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]) model.todos)
+                                    (RemoteData.map
+                                        (\d ->
+                                            let
+                                                _ =
+                                                    Debug.log "d is " d
+                                            in
+                                                d ++ [ (buildNewTodo 0) ]
+                                        )
+                                        model.todos
+                                    )
+
+                            -- (Models.maybeTodos model.todos) ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]
                             , currentWeek = List.map cleartodoListField model.currentWeek
                             , uuid = model.uuid + 1
                         }
@@ -206,9 +263,8 @@ update msg model =
                 { model | currentWeek = List.map updateTodoList model.currentWeek }
                     ! []
 
-        HttpOnFetchTodos res ->
-            ( { model | todos = res }, Cmd.none )
-
+        -- HttpOnFetchTodos res ->
+        --     ( { model | todos = res }, Cmd.none )
         OffsetDay day ->
             let
                 newOffset =
@@ -536,29 +592,23 @@ getTime =
     Task.perform SetTimeAndWeek Time.now
 
 
-fetchTodos : Cmd Msg
-fetchTodos =
-    Http.get "localhost:3000/todos" todosDecoder
-        |> RemoteData.sendRequest
-        |> Cmd.map HttpOnFetchTodos
 
-
-todosDecoder : Decode.Decoder (List Todo)
-todosDecoder =
-    Decode.list todoDecoder
-
-
-
+-- fetchTodos : Cmd Msg
+-- fetchTodos =
+--     Http.get "localhost:3000/todos" todosDecoder
+--         |> RemoteData.sendRequest
+--         |> Cmd.map HttpOnFetchTodos
+-- todosDecoder : Decode.Decoder (List Todo)
+-- todosDecoder =
+--     Decode.list todoDecoder
 -- TODO FIXME THIS THING
-
-
-todoDecoder : Decode.Decoder Todo
-todoDecoder =
-    JsonPipe.decode Todo
-        |> JsonPipe.required "id" Decode.string
-        |> JsonPipe.required "isEditing" Decode.bool
-        |> JsonPipe.required "name" Decode.string
-        |> JsonPipe.required "complete" Decode.bool
-        |> JsonPipe.required "parentList" Decode.string
-        |> JsonPipe.required "order" Decode.int
-        |> JsonPipe.required "ts" Decode.int
+-- todoDecoder : Decode.Decoder Todo
+-- todoDecoder =
+--     JsonPipe.decode Todo
+--         |> JsonPipe.required "id" Decode.string
+--         |> JsonPipe.required "isEditing" Decode.bool
+--         |> JsonPipe.required "name" Decode.string
+--         |> JsonPipe.required "complete" Decode.bool
+--         |> JsonPipe.required "parentList" Decode.string
+--         |> JsonPipe.required "order" Decode.int
+--         |> JsonPipe.required "ts" Decode.int
