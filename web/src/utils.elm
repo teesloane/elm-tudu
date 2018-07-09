@@ -41,6 +41,7 @@ buildWeek dayOffset timestamp =
 
 
 {-| Return true if a todo's due date belongs to a Day
+TODO: Move to Model for todo.
 -}
 taskInDate : Date -> Todo -> Bool
 taskInDate date todo =
