@@ -6,7 +6,7 @@ import Json.Decode as Json
 import Date exposing (..)
 import Debug exposing (..)
 import Models exposing (..)
-import RemoteData exposing (WebData)
+import RemoteData exposing (WebData, map)
 
 
 onStart : a -> Html.Attribute a
@@ -118,54 +118,34 @@ over model targetTodo =
 
 {-| Changes timestamp of dropped todo
 Causes it to be re-rendered in a different List.
-FIXME: use maybe.map instead of having two switch cases.
 -}
 drop : Model -> Todo -> ( Model, Cmd a )
 drop model todo =
-    case model.draggedTodo of
-        Nothing ->
-            ( model, Cmd.none )
+    case ( model.draggedTodo, model.dragTarget ) of
+        ( Just draggedTodo_, Just dragTarget_ ) ->
+            let
+                updateTodos i t =
+                    -- if iterated t.id is the dragged todo, we need to update order, ts, and parentlist
+                    if t.id == draggedTodo_.id then
+                        { t
+                            | ts = dragTarget_.ts
+                            , order = dragTarget_.order
+                            , parentList = dragTarget_.parentList
+                        }
+                        -- if todos are in list where draggedTodo was Dropped, update the order for them.
+                    else if t.parentList == dragTarget_.parentList && t.order >= draggedTodo_.order then
+                        { t | order = t.order + 1 }
+                    else
+                        t
+            in
+                { model
+                    | todos = RemoteData.succeed (model.todos |> Models.maybeTodos |> (List.sortBy .parentList) |> (List.indexedMap updateTodos))
+                    , dragTarget = Nothing
+                    , draggedTodo = Nothing
+                    , beingDragged = False
+                }
+                    ! []
 
-        Just draggedTodo_ ->
-            case model.dragTarget of
-                Nothing ->
-                    ( { model | beingDragged = False }, Cmd.none )
-
-                Just dragTarget_ ->
-                    case model.todos of
-                        RemoteData.NotAsked ->
-                            model ! []
-
-                        RemoteData.Loading ->
-                            model ! []
-
-                        RemoteData.Failure err ->
-                            model ! []
-
-                        RemoteData.Success todos_ ->
-                            let
-                                updateTodos i t =
-                                    -- if iterated t.id is the dragged todo, we need to update order, ts, and parentlist
-                                    if t.id == draggedTodo_.id then
-                                        { t
-                                            | ts = dragTarget_.ts
-                                            , order = dragTarget_.order
-                                            , parentList = dragTarget_.parentList
-                                        }
-                                        -- if todos are in list where draggedTodo was Dropped, update the order for them.
-                                    else if t.parentList == dragTarget_.parentList && t.order >= draggedTodo_.order then
-                                        { t | order = t.order + 1 }
-                                    else
-                                        t
-                            in
-                                model ! []
-
-
-
--- { model
---     | todos = List.indexedMap updateTodos (List.sortBy .parentList todos_)
---     , dragTarget = Nothing
---     , draggedTodo = Nothing
---     , beingDragged = False
--- }
---     ! []
+        _ ->
+            -- NOTE: could set draggedTodo and dragTarget to nothing here
+            model ! []

@@ -3,32 +3,24 @@
     "name": "typicode"
   },
   "todos": [
-    {
-      "id": 1,
-      "isEditing": false,
-      "name": "Task 1",
-      "complete": false,
-      "parentList": "Sun 8 Jul",
-      "order": 0,
-      "ts": 1531060637287
-    },
-    {
-      "id": 2,
-      "isEditing": false,
-      "name": "Task 2",
-      "complete": false,
-      "parentList": "Sun 9 Jul",
-      "order": 0,
-      "ts": 1531060637287
-    },
-        {
-      "id": 3,
+      {
+      "id": 0,
       "isEditing": false,
       "name": "Task 3",
       "complete": false,
-      "parentList": "Sun 9 Jul",
+      "parentList": "Mon 9 Jul",
       "order": 1,
-      "ts": 1531060637287
+      "ts": 1531134334726
+    },
+
+      {
+      "id": 1,
+      "isEditing": false,
+      "name": "Task 3",
+      "complete": false,
+      "parentList": "Tue 10 Jul",
+      "order": 1,
+      "ts": 1531234334726
     }
 
   ]

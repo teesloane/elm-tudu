@@ -65,7 +65,7 @@ maybeTodos response =
             []
 
         RemoteData.Success todos ->
-            []
+            todos
 
         RemoteData.Failure error ->
             []
