@@ -31,6 +31,6 @@ todoDecoder =
 
 fetchAll : Cmd Msg
 fetchAll =
-    Http.get "http://localhost:3000/todos" todosDecoder
+    Http.get "http://localhost:4000/todos" todosDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.HttpOnFetchTodos

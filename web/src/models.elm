@@ -68,6 +68,7 @@ maybeTodos response =
             todos
 
         RemoteData.Failure error ->
+            -- FIXME HANDLE THIS CASE
             []
 
 

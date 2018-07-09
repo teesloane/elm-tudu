@@ -1,12 +1,10 @@
-module Drag exposing (..)
+module Todo.Drag exposing (..)
 
 -- FIXME: move this to todo/
 
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Json.Decode as Json
-import Date exposing (..)
-import Debug exposing (..)
 import Models exposing (..)
 import RemoteData exposing (WebData, map)
 

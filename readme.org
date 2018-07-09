@@ -1,0 +1,6 @@
+* Development
+
+- install foreman
+- install elm packages probably
+- install json-server
+- make develop

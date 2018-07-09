@@ -7,7 +7,7 @@ import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
 import Utils exposing (..)
-import Drag exposing (..)
+import Todo.Drag as Drag exposing (..)
 
 
 type Msg

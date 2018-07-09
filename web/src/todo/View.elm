@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Models exposing (Model, Todo, TodoList)
 import Date exposing (..)
 import Update as Msgs exposing (Msg)
-import Drag exposing (..)
+import Todo.Drag as Drag exposing (..)
 import Utils exposing (onEnter, taskInDate, parseDate)
 
 
