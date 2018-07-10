@@ -94,10 +94,11 @@ update msg model =
                 model ! []
             else
                 let
-                    -- create the order to assign to the new todo.
-                    newTodoOrder =
-                        List.length (Models.getTodosInList todoList model)
-
+                    -- get last item's order, and use it for new todo.
+                    -- The maybe value here makes the rest of the function pretty ugly
+                    -- everything kind of depends on what the order is... so that's weird.
+                    -- not sure how to clean up yet.
+                    -- could use maybe withDefault of 0, even while accessing record attribute?
                     lastItemOrder : Maybe Todo
                     lastItemOrder =
                         (Models.getTodosInList todoList model)
@@ -111,34 +112,45 @@ update msg model =
                         , name = todoList.inputField
                         , complete = False
                         , parentList = todoList.name
-                        , order = n
+                        , order =
+                            if n == 0 then
+                                0
+                            else
+                                n + 1
                         , ts = (Date.toTime todoList.date)
                         }
 
+                    -- update todos in local database
+                    updateTodos order =
+                        if order == 0 then
+                            RemoteData.map (\d -> d ++ [ (buildNewTodo order) ]) model.todos
+                        else
+                            RemoteData.map (\d -> d ++ [ (buildNewTodo (order + 1)) ]) model.todos
+
+                    -- clear the dom input after saving the input.
                     cleartodoListField d =
                         if d.name == todoList.name then
                             { d | inputField = "" }
                         else
                             d
                 in
-                    -- could use maybe with default of 0.
                     case lastItemOrder of
                         Nothing ->
                             ( { model
-                                | todos = (RemoteData.map (\d -> d ++ [ (buildNewTodo 0) ]) model.todos)
+                                | todos = updateTodos 0
                                 , currentWeek = List.map cleartodoListField model.currentWeek
                                 , uuid = model.uuid + 1
                               }
                             , Todo.Http.postTodoCmd (buildNewTodo 0)
                             )
 
-                        Just lastItemOrder_ ->
+                        Just t ->
                             ( { model
-                                | todos = (RemoteData.map (\d -> d ++ [ (buildNewTodo (lastItemOrder_.order + 1)) ]) model.todos)
+                                | todos = updateTodos t.order
                                 , currentWeek = List.map cleartodoListField model.currentWeek
                                 , uuid = model.uuid + 1
                               }
-                            , Todo.Http.postTodoCmd (buildNewTodo (lastItemOrder_.order + 1))
+                            , Todo.Http.postTodoCmd (buildNewTodo (t.order + 1))
                             )
 
         Msgs.TodoFocusInputFromEmpty todoList ->
@@ -180,10 +192,6 @@ update msg model =
                 }
                     ! []
 
-        -- Msgs.OnPlayerSave (Ok player) ->
-        --     ( updatePlayer model player, Cmd.none )
-        -- Msgs.OnPlayerSave (Err error) ->
-        --     ( model, Cmd.none )
         Msgs.HttpOnTodosSave (Ok todos) ->
             model ! []
 
