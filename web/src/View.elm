@@ -5,7 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events as Events exposing (..)
 import Models exposing (Model)
 import Todo.View
-import Update as Msgs exposing (Msg, update)
+import Msgs exposing (Msg)
+import Update as Msgs exposing (update)
 
 
 {-| Top level app-wide view.

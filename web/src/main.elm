@@ -5,7 +5,8 @@ import Models as Models exposing (Model, initialModel)
 import Task exposing (Task)
 import Time exposing (Time)
 import Todo.Http
-import Update as Msgs exposing (Msg, update)
+import Msgs exposing (Msg)
+import Update as Msgs exposing (update)
 import View exposing (topView)
 
 

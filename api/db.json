@@ -3,7 +3,7 @@
     "name": "typicode"
   },
   "todos": [
-      {
+    {
       "id": 0,
       "isEditing": false,
       "name": "Task 3",
@@ -12,8 +12,7 @@
       "order": 1,
       "ts": 1531134334726
     },
-
-      {
+    {
       "id": 1,
       "isEditing": false,
       "name": "Task 3",
@@ -21,7 +20,15 @@
       "parentList": "Tue 10 Jul",
       "order": 1,
       "ts": 1531234334726
+    },
+    {
+      "id": 4,
+      "isEditing": false,
+      "name": "test",
+      "complete": false,
+      "parentList": "Wed 11 Jul",
+      "order": 0,
+      "ts": 1531341982611
     }
-
   ]
 }
