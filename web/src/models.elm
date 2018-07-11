@@ -36,10 +36,6 @@ initialModel =
     }
 
 
-
--- Todo:  Type + Funcs:
-
-
 type alias Todo =
     { id : Int
     , isEditing : Bool

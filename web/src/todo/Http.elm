@@ -113,16 +113,25 @@ fetchAllCmd =
 
 
 -- onFetchAll : Model -> Result Http.Error Todo -> Cmd Msg
+-- onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
 
 
-onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
+{-| On fetching all todos, we set them into state, and set the currentWeek.
+Also, if a todo is overdue and incomplete, move it into current day.
+-}
 onFetchAll model res =
     let
         newWeek =
             (buildWeek model.dayOffset model.timeAtLoad)
+
+        rolledOverTodos t =
+            if t.ts <= model.timeAtLoad && t.complete == False then
+                { t | ts = model.timeAtLoad }
+            else
+                t
     in
         { model
-            | todos = res
+            | todos = RemoteData.succeed (List.map rolledOverTodos (Models.maybeTodos res))
             , uuid = List.length (Models.maybeTodos res) + 1
             , currentWeek = newWeek
         }

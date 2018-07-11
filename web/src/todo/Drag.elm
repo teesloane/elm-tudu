@@ -120,6 +120,7 @@ over model targetTodo =
 Causes it to be re-rendered in a different List.
 NOTE: Decided to avoid ugly model updates "locally" to client to represent the drop;
 when a successful API request will make the change anyway on response + re-render
+-- FIXME: todo drop order is broken
 -}
 drop : Model -> Todo -> ( Model, Cmd Msgs.Msg )
 drop model todo =

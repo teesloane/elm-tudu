@@ -18,7 +18,8 @@ body {
 
 .todo {
   width: 200px;
-  background: #ddd;
+  background: #fff;
+  border-bottom: 1px dotted #bfbfbf;
   font-size: 13px;
   height: 24px;
   margin: 8px 0;
@@ -35,15 +36,21 @@ body {
 
 .todo-input  {
   width: 200px;
-  background: #ddd;
+  background: #fff;
   font-size: 13px;
   border: none;
   outline: none;
-  color: white;
+  background: #fff;
+  border-bottom: 1px dotted #bfbfbf;
 }
 
 .todo-completed {
   text-decoration: line-through;
+  color: #dfdfdf;
+}
+
+.todo-incomplete :hover {
+  background: aliceblue;
 }
 
 .todo-draggable {

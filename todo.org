@@ -1,24 +1,13 @@
-* Basics: Crud Ops [66%]                                                        :key:
-** [X] on new
-CLOSED: [2018-07-10 Tue 17:02]
-** [ ] on delete
-** [X] on updated [100%]
-CLOSED: [2018-07-11 Wed 11:41]
-*** [X] on drag + drop
-CLOSED: [2018-07-11 Wed 11:41]
-*** [X] on edit name
-CLOSED: [2018-07-11 Wed 10:39]
-*** [X] on strikethrough / complete
-CLOSED: [2018-07-11 Wed 10:39]
-* NEXT Feature: Generic Lists at the bottom                                     :key:
-* [?] Feature: Previous Todo's roll over                                        :key:
+* [ ] Feature: Previous Todo's roll over [50%]                                  :key:
 ** [ ] build "created_at" ts for todos, incase orig ts's are needed.
-** [ ] When rendering a list in which todos are < date.now, change the date.
+** [X] When rendering a list in which todos are < date.now, change the date.
+CLOSED: [2018-07-11 Wed 14:10]
+* NEXT Feature: Generic Lists at the bottom                                     :key:
 * [ ] Feature: Date Picker                                                      :n2h:
 https://github.com/elm-community/elm-datepicker
 * [ ] Refactor all the RemoteData.maps                                          :refactor:
 * [ ] Feature: Recurring Tasks                                                  :n2h:
-* [ ] Feature: Themes
+* [ ] Feature: Themes                                                           :n2h:
 * [ ] Feature: Markdown parsing                                                 :stretch:
 * [ ] replace todo id with uuid.                                                :refactor:
 * [ ] [#C] Replace edit icon with pencil                                        :lopri:
@@ -52,7 +41,20 @@ CLOSED: [2018-06-26 Tue 19:28]
 - controlled inputs : dict> key date | value: input
 ** [X] Connect to mock json backend.
 CLOSED: [2018-07-09 Mon 08:13]
-
+** [X] [#C] Basics: Crud Ops [100%]                                            :key:
+CLOSED: [2018-07-11 Wed 13:18]
+*** [X] on new
+CLOSED: [2018-07-10 Tue 17:02]
+*** [X] on delete
+CLOSED: [2018-07-11 Wed 13:17]
+*** [X] on updated [100%]
+CLOSED: [2018-07-11 Wed 11:41]
+**** [X] on drag + drop
+CLOSED: [2018-07-11 Wed 11:41]
+**** [X] on edit name
+CLOSED: [2018-07-11 Wed 10:39]
+**** [X] on strikethrough / complete
+CLOSED: [2018-07-11 Wed 10:39]
 * Notes
 ** Comparable Dict.fromList 
 interesting: https://github.com/elm/compiler/issues/774

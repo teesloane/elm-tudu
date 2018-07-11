@@ -30,13 +30,13 @@ singleIncomplete model todo =
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
             , draggable "true"
+            , onClick (Msgs.TodoToggleComplete todo (not todo.complete))
             , Drag.onStart (Msgs.DragStart todo)
             , Drag.onOver (Msgs.DragOver todo)
             , Drag.onEnd (Msgs.DragEnd todo)
             ]
             [ span
-                [ onClick (Msgs.TodoToggleComplete todo (not todo.complete))
-                , class "todo-draggable"
+                [ class "todo-draggable"
                 , Drag.onStart <| Msgs.DragStart todo
                 ]
                 [ text todo.name ]
@@ -57,6 +57,7 @@ singleComplete model todo =
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
             , draggable "true"
+            , onClick (Msgs.TodoToggleComplete todo (not todo.complete))
             , Drag.onStart (Msgs.DragStart todo)
             , Drag.onOver (Msgs.DragOver todo)
             , Drag.onEnd (Msgs.DragEnd todo)
@@ -112,16 +113,14 @@ singleNew model todoList =
     if model.beingDragged then
         singleDropZoneEmpty model todoList
     else
-        div [ class "todo flex flex-auto justify-between" ]
-            [ input
-                [ onEnter (Msgs.TodoCreate todoList)
-                , value todoList.inputField
-                , id (todoList.name ++ "focus-id")
-                , onInput (Msgs.TodoUpdateNewField todoList)
-                , class "todo-input"
-                ]
-                []
+        input
+            [ onEnter (Msgs.TodoCreate todoList)
+            , value todoList.inputField
+            , id (todoList.name ++ "focus-id")
+            , onInput (Msgs.TodoUpdateNewField todoList)
+            , class "todo todo-input"
             ]
+            []
 
 
 singleDropZoneEmpty : Model -> TodoList -> Html Msg
