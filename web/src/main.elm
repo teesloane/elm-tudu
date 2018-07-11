@@ -15,7 +15,7 @@ import View exposing (topView)
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.batch [ Todo.Http.fetchAll, getTime ] )
+    ( initialModel, Cmd.batch [ Todo.Http.fetchAllCmd, getTime ] )
 
 
 

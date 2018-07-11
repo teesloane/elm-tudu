@@ -35,7 +35,7 @@ singleIncomplete model todo =
             , Drag.onEnd (Msgs.DragEnd todo)
             ]
             [ span
-                [ onClick (Msgs.TodoToggleComplete todo.id (not todo.complete))
+                [ onClick (Msgs.TodoToggleComplete todo (not todo.complete))
                 , class "todo-draggable"
                 , Drag.onStart <| Msgs.DragStart todo
                 ]
@@ -62,7 +62,7 @@ singleComplete model todo =
             , Drag.onEnd (Msgs.DragEnd todo)
             ]
             [ span
-                [ onClick (Msgs.TodoToggleComplete todo.id (not todo.complete))
+                [ onClick (Msgs.TodoToggleComplete todo (not todo.complete))
                 , class "todo-draggable todo-completed"
                 , Drag.onStart <| Msgs.DragStart todo
                 ]

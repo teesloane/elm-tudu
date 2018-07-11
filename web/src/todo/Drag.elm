@@ -1,12 +1,12 @@
 module Todo.Drag exposing (..)
 
--- FIXME: move this to todo/
-
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Json.Decode as Json
 import Models exposing (..)
+import Msgs
 import RemoteData exposing (WebData, map)
+import Todo.Http
 
 
 onStart : a -> Html.Attribute a
@@ -118,34 +118,22 @@ over model targetTodo =
 
 {-| Changes timestamp of dropped todo
 Causes it to be re-rendered in a different List.
+NOTE: Decided to avoid ugly model updates "locally" to client to represent the drop;
+when a successful API request will make the change anyway on response + re-render
 -}
-drop : Model -> Todo -> ( Model, Cmd a )
+drop : Model -> Todo -> ( Model, Cmd Msgs.Msg )
 drop model todo =
     case ( model.draggedTodo, model.dragTarget ) of
         ( Just draggedTodo_, Just dragTarget_ ) ->
             let
-                updateTodos i t =
-                    -- if iterated t.id is the dragged todo, we need to update order, ts, and parentlist
-                    if t.id == draggedTodo_.id then
-                        { t
-                            | ts = dragTarget_.ts
-                            , order = dragTarget_.order
-                            , parentList = dragTarget_.parentList
-                        }
-                        -- if todos are in list where draggedTodo was Dropped, update the order for them.
-                    else if t.parentList == dragTarget_.parentList && t.order >= draggedTodo_.order then
-                        { t | order = t.order + 1 }
-                    else
-                        t
+                updatedTodo =
+                    { draggedTodo_
+                        | ts = dragTarget_.ts
+                        , order = dragTarget_.order
+                        , parentList = dragTarget_.parentList
+                    }
             in
-                { model
-                    | todos = RemoteData.succeed (model.todos |> Models.maybeTodos |> (List.sortBy .parentList) |> (List.indexedMap updateTodos))
-                    , dragTarget = Nothing
-                    , draggedTodo = Nothing
-                    , beingDragged = False
-                }
-                    ! []
+                ( model, Todo.Http.updateCmd updatedTodo )
 
         _ ->
-            -- NOTE: could set draggedTodo and dragTarget to nothing here
-            model ! []
+            { model | draggedTodo = Nothing, dragTarget = Nothing } ! []

@@ -5,8 +5,12 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
 import Models as Models exposing (Model, initialModel, Todo, TodoList)
-import RemoteData exposing (WebData, map)
+import RemoteData exposing (RemoteData, WebData, map)
 import Msgs exposing (Msg)
+import Utils exposing (buildWeek)
+
+
+-- DECODERS / ENCODERS ---------------------------------------------------------
 
 
 todosDecoder : Decode.Decoder (List Todo)
@@ -26,31 +30,6 @@ todoDecoder =
         |> JsonPipe.required "ts" Decode.float
 
 
-saveTodosUrl : String
-saveTodosUrl =
-    "http://localhost:4000/todos"
-
-
-saveTodoRequest : Todo -> Http.Request Todo
-saveTodoRequest todo =
-    Http.request
-        { body = todoEncoder todo |> Http.jsonBody
-        , expect = Http.expectJson todoDecoder
-        , headers = []
-        , method = "POST"
-        , timeout = Nothing
-        , url = saveTodosUrl
-        , withCredentials = False
-        }
-
-
-
--- saveTodosCmd : Player -> Cmd Msg
--- todosEncoder : Decode.Decoder (List Todo)
--- todosEncoder todos =
---     Encode.list (List.map todoEncoder todos)
-
-
 todoEncoder : Todo -> Encode.Value
 todoEncoder todo =
     let
@@ -68,16 +47,148 @@ todoEncoder todo =
 
 
 
+-- REQUESTS
+
+
+createReq : Todo -> Http.Request Todo
+createReq todo =
+    Http.request
+        { body = todoEncoder todo |> Http.jsonBody
+        , expect = Http.expectJson todoDecoder
+        , headers = []
+        , method = "POST"
+        , timeout = Nothing
+        , url = "http://localhost:4000/todos"
+        , withCredentials = False
+        }
+
+
+updateSingleUrl : Todo -> String
+updateSingleUrl todo =
+    "http://localhost:4000/todos/" ++ (toString todo.id)
+
+
+updateReq : Todo -> Http.Request Todo
+updateReq todo =
+    Http.request
+        { body = todoEncoder todo |> Http.jsonBody
+        , expect = Http.expectJson todoDecoder
+        , headers = []
+        , method = "PATCH"
+        , timeout = Nothing
+        , url = updateSingleUrl todo
+        , withCredentials = False
+        }
+
+
+deleteSingleUrl : Todo -> String
+deleteSingleUrl todo =
+    "http://localhost:4000/todos/" ++ (toString todo.id)
+
+
+deleteReq : Todo -> Http.Request Todo
+deleteReq todo =
+    Http.request
+        { body = todoEncoder todo |> Http.jsonBody
+        , expect = Http.expectJson todoDecoder
+        , headers = []
+        , method = "DELETE"
+        , timeout = Nothing
+        , url = deleteSingleUrl todo
+        , withCredentials = False
+        }
+
+
+
 -- PUBLIC ----------------------------------------------------------------------
+-- Fetch All
 
 
-fetchAll : Cmd Msg
-fetchAll =
+fetchAllCmd : Cmd Msg
+fetchAllCmd =
     Http.get "http://localhost:4000/todos" todosDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.HttpOnFetchTodos
 
 
-postTodoCmd todo =
-    saveTodoRequest todo
-        |> Http.send Msgs.HttpOnTodosSave
+
+-- onFetchAll : Model -> Result Http.Error Todo -> Cmd Msg
+
+
+onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
+onFetchAll model res =
+    let
+        newWeek =
+            (buildWeek model.dayOffset model.timeAtLoad)
+    in
+        { model
+            | todos = res
+            , uuid = List.length (Models.maybeTodos res) + 1
+            , currentWeek = newWeek
+        }
+            ! []
+
+
+
+-- Create One Todo
+
+
+createCmd : Todo -> Cmd Msg
+createCmd todo =
+    createReq todo
+        |> Http.send Msgs.HttpOnTodoSave
+
+
+onCreate : Model -> Result Http.Error Todo -> ( Model, Cmd Msg )
+onCreate model res =
+    case res of
+        Ok res ->
+            let
+                newTodos =
+                    RemoteData.map (\d -> d ++ [ res ]) model.todos
+            in
+                { model | todos = newTodos } ! []
+
+        Err err ->
+            -- FIXME - handle error.
+            model ! []
+
+
+
+-- Update One Todo
+
+
+updateCmd : Todo -> Cmd Msg
+updateCmd todo =
+    updateReq todo
+        |> Http.send Msgs.HttpOnTodoUpdate
+
+
+onUpdate : Model -> Result Http.Error Todo -> ( Model, Cmd Msg )
+onUpdate model res =
+    case res of
+        Ok todo ->
+            -- loops through all todos and replaces the one with id with the updated.
+            let
+                updateTodos t =
+                    if t.id == todo.id then
+                        todo
+                    else
+                        t
+            in
+                { model | todos = RemoteData.map (\l -> List.map updateTodos l) model.todos }
+                    ! []
+
+        Err error ->
+            -- TODO!
+            model ! []
+
+
+
+-- Delete one Todo
+
+
+deleteSingleCmd : Todo -> Cmd Msg
+deleteSingleCmd todo =
+    deleteReq todo
+        |> Http.send Msgs.HttpOnTodoDelete

@@ -1,51 +1,58 @@
-
-* [X] Connect to mock json backend.
-CLOSED: [2018-07-09 Mon 08:13]
-* Basics: Crud Ops
-** [ ] on drag/drop, send todo list  back.
-** [ ] on new
+* Basics: Crud Ops [66%]                                                        :key:
+** [X] on new
+CLOSED: [2018-07-10 Tue 17:02]
 ** [ ] on delete
-** [ ] on edit
-** [ ] on strikethrough
-* NEXT Feature: Previous Todo's roll over
+** [X] on updated [100%]
+CLOSED: [2018-07-11 Wed 11:41]
+*** [X] on drag + drop
+CLOSED: [2018-07-11 Wed 11:41]
+*** [X] on edit name
+CLOSED: [2018-07-11 Wed 10:39]
+*** [X] on strikethrough / complete
+CLOSED: [2018-07-11 Wed 10:39]
+* NEXT Feature: Generic Lists at the bottom                                     :key:
+* [?] Feature: Previous Todo's roll over                                        :key:
 ** [ ] build "created_at" ts for todos, incase orig ts's are needed.
 ** [ ] When rendering a list in which todos are < date.now, change the date.
-
-* [ ] replace todo id with uuid.
-* [ ] Feature: Date Picker
+* [ ] Feature: Date Picker                                                      :n2h:
 https://github.com/elm-community/elm-datepicker
-* [ ] Feature: Recurring Tasks
-* [ ] Feature: Markdown parsing
-* [ ] Feature: Generic Lists at the bottom
-* [ ] [#C] Replace edit icon with pencil
-* [ ] [#C] Current day should be styled differently
-* [ ] [#C] clicking outside input should set editing to false
-* [X] [#A] Delete Todos
+* [ ] Refactor all the RemoteData.maps                                          :refactor:
+* [ ] Feature: Recurring Tasks                                                  :n2h:
+* [ ] Feature: Themes
+* [ ] Feature: Markdown parsing                                                 :stretch:
+* [ ] replace todo id with uuid.                                                :refactor:
+* [ ] [#C] Replace edit icon with pencil                                        :lopri:
+* [ ] [#C] Current day should be styled differently                             :lopri:
+* [ ] [#C] clicking outside input should set editing to false                   :lopri:
+* [ ]  clicking edit should focus the input.
+* Done
+** [X] [#A] Delete Todos
 CLOSED: [2018-07-07 Sat 13:55]
 - [X] when checked they can be deleted
 - [X] if you remove the text of a todo and hit enter and there's nothing there,
   delete it.
 - [?]going to have to resort everything when you delete something.
-* [X] Feature: Return to current day.
+** [X] Feature: Return to current day.
 CLOSED: [2018-07-07 Sat 23:45]
-* [X] Feature: Future Weeks 
+** [X] Feature: Future Weeks 
 CLOSED: [2018-07-07 Sat 13:55]
-** [ ] add timeoffset to model (in days?
-** [ ] clicking on a ~>~ ~<~ will offset.
-** [ ] set currentWeek to be offset * ms ...
-** [ ] 
-** [ ] 
-* [X] Create stack of todo entries up to N max per day.
+*** [ ] add timeoffset to model (in days?
+*** [ ] clicking on a ~>~ ~<~ will offset.
+*** [ ] set currentWeek to be offset * ms ...
+*** [ ] 
+*** [ ] 
+** [X] Create stack of todo entries up to N max per day.
 CLOSED: [2018-06-26 Tue 22:34]
-* [X] [#A] clicking on viewTodoEmpty should focus viewTodoNew - [[https://ellie-app.com/embed/kqLTvMXJj3a1][example]]
+** [X] [#A] clicking on viewTodoEmpty should focus viewTodoNew - [[https://ellie-app.com/embed/kqLTvMXJj3a1][example]]
 CLOSED: [2018-07-07 Sat 10:21]
-* [X] Feature: Drag and Drop
+** [X] Feature: Drag and Drop
 CLOSED: [2018-07-07 Sat 09:51]
-* [X] Create Todo
+** [X] Create Todo
 CLOSED: [2018-06-26 Tue 19:28]
 - controlled inputs : dict> key date | value: input
+** [X] Connect to mock json backend.
+CLOSED: [2018-07-09 Mon 08:13]
 
-  
 * Notes
 ** Comparable Dict.fromList 
 interesting: https://github.com/elm/compiler/issues/774
@@ -61,8 +68,14 @@ We work around this by using List (Field, String) as a fake Dict and then filter
 errors : Dict String comparable -> Decoder (Dict comparable (List String))
 Right now we can't do that, because if we did we couldn't use union types for our fields.
     #+END_QUOTE
-    
-* Links
+** Question about front end / backend sync :
+when updating a resource - say editing a todo name...
+should it really update the local state right away when you do this, or wait
+till the api returns a success, then, search through the list and re-replace it
+with the finalized state? Or should I not even worry about things being out of
+sync and just let the backend update, and then the front end do it's thing until
+the user re-refreshes (seems dicey...)
+** Links
 - [[http://package.elm-lang.org/packages/elm-lang/core/5.1.1/Date][elm core date]]
 - [[https://stackoverflow.com/questions/37910613/how-do-i-get-the-current-date-in-elm][get current date in elm]]
 - [[https://github.com/evancz/elm-todomvc/blob/master/Todo.elm][elm todo mvc (of course)]]
@@ -71,8 +84,7 @@ Right now we can't do that, because if we did we couldn't use union types for ou
 - [[https://stackoverflow.com/questions/40600296/is-there-a-less-verbose-way-to-unwrap-maybe-values-in-elm][elm nested maybe stuff]] 
 - [[https://robots.thoughtbot.com/maybe-mechanics][elm mechanics of maybe]]
 - [[elm remote data http://blog.jenkster.com/2016/06/how-elm-slays-a-ui-antipattern.html][elm remote data]]
-
-* Things this app deals with 
+** Things this app deals with 
 - Drag and Drop
 - Dealing with maybes
-- 
+- RemoteData

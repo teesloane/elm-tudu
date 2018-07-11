@@ -27,16 +27,17 @@ update msg model =
                 }
                     ! []
 
-        Msgs.TodoToggleComplete id isCompleted ->
+        Msgs.TodoToggleComplete todo isCompleted ->
             let
                 todoNew t =
-                    if t.id == id then
+                    if t.id == todo.id then
                         { t | complete = isCompleted }
                     else
                         t
             in
-                { model | todos = RemoteData.map (\d -> List.map todoNew d) model.todos }
-                    ! []
+                ( { model | todos = RemoteData.map (\d -> List.map todoNew d) model.todos }
+                , Todo.Http.updateCmd { todo | complete = True }
+                )
 
         Msgs.TodoToggleEditing id isEditing ->
             let
@@ -50,7 +51,8 @@ update msg model =
                     ! []
 
         Msgs.TodoStopEditing todo isEditing ->
-            -- capable of editing or deleting if the edited string is empty.
+            -- Async | Triggered by pressing "Enter" when done changing a Todo name.
+            -- If the todo name is empty, we should delete it (TODO).
             let
                 isEmpty =
                     String.isEmpty todo.name
@@ -61,14 +63,24 @@ update msg model =
                     else
                         t
 
+                -- FIXME: refactor final model/this with something less verbose.
                 finalUpdate todos =
                     if isEmpty then
                         List.filter (\t -> t.id /= todo.id) todos
                     else
                         List.map updateTodos todos
+
+                finalModel =
+                    { model | todos = RemoteData.map (\d -> (finalUpdate d)) model.todos }
+
+                -- TODO if is Empty should be delete query once written
+                pickCmd =
+                    if isEmpty then
+                        Todo.Http.createCmd { todo | isEditing = False }
+                    else
+                        Todo.Http.createCmd { todo | isEditing = False }
             in
-                { model | todos = RemoteData.map (\d -> (finalUpdate d)) model.todos }
-                    ! []
+                ( finalModel, pickCmd )
 
         Msgs.TodoEditName id newChar ->
             let
@@ -86,8 +98,9 @@ update msg model =
                 filterTodos todoList =
                     List.filter (\t -> t.id /= todo.id) todoList
             in
-                { model | todos = RemoteData.map filterTodos model.todos }
-                    ! []
+                ( { model | todos = RemoteData.map filterTodos model.todos }
+                , Todo.Http.deleteSingleCmd todo
+                )
 
         Msgs.TodoCreate todoList ->
             if String.isEmpty todoList.inputField then
@@ -99,6 +112,8 @@ update msg model =
                     -- everything kind of depends on what the order is... so that's weird.
                     -- not sure how to clean up yet.
                     -- could use maybe withDefault of 0, even while accessing record attribute?
+                    -- Also, on success we actually add the model to the db, otherwise...?
+                    -- not simply adding it to the model regardless of http success/failure.
                     lastItemOrder : Maybe Todo
                     lastItemOrder =
                         (Models.getTodosInList todoList model)
@@ -133,24 +148,23 @@ update msg model =
                             { d | inputField = "" }
                         else
                             d
+
+                    newModel x =
+                        { model
+                          -- | todos = updateTodos x -- only add todo to model when http succeeds?
+                            | currentWeek = List.map cleartodoListField model.currentWeek
+                            , uuid = model.uuid + 1
+                        }
                 in
                     case lastItemOrder of
                         Nothing ->
-                            ( { model
-                                | todos = updateTodos 0
-                                , currentWeek = List.map cleartodoListField model.currentWeek
-                                , uuid = model.uuid + 1
-                              }
-                            , Todo.Http.postTodoCmd (buildNewTodo 0)
+                            ( newModel 0
+                            , Todo.Http.createCmd (buildNewTodo 0)
                             )
 
                         Just t ->
-                            ( { model
-                                | todos = updateTodos t.order
-                                , currentWeek = List.map cleartodoListField model.currentWeek
-                                , uuid = model.uuid + 1
-                              }
-                            , Todo.Http.postTodoCmd (buildNewTodo (t.order + 1))
+                            ( newModel t.order
+                            , Todo.Http.createCmd (buildNewTodo (t.order + 1))
                             )
 
         Msgs.TodoFocusInputFromEmpty todoList ->
@@ -181,21 +195,25 @@ update msg model =
                     ! []
 
         Msgs.HttpOnFetchTodos res ->
+            Todo.Http.onFetchAll model res
+
+        Msgs.HttpOnTodoSave res ->
+            Todo.Http.onCreate model res
+
+        Msgs.HttpOnTodoUpdate res ->
+            Todo.Http.onUpdate model res
+
+        Msgs.HttpOnTodoDelete (Ok todo) ->
+            -- model ! []
             let
-                newWeek =
-                    (buildWeek model.dayOffset model.timeAtLoad)
+                filterTodos todoList =
+                    List.filter (\t -> t.id /= todo.id) todoList
             in
-                { model
-                    | todos = res
-                    , uuid = List.length (Models.maybeTodos res) + 1
-                    , currentWeek = newWeek
-                }
+                { model | todos = RemoteData.map filterTodos model.todos }
                     ! []
 
-        Msgs.HttpOnTodosSave (Ok todos) ->
-            model ! []
-
-        Msgs.HttpOnTodosSave (Err error) ->
+        Msgs.HttpOnTodoDelete (Err error) ->
+            -- TODO!
             model ! []
 
         Msgs.OffsetDay day ->
