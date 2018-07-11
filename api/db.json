@@ -25,7 +25,7 @@
       "id": 4,
       "isEditing": false,
       "name": "test",
-      "complete": false,
+      "complete": true,
       "parentList": "Wed 11 Jul",
       "order": 0,
       "ts": 1531341982611

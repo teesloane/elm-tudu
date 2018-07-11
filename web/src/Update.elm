@@ -36,7 +36,7 @@ update msg model =
                         t
             in
                 ( { model | todos = RemoteData.map (\d -> List.map todoNew d) model.todos }
-                , Todo.Http.updateCmd { todo | complete = True }
+                , Todo.Http.updateCmd { todo | complete = isCompleted }
                 )
 
         Msgs.TodoToggleEditing id isEditing ->
