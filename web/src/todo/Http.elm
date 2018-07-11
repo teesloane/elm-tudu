@@ -192,3 +192,21 @@ deleteSingleCmd : Todo -> Cmd Msg
 deleteSingleCmd todo =
     deleteReq todo
         |> Http.send Msgs.HttpOnTodoDelete
+
+
+onDelete : Model -> Result Http.Error Todo -> ( Model, Cmd Msg )
+onDelete model res =
+    case res of
+        Ok _ ->
+            --NOTE  current JSON-api doesn't return anything for delete, but the real api will eventaully.
+            -- let
+            --     filterTodos todoList =
+            --         List.filter (\t -> t.id /= todo.id) todoList
+            -- in
+            --     { model | todos = RemoteData.map filterTodos model.todos }
+            --         ! []
+            model ! []
+
+        Err error ->
+            -- TODO!
+            model ! []

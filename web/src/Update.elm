@@ -203,18 +203,8 @@ update msg model =
         Msgs.HttpOnTodoUpdate res ->
             Todo.Http.onUpdate model res
 
-        Msgs.HttpOnTodoDelete (Ok todo) ->
-            -- model ! []
-            let
-                filterTodos todoList =
-                    List.filter (\t -> t.id /= todo.id) todoList
-            in
-                { model | todos = RemoteData.map filterTodos model.todos }
-                    ! []
-
-        Msgs.HttpOnTodoDelete (Err error) ->
-            -- TODO!
-            model ! []
+        Msgs.HttpOnTodoDelete res ->
+            Todo.Http.onDelete model res
 
         Msgs.OffsetDay day ->
             let
