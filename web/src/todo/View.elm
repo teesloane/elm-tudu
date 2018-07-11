@@ -19,7 +19,7 @@ singleEditing model todo =
         [ value todo.name
         , onInput (Msgs.TodoEditName todo.id)
         , onEnter (Msgs.TodoStopEditing todo (not todo.isEditing))
-        , class "todo todo-input"
+        , class "todo-input"
         ]
         []
 
@@ -30,7 +30,6 @@ singleIncomplete model todo =
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
             , draggable "true"
-            , onClick (Msgs.TodoToggleComplete todo (not todo.complete))
             , Drag.onStart (Msgs.DragStart todo)
             , Drag.onOver (Msgs.DragOver todo)
             , Drag.onEnd (Msgs.DragEnd todo)
@@ -38,6 +37,7 @@ singleIncomplete model todo =
             [ span
                 [ class "todo-draggable"
                 , Drag.onStart <| Msgs.DragStart todo
+                , onClick (Msgs.TodoToggleComplete todo (not todo.complete))
                 ]
                 [ text todo.name ]
             , span
@@ -57,7 +57,6 @@ singleComplete model todo =
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
             , draggable "true"
-            , onClick (Msgs.TodoToggleComplete todo (not todo.complete))
             , Drag.onStart (Msgs.DragStart todo)
             , Drag.onOver (Msgs.DragOver todo)
             , Drag.onEnd (Msgs.DragEnd todo)
@@ -118,7 +117,7 @@ singleNew model todoList =
             , value todoList.inputField
             , id (todoList.name ++ "focus-id")
             , onInput (Msgs.TodoUpdateNewField todoList)
-            , class "todo todo-input"
+            , class "todo-input"
             ]
             []
 
@@ -232,8 +231,8 @@ list model todoList =
                 , moDayYear = "date-moDayYear"
                 }
     in
-        div []
-            [ div [ class "m2" ]
+        div [ class "todoListColumn flex flex-auto" ]
+            [ div [ class "flex flex-auto flex-column m1" ]
                 [ div [ class "todoListName" ]
                     [ div [ class styles.day ] [ text (parseDate todoList.date "DayOfWeek") ]
                     , div [ class styles.moDayYear ] [ text (parseDate todoList.date "MoDayYear") ]

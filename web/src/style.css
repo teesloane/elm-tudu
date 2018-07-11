@@ -10,38 +10,45 @@ body {
   background: #fff;
   color: black;
   font-family: "Roboto Condensed", arial;
-  padding: 8px;
 }
 
 
 /* viewTodo Styles ; ie: a single todo entry.*/
 
 .todo {
-  width: 200px;
+  min-width: 200px;
   background: #fff;
   border-bottom: 1px dotted #bfbfbf;
   font-size: 13px;
   height: 24px;
-  margin: 8px 0;
+  margin: 3px 0;
   display: flex;
-  padding: 4px 8px;
+  padding: 2px;
   align-items: center;
+}
+
+.todo:hover {
+  background: aliceblue;
 }
 
 
 .todo-dropzone {
-  padding: 2px 6px;
+  padding: 0px 6px;
   border: 2px dotted #ddd;
 }
 
 .todo-input  {
-  width: 200px;
-  background: #fff;
-  font-size: 13px;
   border: none;
   outline: none;
+  min-width: 200px;
   background: #fff;
   border-bottom: 1px dotted #bfbfbf;
+  font-size: 13px;
+  height: 24px;
+  margin: 3px 0;
+  display: flex;
+  padding: 2px;
+  align-items: center;
 }
 
 .todo-completed {
@@ -49,21 +56,23 @@ body {
   color: #dfdfdf;
 }
 
-.todo-incomplete :hover {
-  background: aliceblue;
-}
-
 .todo-draggable {
   cursor: drag;
+  display: flex;
+  flex: auto;
+  padding: 2px 4px;
 }
+
 
 .todo-edit-btn, .todo-delete-btn {
   opacity: 0.1;
+  padding: 0 3px;
   cursor: pointer; 
 }
 
 .todo-edit-btn:hover {
   opacity: 0.5;
+  padding-left: 4px;
   cursor: pointer; 
 }
 
@@ -79,11 +88,29 @@ body {
   cursor: pointer;
 }
 
+/* Tudu Header ----------------------------------------------------------------------- */
+
+.tudu-nav {
+  padding: 4px 64px;
+  color: white;
+  text-transform: uppercase;
+  display: flex;
+  font-weight: 700;
+  letter-spacing: 4px;
+  background: #54a0ff;
+}
+
 /* TodoList styles  ------------------------------------------------------------------ */
+
+.todoListColumn {
+  /* border-right: 1px solid #efefef; */
+  border-left: 1px solid #efefef;
+  margin: 24px 4px;
+}
 
 .todoListName {
   text-align: center;
-  padding: 16px 0;
+  padding: 8px 0;
 }
 
 .date-dayOfWeek {

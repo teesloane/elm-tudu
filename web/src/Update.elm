@@ -76,7 +76,7 @@ update msg model =
                 -- TODO if is Empty should be delete query once written
                 pickCmd =
                     if isEmpty then
-                        Todo.Http.createCmd { todo | isEditing = False }
+                        Todo.Http.deleteCmd { todo | isEditing = False }
                     else
                         Todo.Http.createCmd { todo | isEditing = False }
             in
@@ -99,7 +99,7 @@ update msg model =
                     List.filter (\t -> t.id /= todo.id) todoList
             in
                 ( { model | todos = RemoteData.map filterTodos model.todos }
-                , Todo.Http.deleteSingleCmd todo
+                , Todo.Http.deleteCmd todo
                 )
 
         Msgs.TodoCreate todoList ->

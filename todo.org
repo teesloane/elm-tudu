@@ -10,6 +10,8 @@ https://github.com/elm-community/elm-datepicker
 * [ ] Feature: Themes                                                           :n2h:
 * [ ] Feature: Markdown parsing                                                 :stretch:
 * [ ] replace todo id with uuid.                                                :refactor:
+* [ ] Disable creating new todos on past days                                   :uiux:
+* [ ] truncate long lines / display on hover                                    :uiux:
 * [ ] [#C] Replace edit icon with pencil                                        :lopri:
 * [ ] [#C] Current day should be styled differently                             :lopri:
 * [ ] [#C] clicking outside input should set editing to false                   :lopri:

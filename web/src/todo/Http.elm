@@ -197,8 +197,8 @@ onUpdate model res =
 -- Delete one Todo
 
 
-deleteSingleCmd : Todo -> Cmd Msg
-deleteSingleCmd todo =
+deleteCmd : Todo -> Cmd Msg
+deleteCmd todo =
     deleteReq todo
         |> Http.send Msgs.HttpOnTodoDelete
 
