@@ -11,6 +11,9 @@ type alias TodoList =
     , date : Date
     , name : String
     , ts : Time
+
+    -- could use a union type for this? "custom" or "day" ?
+    , listType : String
     }
 
 

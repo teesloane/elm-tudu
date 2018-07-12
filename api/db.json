@@ -5,6 +5,7 @@
   "customlists": [
     { "hasTodos": false,
       "name": "Someday",
+      "listType": "custom",
       "ts": 1531417104820
     }
   ],

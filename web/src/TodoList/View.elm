@@ -60,13 +60,18 @@ list model todoList =
                 { day = "date-dayOfWeek"
                 , moDayYear = "date-moDayYear"
                 }
+
+        todoListName =
+            if todoList.listType == "custom" then
+                [ div [ class styles.day ] [ text todoList.name ] ]
+            else
+                [ div [ class styles.day ] [ text (parseDate todoList.date "DayOfWeek") ]
+                , div [ class styles.moDayYear ] [ text (parseDate todoList.date "MoDayYear") ]
+                ]
     in
         div [ class "todoListColumn flex flex-auto" ]
             [ div [ class "flex flex-auto flex-column m1" ]
-                [ div [ class "todoListName" ]
-                    [ div [ class styles.day ] [ text (parseDate todoList.date "DayOfWeek") ]
-                    , div [ class styles.moDayYear ] [ text (parseDate todoList.date "MoDayYear") ]
-                    ]
+                [ div [ class "todoListName" ] todoListName
                 , div [] (List.map (single model) todosSortedAndFiltered)
                 , newInput model todoList
                 , emptyTodos model todoList -- make a bunch of empty ones of this

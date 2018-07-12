@@ -50,7 +50,7 @@ onFetchAll model res =
                 _ =
                     Debug.log "thing is " l
             in
-                TodoList l.hasTodos "" (Date.fromTime l.ts) l.name l.ts
+                TodoList l.hasTodos "" (Date.fromTime l.ts) l.name l.ts "custom"
     in
         { model
             | customLists = RemoteData.succeed (List.map constructLists (maybeTodoLists res))
