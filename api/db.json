@@ -17,23 +17,11 @@
       "isEditing": false,
       "name": "test",
       "complete": false,
-      "parentList": "Sat 14 Jul123",
-      "order": 0,
-      "created_at": 1531430926360,
-      "originalDay": 1531517324984,
-      "currentDay": 1531603787869,
-      "hasRolledOver": true
-    },
-    {
-      "id": 3,
-      "isEditing": false,
-      "name": "hi",
-      "complete": false,
       "parentList": "Fri 13 Jul123",
       "order": 0,
-      "created_at": 1531430927865,
-      "originalDay": 1531603724984,
-      "currentDay": 1531517409702,
+      "created_at": 1531432575752,
+      "originalDay": 1531417104820,
+      "currentDay": 1531518977182,
       "hasRolledOver": true
     }
   ]

@@ -7,6 +7,7 @@ import Time exposing (Time)
 import Task exposing (Task)
 import Utils exposing (..)
 import Todo.Drag as Drag exposing (..)
+import TodoList.Model exposing (maybeTodoLists)
 import Msgs exposing (Msg)
 import Todo.Http
 import TodoList.Http
@@ -128,6 +129,7 @@ update msg model =
                         -- if we have noticeable lag we can add it locally and then de-dupe on response.
                         { model
                             | currentWeek = List.map cleartodoListField model.currentWeek
+                            , customLists = RemoteData.map (\l -> List.map cleartodoListField l) model.customLists
                             , uuid = model.uuid + 1
                         }
                 in
@@ -154,13 +156,21 @@ update msg model =
 
         Msgs.TodoUpdateNewField todoList newChar ->
             let
+                allTodoLists =
+                    model.currentWeek ++ (maybeTodoLists model.customLists)
+
                 updateTodoList t =
-                    if t.name == todoList.name then
+                    if t.id == todoList.id then
                         { t | inputField = newChar }
                     else
                         t
             in
-                { model | currentWeek = List.map updateTodoList model.currentWeek }
+                { model
+                    | currentWeek = List.map updateTodoList model.currentWeek
+
+                    -- these lambdas for remote data map are annoying
+                    , customLists = RemoteData.map (\d -> List.map updateTodoList d) model.customLists
+                }
                     ! []
 
         Msgs.HttpOnFetchTodos res ->

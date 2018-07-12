@@ -13,11 +13,12 @@ import Http
 
 type Msg
     = SetTimeAndWeek Time
+      -- Todo client state
     | TodoToggleComplete Todo Bool
     | TodoToggleEditing Int Bool
     | TodoStopEditing Todo Bool
-    | TodoFocusInputFromEmpty TodoList
     | TodoDelete Todo
+    | TodoFocusInputFromEmpty TodoList
     | TodoFocusInputResult (Result Dom.Error ())
     | TodoEditName Int String
     | TodoCreate TodoList

@@ -13,7 +13,7 @@ type alias TodoList =
     , ts : Time
     , id : String
 
-    -- could use a union type for this? "custom" or "day" ?
+    -- NOTE:  could use a union type for this? "custom" or "day" ?
     , listType : String
     }
 
