@@ -20,6 +20,7 @@ type Msg
     | TodoFocusInputResult (Result Dom.Error ())
     | TodoEditName Int String
     | TodoCreate TodoList
+    | TodoCreateWithTime Todo Time
     | TodoUpdateNewField TodoList String
     | HttpOnFetchTodos (WebData (List Todo))
     | HttpOnTodoSave (Result Http.Error Todo)

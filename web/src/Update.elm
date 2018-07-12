@@ -73,7 +73,6 @@ update msg model =
                 finalModel =
                     { model | todos = RemoteData.map (\d -> (finalUpdate d)) model.todos }
 
-                -- TODO if is Empty should be delete query once written
                 pickCmd =
                     if isEmpty then
                         Todo.Http.deleteCmd { todo | isEditing = False }
@@ -107,37 +106,12 @@ update msg model =
                 model ! []
             else
                 let
-                    -- get last item's order, and use it for new todo.
-                    -- The maybe value here makes the rest of the function pretty ugly
-                    -- everything kind of depends on what the order is... so that's weird.
-                    -- not sure how to clean up yet.
-                    -- could use maybe withDefault of 0, even while accessing record attribute?
-                    -- Also, on success we actually add the model to the db, otherwise...?
-                    -- not simply adding it to the model regardless of http success/failure.
-                    lastItemOrder : Maybe Todo
-                    lastItemOrder =
-                        (Models.getTodosInList todoList model)
-                            |> List.sortBy .order
-                            |> List.reverse
-                            |> List.head
-
-                    buildNewTodo n =
+                    newTodo =
                         Models.createDefaultTodo
                             { id = model.uuid + 1
                             , parentList = todoList
-                            , order =
-                                if n == 0 then
-                                    0
-                                else
-                                    n + 1
+                            , order = List.length (Models.getTodosInList todoList model)
                             }
-
-                    -- update todos in local database
-                    updateTodos order =
-                        if order == 0 then
-                            RemoteData.map (\d -> d ++ [ (buildNewTodo order) ]) model.todos
-                        else
-                            RemoteData.map (\d -> d ++ [ (buildNewTodo (order + 1)) ]) model.todos
 
                     -- clear the dom input after saving the input.
                     cleartodoListField d =
@@ -146,23 +120,19 @@ update msg model =
                         else
                             d
 
-                    newModel x =
+                    newModel =
+                        -- FIXME Document this:
+                        -- we actually add the newTodo only when the server responds successfully.
+                        -- if we have noticeable lag we can add it locally and then de-dupe on response.
                         { model
-                          -- | todos = updateTodos x -- only add todo to model when http succeeds?
                             | currentWeek = List.map cleartodoListField model.currentWeek
                             , uuid = model.uuid + 1
                         }
                 in
-                    case lastItemOrder of
-                        Nothing ->
-                            ( newModel 0
-                            , Todo.Http.createCmd (buildNewTodo 0)
-                            )
+                    ( newModel, Task.perform (Msgs.TodoCreateWithTime newTodo) Time.now )
 
-                        Just t ->
-                            ( newModel t.order
-                            , Todo.Http.createCmd (buildNewTodo (t.order + 1))
-                            )
+        Msgs.TodoCreateWithTime todo time ->
+            ( model, Todo.Http.createCmd { todo | created_at = time } )
 
         Msgs.TodoFocusInputFromEmpty todoList ->
             let

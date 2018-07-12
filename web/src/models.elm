@@ -43,7 +43,7 @@ type alias Todo =
     , complete : Bool
     , parentList : String
     , order : Int
-    , ts : Time
+    , created_at : Time
     , originalDay : Time
     , currentDay : Time
     , hasRolledOver : Bool
@@ -60,7 +60,7 @@ createDefaultTodo opts =
     , originalDay = (Date.toTime opts.parentList.date)
     , currentDay = (Date.toTime opts.parentList.date)
     , hasRolledOver = False
-    , ts = (Date.toTime opts.parentList.date)
+    , created_at = (Date.toTime opts.parentList.date)
     }
 
 

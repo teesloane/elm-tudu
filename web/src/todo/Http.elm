@@ -27,7 +27,7 @@ todoDecoder =
         |> JsonPipe.required "complete" Decode.bool
         |> JsonPipe.required "parentList" Decode.string
         |> JsonPipe.required "order" Decode.int
-        |> JsonPipe.required "ts" Decode.float
+        |> JsonPipe.required "created_at" Decode.float
         |> JsonPipe.required "originalDay" Decode.float
         |> JsonPipe.required "currentDay" Decode.float
         |> JsonPipe.required "hasRolledOver" Decode.bool
@@ -43,7 +43,7 @@ todoEncoder todo =
             , ( "complete", Encode.bool todo.complete )
             , ( "parentList", Encode.string todo.parentList )
             , ( "order", Encode.int todo.order )
-            , ( "ts", Encode.float todo.ts )
+            , ( "created_at", Encode.float todo.created_at )
             , ( "originalDay", Encode.float todo.originalDay )
             , ( "currentDay", Encode.float todo.currentDay )
             , ( "hasRolledOver", Encode.bool todo.hasRolledOver )

@@ -1,23 +1,36 @@
-* [ ] Feature: Previous Todo's roll over [50%]                                  :key:
-** [ ] build "created_at" ts for todos, incase orig ts's are needed.
-** [X] When rendering a list in which todos are < date.now, change the date.
-CLOSED: [2018-07-11 Wed 14:10]
-* NEXT Feature: Generic Lists at the bottom                                     :key:
-* [ ] Feature: Date Picker                                                      :n2h:
+* -- CURRENT / ON DECK ---------------------------------------------------------
+
+* [ ] Fix order in Drag + patch all todos that changed                          :bug:
+- on drop, it should update the order for EVERY todo in a list.
+  - figure out sort
+  - something like:
+  - on drop, everything after the dropped todo gets incremented
+  - but also, mapIndex over them and replace order with index?
+  - probably a better way than this.
+- when you do this, you need to save them all
+- batch send the todosInList to the back end and save all.
+* [ ] Generic Lists at the bottom                                               :feature:
+  
+* -- LOW PRIORITY --------------------------------------------------------------
+
+* DEV X / Refactoring
+** [ ] Refactor scss.                                                          :dx:
+** [ ] Refactor all the RemoteData.maps                                        :refactor:
+** [ ] replace todo id with uuid.                                              :refactor:
+* Features
+** [ ] Feature: Themes                                                         :n2h:
+** [ ] Feature: Markdown parsing                                               :stretch:
+** [ ] Feature: Recurring Tasks                                                :n2h:
+** [ ] Feature: Date Picker                                                    :n2h:
 https://github.com/elm-community/elm-datepicker
-* [ ] Refactor all the RemoteData.maps                                          :refactor:
-* [ ] Feature: Recurring Tasks                                                  :n2h:
-* [ ] Feature: Themes                                                           :n2h:
-* [ ] Feature: Markdown parsing                                                 :stretch:
-* [ ] replace todo id with uuid.                                                :refactor:
-* [ ] Disable creating new todos on past days                                   :uiux:
-* [ ] truncate todo long lines / display on hover                               :uiux:
-* [ ] Refactor scss.
-* [ ] Only show dropzone WHEN you hover OVER a slot.
-* [ ] [#C] Replace edit icon with pencil                                        :lopri:
-* [ ] [#C] Current day should be styled differently                             :lopri:
-* [ ] [#C] clicking outside input should set editing to false                   :lopri:
-* [ ]  clicking edit should focus the input.
+* UI/UX Fixes
+** [ ]  clicking edit should focus the input.                                  :uiux:
+** [ ] [#C] Replace edit icon with pencil                                      :lopri:
+** [ ] [#C] clicking outside input should set editing to false                 :lopri:
+** [ ] [#C] Current day should be styled differently                           :lopri:
+** [ ] Only show dropzone WHEN you hover OVER a slot.                          :annoying:
+** [ ] truncate todo long lines / display on hover                             :uiux:
+** [ ] Disable creating new todos on past days                                 :uiux:
 * Done
 ** [X] [#A] Delete Todos
 CLOSED: [2018-07-07 Sat 13:55]
@@ -59,7 +72,23 @@ CLOSED: [2018-07-11 Wed 11:41]
 CLOSED: [2018-07-11 Wed 10:39]
 **** [X] on strikethrough / complete
 CLOSED: [2018-07-11 Wed 10:39]
-* Notes
+
+** [X] Previous Todo's roll over [100%]                                        :feature:
+CLOSED: [2018-07-12 Thu 13:45]
+*** [X] build "created_at" ts for todos, incase orig ts's are needed.
+CLOSED: [2018-07-12 Thu 13:45]
+*** [X] ^ replace createTodo to be a task + result for getting timestamp to assign an accurate "created_at" timestamp,
+CLOSED: [2018-07-12 Thu 13:45]
+really probably unecessary for this level of things, BUT, could be fun for
+having like a "when you create todos most etc" / you never know when you
+actually need correct timestamps.
+**** [ ] so "createTodoGetTime" -> "createTodoWithTime"
+*** [X] When rendering a list in which todos are < date.now, change the date.
+CLOSED: [2018-07-11 Wed 14:10]
+
+* -- DOCS / ETC ----------------------------------------------------------------
+
+* NOTES
 ** Comparable Dict.fromList 
 interesting: https://github.com/elm/compiler/issues/774
   - ran into this  when trying to map over a list of DAYs but it wouldn't let me
@@ -94,3 +123,14 @@ the user re-refreshes (seems dicey...)
 - Drag and Drop
 - Dealing with maybes
 - RemoteData
+* DOCUMENTATION
+** Delicating model updates to HTTP responses
+- lots of client side changes need to update things in the database.
+  - Ex: completing a task needs to update the DB.
+  - The response is the todo that got updated
+  - this todo replaces the old one in the model.
+  - so there's a possibility there will be a lag, but as of now, it's  pretty fine.
+  - Syncing model state with db is a bit annoying, but for now many Update
+    actions are ending up making minimal changes, and then running an HTTP
+    command who's handler (another update) will be responsible for triggering
+    the necessary re-renders
