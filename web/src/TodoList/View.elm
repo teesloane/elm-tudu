@@ -61,9 +61,6 @@ list model todoList =
                 , moDayYear = "date-moDayYear"
                 }
 
-        _ =
-            Debug.log "hi" todoList.name
-
         todoListName =
             if todoList.listType == "custom" then
                 [ div [ class styles.day ] [ text todoList.name ] ]

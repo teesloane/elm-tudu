@@ -37,7 +37,7 @@ fetchAllCmd =
         |> Cmd.map Msgs.HttpOnFetchTodoLists
 
 
-onFetchAll : Model -> WebData (List TodoList) -> ( Model, Cmd a )
+onFetchAll : Model -> WebData (List TodoListDB) -> ( Model, Cmd a )
 onFetchAll model res =
     let
         constructLists l =
