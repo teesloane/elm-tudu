@@ -5,12 +5,14 @@ import Json.Decode as Decode
 import Json.Decode.Extra
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
 import Models as Models exposing (Model, initialModel, Todo)
-import TodoList.Model exposing (TodoList, maybeTodoLists)
+import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists)
 import RemoteData exposing (RemoteData, WebData, map)
+import Date exposing (Date)
+import Time exposing (Time)
 import Msgs exposing (Msg)
 
 
-customListsDecoder : Decode.Decoder (List TodoList)
+customListsDecoder : Decode.Decoder (List TodoListDB)
 customListsDecoder =
     Decode.list customList
 
@@ -20,10 +22,8 @@ customListsDecoder =
 
 
 customList =
-    JsonPipe.decode TodoList
+    JsonPipe.decode TodoListDB
         |> JsonPipe.required "hasTodos" Decode.bool
-        |> JsonPipe.required "inputField" Decode.string
-        |> JsonPipe.required "date" Json.Decode.Extra.date
         |> JsonPipe.required "name" Decode.string
         |> JsonPipe.required "ts" Decode.float
 
@@ -44,7 +44,15 @@ fetchAllCmd =
 
 
 onFetchAll model res =
-    { model
-        | customLists = RemoteData.succeed (maybeTodoLists res)
-    }
-        ! []
+    let
+        constructLists l =
+            let
+                _ =
+                    Debug.log "thing is " l
+            in
+                TodoList l.hasTodos "" (Date.fromTime l.ts) l.name l.ts
+    in
+        { model
+            | customLists = RemoteData.succeed (List.map constructLists (maybeTodoLists res))
+        }
+            ! []

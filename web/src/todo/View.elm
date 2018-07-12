@@ -1,11 +1,10 @@
-module Todo.View exposing (single, list)
+module Todo.View exposing (single, newInput, dropZoneEmpty)
 
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Html.Attributes exposing (..)
 import Models exposing (Model, Todo)
 import TodoList.Model exposing (TodoList)
-import Date exposing (..)
 import Msgs exposing (Msg)
 import Todo.Drag as Drag exposing (..)
 import Utils exposing (onEnter, taskInDate, parseDate)
@@ -14,8 +13,8 @@ import Utils exposing (onEnter, taskInDate, parseDate)
 -- Single Todo Views [editing, incomplete, complete etc] ------------------------
 
 
-singleEditing : Model -> Todo -> Html Msg
-singleEditing model todo =
+editing : Model -> Todo -> Html Msg
+editing model todo =
     input
         [ value todo.name
         , onInput (Msgs.TodoEditName todo.id)
@@ -25,8 +24,8 @@ singleEditing model todo =
         []
 
 
-singleIncomplete : Model -> Todo -> Html Msg
-singleIncomplete model todo =
+incomplete : Model -> Todo -> Html Msg
+incomplete model todo =
     div [ class "todo todo-incomplete" ]
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
@@ -52,8 +51,8 @@ singleIncomplete model todo =
 
 {-| A todo that can be deleted because it is complete
 -}
-singleComplete : Model -> Todo -> Html Msg
-singleComplete model todo =
+complete : Model -> Todo -> Html Msg
+complete model todo =
     div [ class "todo " ]
         [ div
             [ class "flex flex-auto justify-between cursor-drag"
@@ -97,7 +96,7 @@ emptyTodos model todolist =
 
         renderRow _ idx =
             if model.beingDragged then
-                singleDropZoneEmpty model todolist idx
+                dropZoneEmpty model todolist idx
             else
                 div
                     [ class "todo", onClick (Msgs.TodoFocusInputFromEmpty todolist) ]
@@ -106,10 +105,10 @@ emptyTodos model todolist =
         div [] (List.indexedMap renderRow rowsToCreate)
 
 
-singleNew : Model -> TodoList -> Html Msg
-singleNew model todoList =
+newInput : Model -> TodoList -> Html Msg
+newInput model todoList =
     if model.beingDragged then
-        singleDropZoneEmpty model todoList 0
+        dropZoneEmpty model todoList 0
     else
         input
             [ onEnter (Msgs.TodoCreate todoList)
@@ -126,8 +125,8 @@ Basically, any empty slot via emptyTodos can render this.
 NOTE: Hack: we create a fake / empty todo so that we can pass
 this to Update so that our Drag.onDrop msg works.
 -}
-singleDropZoneEmpty : Model -> TodoList -> Int -> Html Msg
-singleDropZoneEmpty model todoList idx =
+dropZoneEmpty : Model -> TodoList -> Int -> Html Msg
+dropZoneEmpty model todoList idx =
     let
         _ =
             Debug.log "idx is " idx
@@ -168,8 +167,8 @@ singleDropZoneEmpty model todoList idx =
 {-| for dropping todos on top of other todos and replacing them.
 could be combined with above?
 -}
-singleDropZone : Model -> Todo -> Html Msg
-singleDropZone model todo =
+dropZone : Model -> Todo -> Html Msg
+dropZone model todo =
     let
         dropZone =
             div
@@ -181,7 +180,7 @@ singleDropZone model todo =
     in
         div []
             [ dropZone
-            , singleIncomplete model todo
+            , incomplete model todo
             ]
 
 
@@ -196,11 +195,11 @@ single model todo =
     let
         defaultRenderState =
             if todo.isEditing then
-                singleEditing model todo
+                editing model todo
             else if todo.complete == False then
-                singleIncomplete model todo
+                incomplete model todo
             else
-                singleComplete model todo
+                complete model todo
     in
         -- We are dragging something/ there is a drag target.
         case ( model.dragTarget, model.draggedTodo ) of
@@ -208,48 +207,9 @@ single model todo =
                 if dragTarget_.id == todo.id && dragTarget_.id /= draggedTodo_.id then
                     -- if branch for maybe: this is how we display drop zones
                     -- if the dragged todo is over another todo
-                    singleDropZone model todo
+                    dropZone model todo
                 else
                     defaultRenderState
 
             _ ->
                 defaultRenderState
-
-
-{-| A list of todos.
--}
-list : Model -> TodoList -> Html Msg
-list model todoList =
-    let
-        todosSortedAndFiltered =
-            model.todos
-                |> Models.maybeTodos
-                |> List.filter (taskInDate todoList.date)
-                |> List.sortBy .order
-
-        -- if todolist is currentDay style it nicely.
-        styles =
-            if todoList.date == (Date.fromTime model.timeAtLoad) then
-                { day = "date-dayOfWeek--active"
-                , moDayYear = "date-moDayYear--active"
-                }
-            else
-                { day = "date-dayOfWeek"
-                , moDayYear = "date-moDayYear"
-                }
-    in
-        div [ class "todoListColumn flex flex-auto" ]
-            [ div [ class "flex flex-auto flex-column m1" ]
-                [ div [ class "todoListName" ]
-                    [ div [ class styles.day ] [ text (parseDate todoList.date "DayOfWeek") ]
-                    , div [ class styles.moDayYear ] [ text (parseDate todoList.date "MoDayYear") ]
-                    ]
-                , div [] (List.map (single model) todosSortedAndFiltered)
-                , singleNew model todoList
-                , emptyTodos model todoList -- make a bunch of empty ones of this
-                ]
-            ]
-
-
-
--- customLists model customLists

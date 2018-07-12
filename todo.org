@@ -129,6 +129,11 @@ the user re-refreshes (seems dicey...)
 - Drag and Drop
 - Dealing with maybes
 - RemoteData
+** Q: Decoder Type vs app db Type
+- See: TodoList vs TodoListDB
+- What coems back from the backend doesn't serialize directly to the front end.
+- ie, I don't need to store what te "inputField" for a TodoList is in the back
+  end, so I have to have a SEPERATE type for that when doing http requests.
 * DOCUMENTATION
 ** 1. HTTP
 *** 1.1 Delicating model updates to HTTP responses

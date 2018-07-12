@@ -174,7 +174,11 @@ update msg model =
             Todo.Http.onDelete model res
 
         Msgs.HttpOnFetchTodoLists res ->
-            TodoList.Http.onFetchAll model res
+            let
+                _ =
+                    Debug.log "res is " res
+            in
+                TodoList.Http.onFetchAll model res
 
         Msgs.OffsetDay day ->
             let

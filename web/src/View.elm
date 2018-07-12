@@ -5,6 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events as Events exposing (..)
 import Models exposing (Model)
 import Todo.View
+import TodoList.View
+import TodoList.Model exposing (maybeTodoLists)
 import Msgs exposing (Msg)
 import Update as Msgs exposing (update)
 
@@ -14,6 +16,9 @@ import Update as Msgs exposing (update)
 topView : Model -> Html Msg
 topView model =
     let
+        customLists =
+            maybeTodoLists model.customLists
+
         arrowBigStyle =
             style [ ( "width", "32px" ) ]
 
@@ -42,10 +47,10 @@ topView model =
                 -- the actual todos --:
                 , div [ class "flex flex-auto flex-column" ]
                     [ div [ class "flex flex-auto justify-around" ]
-                        (List.map (Todo.View.list model) model.currentWeek)
+                        (List.map (TodoList.View.list model) model.currentWeek)
                     , div [ class "list-divider" ] []
                     , div [ class "flex flex-auto justify-around" ]
-                        (List.map (Todo.View.list model) model.currentWeek)
+                        (List.map (TodoList.View.list model) customLists)
                     ]
 
                 -- more date ops

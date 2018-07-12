@@ -1,4 +1,4 @@
-module TodoList.Model exposing (TodoList, maybeTodoLists)
+module TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists)
 
 import RemoteData exposing (WebData, map)
 import Date exposing (Date)
@@ -14,6 +14,13 @@ type alias TodoList =
     }
 
 
+type alias TodoListDB =
+    { hasTodos : Bool
+    , name : String
+    , ts : Time
+    }
+
+
 maybeTodoLists response =
     case response of
         RemoteData.NotAsked ->
@@ -22,8 +29,8 @@ maybeTodoLists response =
         RemoteData.Loading ->
             []
 
-        RemoteData.Success todos ->
-            todos
+        RemoteData.Success lists ->
+            lists
 
         RemoteData.Failure error ->
             -- FIXME HANDLE THIS CASE
