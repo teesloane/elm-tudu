@@ -3,7 +3,7 @@ module Todo.View exposing (single, newInput, dropZoneEmpty)
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Html.Attributes exposing (..)
-import Models exposing (Model, Todo)
+import Models exposing (Model, Todo, maybeTodos)
 import TodoList.Model exposing (TodoList)
 import Msgs exposing (Msg)
 import Todo.Drag as Drag exposing (..)
@@ -133,7 +133,9 @@ dropZoneEmpty model todoList idx =
 
         lastItem : Maybe Todo
         lastItem =
-            (Models.getTodosInList todoList model)
+            -- (Models.getTodosInList todoList model)
+            (maybeTodos model.todos)
+                |> List.filter (\t -> t.parentList == todoList.id)
                 |> List.sortBy .order
                 |> List.reverse
                 |> List.head

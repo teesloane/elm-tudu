@@ -35,6 +35,7 @@ buildWeek dayOffset timestamp =
                     , date = n_date
                     , ts = (Date.toTime n_date)
                     , listType = "day"
+                    , id = (parseDate n_date "Full") ++ "123"
                     }
             in
                 newTodoList

@@ -17,15 +17,13 @@ customListsDecoder =
     Decode.list customList
 
 
-
--- customList : Decode.Decoder TodoList
-
-
 customList =
     JsonPipe.decode TodoListDB
         |> JsonPipe.required "hasTodos" Decode.bool
         |> JsonPipe.required "name" Decode.string
         |> JsonPipe.required "ts" Decode.float
+        |> JsonPipe.required "id" Decode.string
+        |> JsonPipe.required "listType" Decode.string
 
 
 
@@ -39,18 +37,18 @@ fetchAllCmd =
         |> Cmd.map Msgs.HttpOnFetchTodoLists
 
 
-
--- onFetchAll : Model -> WebData (List TodoList) -> ( Model, Cmd a )
-
-
+onFetchAll : Model -> WebData (List TodoList) -> ( Model, Cmd a )
 onFetchAll model res =
     let
         constructLists l =
-            let
-                _ =
-                    Debug.log "thing is " l
-            in
-                TodoList l.hasTodos "" (Date.fromTime l.ts) l.name l.ts "custom"
+            { hasTodos = False
+            , inputField = ""
+            , date = (Date.fromTime l.ts)
+            , name = l.name
+            , ts = l.ts
+            , listType = l.listType
+            , id = l.id
+            }
     in
         { model
             | customLists = RemoteData.succeed (List.map constructLists (maybeTodoLists res))

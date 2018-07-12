@@ -47,7 +47,7 @@ list model todoList =
         todosSortedAndFiltered =
             model.todos
                 |> Models.maybeTodos
-                |> List.filter (taskInDate todoList.date)
+                |> List.filter (\t -> t.parentList == todoList.id)
                 |> List.sortBy .order
 
         -- if todolist is currentDay style it nicely.
@@ -60,6 +60,9 @@ list model todoList =
                 { day = "date-dayOfWeek"
                 , moDayYear = "date-moDayYear"
                 }
+
+        _ =
+            Debug.log "hi" todoList.name
 
         todoListName =
             if todoList.listType == "custom" then

@@ -11,6 +11,7 @@ type alias TodoList =
     , date : Date
     , name : String
     , ts : Time
+    , id : String
 
     -- could use a union type for this? "custom" or "day" ?
     , listType : String
@@ -21,6 +22,8 @@ type alias TodoListDB =
     { hasTodos : Bool
     , name : String
     , ts : Time
+    , id : String
+    , listType : String
     }
 
 

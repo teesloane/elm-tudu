@@ -58,7 +58,7 @@ createDefaultTodo opts =
     , isEditing = False
     , name = opts.parentList.inputField
     , complete = False
-    , parentList = opts.parentList.name
+    , parentList = opts.parentList.id
     , order = opts.order
     , originalDay = (Date.toTime opts.parentList.date)
     , currentDay = (Date.toTime opts.parentList.date)
@@ -83,9 +83,8 @@ maybeTodos response =
             []
 
 
-getTodosInList :
-    { b | name : a }
-    -> { d | todos : RemoteData.RemoteData e (List { c | parentList : a }) }
-    -> List { c | parentList : a }
-getTodosInList todoList model =
-    List.filter (\t -> t.parentList == todoList.name) (maybeTodos model.todos)
+
+-- getTodosInList : TodoList -> Model -> List Todo
+-- getTodosInList todoList model =
+--     -- FIXME: move this to TodoList
+--     List.filter (\t -> t.parentList == todoList.id) (maybeTodos model.todos)

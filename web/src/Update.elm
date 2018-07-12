@@ -109,7 +109,10 @@ update msg model =
                         Models.createDefaultTodo
                             { id = model.uuid + 1
                             , parentList = todoList
-                            , order = List.length (Models.getTodosInList todoList model)
+                            , order =
+                                (Models.maybeTodos model.todos)
+                                    |> List.filter (\t -> t.parentList == todoList.id)
+                                    |> List.length
                             }
 
                     -- clear the dom input after saving the input.

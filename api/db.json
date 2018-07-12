@@ -3,49 +3,38 @@
     "name": "typicode"
   },
   "customlists": [
-    { "hasTodos": false,
+    {
+      "hasTodos": false,
       "name": "Someday",
       "listType": "custom",
-      "ts": 1531417104820
+      "ts": 1531417104820,
+      "id": "Someday123"
     }
   ],
-
   "todos": [
     {
       "id": 2,
       "isEditing": false,
       "name": "test",
-      "complete": true,
-      "parentList": "Fri 13 Jul",
+      "complete": false,
+      "parentList": "Sat 14 Jul123",
       "order": 0,
-      "created_at": 1531417104820,
-      "originalDay": 1531503503769,
-      "currentDay": 1531503503769,
-      "hasRolledOver": false
+      "created_at": 1531430926360,
+      "originalDay": 1531517324984,
+      "currentDay": 1531603787869,
+      "hasRolledOver": true
     },
     {
       "id": 3,
       "isEditing": false,
-      "name": "time at make",
+      "name": "hi",
       "complete": false,
-      "parentList": "Sat 14 Jul",
+      "parentList": "Fri 13 Jul123",
       "order": 0,
-      "created_at": 1531417131134,
-      "originalDay": 1531503503769,
-      "currentDay": 1531589959023,
-      "hasRolledOver": false
-    },
-    {
-      "id": 4,
-      "isEditing": false,
-      "name": "help",
-      "complete": false,
-      "parentList": "Thu 12 Jul",
-      "order": 0,
-      "created_at": 1531417218251,
-      "originalDay": 1531417215351,
-      "currentDay": 1531417215351,
-      "hasRolledOver": false
+      "created_at": 1531430927865,
+      "originalDay": 1531603724984,
+      "currentDay": 1531517409702,
+      "hasRolledOver": true
     }
   ]
 }
