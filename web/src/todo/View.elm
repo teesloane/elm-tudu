@@ -3,7 +3,8 @@ module Todo.View exposing (single, list)
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Html.Attributes exposing (..)
-import Models exposing (Model, Todo, TodoList)
+import Models exposing (Model, Todo)
+import TodoList.Model exposing (TodoList)
 import Date exposing (..)
 import Msgs exposing (Msg)
 import Todo.Drag as Drag exposing (..)
@@ -248,3 +249,7 @@ list model todoList =
                 , emptyTodos model todoList -- make a bunch of empty ones of this
                 ]
             ]
+
+
+
+-- customLists model customLists

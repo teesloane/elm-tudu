@@ -4,7 +4,8 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
-import Models as Models exposing (Model, initialModel, Todo, TodoList)
+import Models as Models exposing (Model, initialModel, Todo)
+import TodoList.Model exposing (TodoList)
 import RemoteData exposing (RemoteData, WebData, map)
 import Msgs exposing (Msg)
 import Utils exposing (buildWeek)

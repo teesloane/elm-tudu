@@ -3,14 +3,13 @@ module Update exposing (..)
 import Dom exposing (focus)
 import RemoteData exposing (WebData, map)
 import Models exposing (..)
-import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
 import Utils exposing (..)
 import Todo.Drag as Drag exposing (..)
 import Msgs exposing (Msg)
 import Todo.Http
-import Http
+import TodoList.Http
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -162,6 +161,7 @@ update msg model =
                     ! []
 
         Msgs.HttpOnFetchTodos res ->
+            -- FIXME: this doesn't pattern match like the others below do.
             Todo.Http.onFetchAll model res
 
         Msgs.HttpOnTodoSave res ->
@@ -172,6 +172,9 @@ update msg model =
 
         Msgs.HttpOnTodoDelete res ->
             Todo.Http.onDelete model res
+
+        Msgs.HttpOnFetchTodoLists res ->
+            TodoList.Http.onFetchAll model res
 
         Msgs.OffsetDay day ->
             let

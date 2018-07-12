@@ -40,8 +40,13 @@ topView model =
                     ]
 
                 -- the actual todos --:
-                , div [ class "flex flex-auto justify-around" ]
-                    (List.map (Todo.View.list model) model.currentWeek)
+                , div [ class "flex flex-auto flex-column" ]
+                    [ div [ class "flex flex-auto justify-around" ]
+                        (List.map (Todo.View.list model) model.currentWeek)
+                    , div [ class "list-divider" ] []
+                    , div [ class "flex flex-auto justify-around" ]
+                        (List.map (Todo.View.list model) model.currentWeek)
+                    ]
 
                 -- more date ops
                 , div [ class "advancer-wrapper" ]

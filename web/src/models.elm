@@ -4,6 +4,7 @@ import Date exposing (Date)
 import Time exposing (Time)
 import Maybe exposing (Maybe(..))
 import RemoteData exposing (WebData)
+import TodoList.Model exposing (TodoList)
 
 
 -- our top level model for entire state.
@@ -13,6 +14,7 @@ type alias Model =
     { todos : WebData (List Todo)
     , beingDragged : Bool
     , currentWeek : List TodoList
+    , customLists : WebData (List TodoList)
     , dayOffset : Int
     , dragTarget : Maybe Todo
     , dragTargetExists : Bool
@@ -27,6 +29,7 @@ initialModel =
     { todos = RemoteData.Loading
     , beingDragged = False
     , currentWeek = []
+    , customLists = RemoteData.Loading
     , dayOffset = 0
     , dragTarget = Nothing
     , dragTargetExists = False
@@ -78,19 +81,6 @@ maybeTodos response =
         RemoteData.Failure error ->
             -- FIXME HANDLE THIS CASE
             []
-
-
-type alias TodoListName =
-    String
-
-
-type alias TodoList =
-    { hasTodos : Bool
-    , inputField : String
-    , date : Date
-    , name : String
-    , ts : Time
-    }
 
 
 getTodosInList :

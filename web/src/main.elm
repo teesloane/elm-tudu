@@ -5,6 +5,7 @@ import Models as Models exposing (Model, initialModel)
 import Task exposing (Task)
 import Time exposing (Time)
 import Todo.Http
+import TodoList.Http
 import Msgs exposing (Msg)
 import Update as Msgs exposing (update)
 import View exposing (topView)
@@ -15,7 +16,7 @@ import View exposing (topView)
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.batch [ Todo.Http.fetchAllCmd, getTime ] )
+    ( initialModel, Cmd.batch [ Todo.Http.fetchAllCmd, TodoList.Http.fetchAllCmd, getTime ] )
 
 
 

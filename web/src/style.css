@@ -158,6 +158,16 @@ body {
   color: #54a0ff;
 }
 
+
+/* misc */
+
+.list-divider {
+  height: 8px;
+  background-color: #dfdfdf;
+  width: 100%;
+  
+}
+
 /* ---------------------------------------------------------------------------*/
 
 /* utilities */

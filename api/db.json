@@ -2,6 +2,13 @@
   "profile": {
     "name": "typicode"
   },
+  "customlists": [
+    { "hasTodos": false,
+      "name": "Someday",
+      "ts": 1531417104820
+    }
+  ],
+
   "todos": [
     {
       "id": 2,

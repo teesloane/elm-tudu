@@ -1,6 +1,12 @@
 * -- CURRENT / ON DECK ---------------------------------------------------------
 
 * [ ] Generic Lists at the bottom                                               :feature:
+- add model item: customLists = List TodoLists
+- add default "someday" list maybe.
+- ability to create these lists
+- ability to delete them
+- rename name
+- HTTP for all the above
 * WAITING Fix order in Drag + patch all todos that changed                      :bug:
 - on drop, it should update the order for EVERY todo in a list.
   - figure out sort

@@ -7,6 +7,7 @@ import Date exposing (Date)
 import Time exposing (Time)
 import Task exposing (Task)
 import Utils exposing (..)
+import TodoList.Model exposing (TodoList)
 import Http
 
 
@@ -22,11 +23,15 @@ type Msg
     | TodoCreate TodoList
     | TodoCreateWithTime Todo Time
     | TodoUpdateNewField TodoList String
+      -- todo https
     | HttpOnFetchTodos (WebData (List Todo))
     | HttpOnTodoSave (Result Http.Error Todo)
     | HttpOnTodoUpdate (Result Http.Error Todo)
     | HttpOnTodoDelete (Result Http.Error Todo)
+      -- customlists https
+    | HttpOnFetchTodoLists (WebData (List TodoList))
     | OffsetDay Int
+      -- Drag stuff
     | DragStart Todo
     | DragEnd Todo
     | DragOver Todo
