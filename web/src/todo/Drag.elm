@@ -120,7 +120,7 @@ over model targetTodo =
 Causes it to be re-rendered in a different List.
 NOTE: Decided to avoid ugly model updates "locally" to client to represent the drop;
 when a successful API request will make the change anyway on response + re-render
--- FIXME: todo drop order is broken
+-- FIXME: todo drop order is broken? Yes, within the same list it seems.
 -}
 drop : Model -> Todo -> ( Model, Cmd Msgs.Msg )
 drop model todo =
@@ -129,7 +129,7 @@ drop model todo =
             let
                 updatedTodo =
                     { draggedTodo_
-                        | ts = dragTarget_.ts
+                        | currentDay = dragTarget_.currentDay
                         , order = dragTarget_.order
                         , parentList = dragTarget_.parentList
                     }

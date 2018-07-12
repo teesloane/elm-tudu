@@ -44,12 +44,24 @@ type alias Todo =
     , parentList : String
     , order : Int
     , ts : Time
+    , originalDay : Time
+    , currentDay : Time
+    , hasRolledOver : Bool
     }
 
 
-
--- maybeTodos : WebData (List Todo) -> Html Msg
--- maybeTodos : RemoteData.RemoteData e (List a) -> List a
+createDefaultTodo opts =
+    { id = opts.id -- no good, change to uuid soon
+    , isEditing = False
+    , name = opts.parentList.inputField
+    , complete = False
+    , parentList = opts.parentList.name
+    , order = opts.order
+    , originalDay = (Date.toTime opts.parentList.date)
+    , currentDay = (Date.toTime opts.parentList.date)
+    , hasRolledOver = False
+    , ts = (Date.toTime opts.parentList.date)
+    }
 
 
 maybeTodos response =

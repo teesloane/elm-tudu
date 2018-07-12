@@ -122,18 +122,15 @@ update msg model =
                             |> List.head
 
                     buildNewTodo n =
-                        { id = model.uuid + 1 -- no good, change to uuid soon
-                        , isEditing = False
-                        , name = todoList.inputField
-                        , complete = False
-                        , parentList = todoList.name
-                        , order =
-                            if n == 0 then
-                                0
-                            else
-                                n + 1
-                        , ts = (Date.toTime todoList.date)
-                        }
+                        Models.createDefaultTodo
+                            { id = model.uuid + 1
+                            , parentList = todoList
+                            , order =
+                                if n == 0 then
+                                    0
+                                else
+                                    n + 1
+                            }
 
                     -- update todos in local database
                     updateTodos order =

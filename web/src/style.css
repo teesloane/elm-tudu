@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700');
+/* @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700'); */
+@import url('https://fonts.googleapis.com/css?family=Oswald:400,500|Roboto');
 
 /* colours
    backgrounds: #ddd
@@ -9,22 +10,22 @@
 body {
   background: #fff;
   color: black;
-  font-family: "Roboto Condensed", arial;
+  font-family: "Roboto", arial;
 }
 
 
 /* viewTodo Styles ; ie: a single todo entry.*/
 
 .todo {
-  min-width: 200px;
+  min-width: 160px;
   background: #fff;
   border-bottom: 1px dotted #bfbfbf;
   font-size: 13px;
   height: 24px;
-  margin: 3px 0;
   display: flex;
-  padding: 2px;
+  padding: 2px 0;
   align-items: center;
+  margin: 2px 0;
 }
 
 .todo:hover {
@@ -33,20 +34,21 @@ body {
 
 
 .todo-dropzone {
-  padding: 0px 6px;
-  border: 2px dotted #ddd;
+  /* padding: 0px 6px; */
+  border: 1px dotted #3fabcd;
 }
 
 .todo-input  {
+  margin: 2px 0;
   border: none;
   outline: none;
-  min-width: 200px;
+  min-width: 160px;
   background: #fff;
   border-bottom: 1px dotted #bfbfbf;
   font-size: 13px;
   height: 24px;
-  margin: 3px 0;
   display: flex;
+  width: 98%; /* what */
   padding: 2px;
   align-items: center;
 }
@@ -77,6 +79,15 @@ body {
 }
 
 /* Days / Day Pickers + Other stuff  ---------------------------------------------------------------- */
+
+.advancer-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-align: center;
+  padding: 8px;
+  min-width: 48px;
+}
 
 .day-advance {
   font-size: 40px;
@@ -111,27 +122,37 @@ body {
 .todoListName {
   text-align: center;
   padding: 8px 0;
+  font-family: "Oswald", arial;
+  font-weight: 700;
 }
 
 .date-dayOfWeek {
-  font-size: 35px;
+  font-size: 28px;
+  letter-spacing: 4px;
   text-transform: uppercase;
+  color: #555;
 }
 
 .date-dayOfWeek--active {
-  font-size: 35px;
+  letter-spacing: 4px;
+  font-size: 28px;
   text-transform: uppercase;
   color: #54a0ff;
 }
 
 .date-moDayYear {
-  font-size: 16px;
+  font-size: 13px;
   text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #555;
+  font-family: "Oswald", arial;
+  font-weight: 400;
 }
 
 .date-moDayYear--active {
-  font-size: 16px;
+  font-size: 13px;
   text-transform: uppercase;
+  letter-spacing: 2px;
   color: #54a0ff;
 }
 

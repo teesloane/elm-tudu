@@ -48,13 +48,13 @@ taskInDate : Date -> Todo -> Bool
 taskInDate date todo =
     let
         todoYear =
-            todo.ts |> Date.fromTime |> Date.year
+            todo.currentDay |> Date.fromTime |> Date.year
 
         todoMonth =
-            todo.ts |> Date.fromTime |> Date.month
+            todo.currentDay |> Date.fromTime |> Date.month
 
         todoDay =
-            todo.ts |> Date.fromTime |> Date.day
+            todo.currentDay |> Date.fromTime |> Date.day
     in
         if todoDay == (Date.day date) && (Date.year date) == todoYear && (Date.month date) == todoMonth then
             True

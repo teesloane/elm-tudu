@@ -79,8 +79,8 @@ singleComplete model todo =
 {-| Fill empty todo space up to max (N).
 For the current todoList , see how many todos (t) there are, and then add N - t empty todos.
 -}
-singleEmpty : Model -> TodoList -> Html Msg
-singleEmpty model todolist =
+emptyTodos : Model -> TodoList -> Html Msg
+emptyTodos model todolist =
     let
         maxRows =
             7
@@ -94,23 +94,21 @@ singleEmpty model todolist =
         rowsToCreate =
             (List.range 0 (maxRows - todosPerTodoList))
 
-        renderRow _ =
+        renderRow _ idx =
             if model.beingDragged then
-                singleDropZoneEmpty model todolist
+                singleDropZoneEmpty model todolist idx
             else
                 div
-                    [ class "todo"
-                    , onClick (Msgs.TodoFocusInputFromEmpty todolist)
-                    ]
+                    [ class "todo", onClick (Msgs.TodoFocusInputFromEmpty todolist) ]
                     [ text "" ]
     in
-        div [] (List.map renderRow rowsToCreate)
+        div [] (List.indexedMap renderRow rowsToCreate)
 
 
 singleNew : Model -> TodoList -> Html Msg
 singleNew model todoList =
     if model.beingDragged then
-        singleDropZoneEmpty model todoList
+        singleDropZoneEmpty model todoList 0
     else
         input
             [ onEnter (Msgs.TodoCreate todoList)
@@ -122,9 +120,17 @@ singleNew model todoList =
             []
 
 
-singleDropZoneEmpty : Model -> TodoList -> Html Msg
-singleDropZoneEmpty model todoList =
+{-| Displays an empty drop zone for a dragged Todo.
+Basically, any empty slot via emptyTodos can render this.
+NOTE: Hack: we create a fake / empty todo so that we can pass
+this to Update so that our Drag.onDrop msg works.
+-}
+singleDropZoneEmpty : Model -> TodoList -> Int -> Html Msg
+singleDropZoneEmpty model todoList idx =
     let
+        _ =
+            Debug.log "idx is " idx
+
         lastItem : Maybe Todo
         lastItem =
             (Models.getTodosInList todoList model)
@@ -132,15 +138,12 @@ singleDropZoneEmpty model todoList =
                 |> List.reverse
                 |> List.head
 
-        buildNewTodo order =
-            { id = model.uuid + 1
-            , isEditing = False
-            , name = "fake!"
-            , complete = False
-            , parentList = todoList.name
-            , order = order
-            , ts = (Date.toTime todoList.date)
-            }
+        buildNewTodo n =
+            Models.createDefaultTodo
+                { id = model.uuid + 1
+                , parentList = todoList
+                , order = n
+                }
 
         dropZone order =
             div
@@ -198,6 +201,7 @@ single model todo =
             else
                 singleComplete model todo
     in
+        -- We are dragging something/ there is a drag target.
         case ( model.dragTarget, model.draggedTodo ) of
             ( Just dragTarget_, Just draggedTodo_ ) ->
                 if dragTarget_.id == todo.id && dragTarget_.id /= draggedTodo_.id then
@@ -211,6 +215,8 @@ single model todo =
                 defaultRenderState
 
 
+{-| A list of todos.
+-}
 list : Model -> TodoList -> Html Msg
 list model todoList =
     let
@@ -239,6 +245,6 @@ list model todoList =
                     ]
                 , div [] (List.map (single model) todosSortedAndFiltered)
                 , singleNew model todoList
-                , singleEmpty model todoList -- make a bunch of empty ones of this
+                , emptyTodos model todoList -- make a bunch of empty ones of this
                 ]
             ]

@@ -19,7 +19,7 @@ topView model =
         , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
         , div [ class "tudu-nav" ] [ text "Tudu" ]
         , div [ class "flex" ]
-            [ div [ class "p3" ]
+            [ div [ class "advancer-wrapper" ]
                 -- date opts
                 [ div [ class "day-advance", onClick (Msgs.OffsetDay -1) ] [ text "<" ]
                 , div [ class "week-advance", onClick (Msgs.OffsetDay -5) ] [ text "<<" ]
@@ -27,11 +27,11 @@ topView model =
                 ]
 
             -- the actual todos --:
-            , div [ class "flex flex-auto justify-around mx3" ]
+            , div [ class "flex flex-auto justify-around" ]
                 (List.map (Todo.View.list model) model.currentWeek)
 
             -- more date ops
-            , div [ class "p3" ]
+            , div [ class "advancer-wrapper" ]
                 [ div [ class "day-advance", onClick (Msgs.OffsetDay 1) ] [ text ">" ]
                 , div [ class "week-advance", onClick (Msgs.OffsetDay 5) ] [ text ">>" ]
                 ]

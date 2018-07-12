@@ -28,6 +28,9 @@ todoDecoder =
         |> JsonPipe.required "parentList" Decode.string
         |> JsonPipe.required "order" Decode.int
         |> JsonPipe.required "ts" Decode.float
+        |> JsonPipe.required "originalDay" Decode.float
+        |> JsonPipe.required "currentDay" Decode.float
+        |> JsonPipe.required "hasRolledOver" Decode.bool
 
 
 todoEncoder : Todo -> Encode.Value
@@ -41,6 +44,9 @@ todoEncoder todo =
             , ( "parentList", Encode.string todo.parentList )
             , ( "order", Encode.int todo.order )
             , ( "ts", Encode.float todo.ts )
+            , ( "originalDay", Encode.float todo.originalDay )
+            , ( "currentDay", Encode.float todo.currentDay )
+            , ( "hasRolledOver", Encode.bool todo.hasRolledOver )
             ]
     in
         Encode.object attributes
@@ -111,22 +117,23 @@ fetchAllCmd =
         |> Cmd.map Msgs.HttpOnFetchTodos
 
 
-
--- onFetchAll : Model -> Result Http.Error Todo -> Cmd Msg
--- onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
-
-
 {-| On fetching all todos, we set them into state, and set the currentWeek.
 Also, if a todo is overdue and incomplete, move it into current day.
 -}
+onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
 onFetchAll model res =
     let
         newWeek =
             (buildWeek model.dayOffset model.timeAtLoad)
 
         rolledOverTodos t =
-            if t.ts <= model.timeAtLoad && t.complete == False then
-                { t | ts = model.timeAtLoad }
+            if t.currentDay <= model.timeAtLoad && t.complete == False then
+                { t
+                    | currentDay = model.timeAtLoad
+
+                    -- this is not persisting on the backend until the todo is updated or saved...
+                    , hasRolledOver = True
+                }
             else
                 t
     in
