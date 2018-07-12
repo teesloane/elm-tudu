@@ -13,27 +13,42 @@ import Update as Msgs exposing (update)
 -}
 topView : Model -> Html Msg
 topView model =
-    div [ class "flex flex-column flex-auto justify-center" ]
-        -- hack to add a stylesheet for elm reactor.
-        [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
-        , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
-        , div [ class "tudu-nav" ] [ text "Tudu" ]
-        , div [ class "flex" ]
-            [ div [ class "advancer-wrapper" ]
-                -- date opts
-                [ div [ class "day-advance", onClick (Msgs.OffsetDay -1) ] [ text "<" ]
-                , div [ class "week-advance", onClick (Msgs.OffsetDay -5) ] [ text "<<" ]
-                , div [ class "go-home-week", onClick (Msgs.OffsetDay 0) ] [ text "home" ]
-                ]
+    let
+        arrowBigStyle =
+            style [ ( "width", "32px" ) ]
 
-            -- the actual todos --:
-            , div [ class "flex flex-auto justify-around" ]
-                (List.map (Todo.View.list model) model.currentWeek)
+        arrowSmallStyle =
+            style [ ( "width", "18px" ) ]
 
-            -- more date ops
-            , div [ class "advancer-wrapper" ]
-                [ div [ class "day-advance", onClick (Msgs.OffsetDay 1) ] [ text ">" ]
-                , div [ class "week-advance", onClick (Msgs.OffsetDay 5) ] [ text ">>" ]
+        homeStyle =
+            style [ ( "width", "18px" ), ( "margin-top", "18px" ), ( "cursor", "pointer" ) ]
+    in
+        div [ class "flex flex-column flex-auto justify-center" ]
+            -- hack to add a stylesheet for elm reactor.
+            [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
+            , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
+            , div [ class "tudu-nav" ] [ text "Tudu" ]
+            , div [ class "flex" ]
+                [ div [ class "advancer-wrapper" ]
+                    -- date opts
+                    [ div [ class "day-advance", onClick (Msgs.OffsetDay -1) ]
+                        [ Html.img [ arrowBigStyle, src "imgs/arrow-left-circle.svg" ] [] ]
+                    , div [ class "week-advance", onClick (Msgs.OffsetDay -5) ]
+                        [ Html.img [ arrowSmallStyle, src "imgs/arrow-left.svg" ] [] ]
+                    , div [ class "go-home-week", onClick (Msgs.OffsetDay 0) ]
+                        [ Html.img [ homeStyle, src "imgs/home.svg" ] [] ]
+                    ]
+
+                -- the actual todos --:
+                , div [ class "flex flex-auto justify-around" ]
+                    (List.map (Todo.View.list model) model.currentWeek)
+
+                -- more date ops
+                , div [ class "advancer-wrapper" ]
+                    [ div [ class "day-advance", onClick (Msgs.OffsetDay 1) ]
+                        [ Html.img [ arrowBigStyle, src "imgs/arrow-right-circle.svg" ] [] ]
+                    , div [ class "week-advance", onClick (Msgs.OffsetDay 5) ]
+                        [ Html.img [ arrowSmallStyle, src "imgs/arrow-right.svg" ] [] ]
+                    ]
                 ]
             ]
-        ]
