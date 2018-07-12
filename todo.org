@@ -1,6 +1,7 @@
 * -- CURRENT / ON DECK ---------------------------------------------------------
 
-* [ ] Fix order in Drag + patch all todos that changed                          :bug:
+* [ ] Generic Lists at the bottom                                               :feature:
+* WAITING Fix order in Drag + patch all todos that changed                      :bug:
 - on drop, it should update the order for EVERY todo in a list.
   - figure out sort
   - something like:
@@ -9,7 +10,7 @@
   - probably a better way than this.
 - when you do this, you need to save them all
 - batch send the todosInList to the back end and save all.
-* [ ] Generic Lists at the bottom                                               :feature:
+- This will need a real API, as I don't think json-server can handle it.
   
 * -- LOW PRIORITY --------------------------------------------------------------
 
@@ -72,7 +73,6 @@ CLOSED: [2018-07-11 Wed 11:41]
 CLOSED: [2018-07-11 Wed 10:39]
 **** [X] on strikethrough / complete
 CLOSED: [2018-07-11 Wed 10:39]
-
 ** [X] Previous Todo's roll over [100%]                                        :feature:
 CLOSED: [2018-07-12 Thu 13:45]
 *** [X] build "created_at" ts for todos, incase orig ts's are needed.
@@ -124,7 +124,8 @@ the user re-refreshes (seems dicey...)
 - Dealing with maybes
 - RemoteData
 * DOCUMENTATION
-** Delicating model updates to HTTP responses
+** 1. HTTP
+*** 1.1 Delicating model updates to HTTP responses
 - lots of client side changes need to update things in the database.
   - Ex: completing a task needs to update the DB.
   - The response is the todo that got updated

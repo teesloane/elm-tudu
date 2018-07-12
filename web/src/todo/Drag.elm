@@ -108,18 +108,14 @@ over model targetTodo =
                                     (Just targetTodo_)
                                 else
                                     Nothing
-
-                            -- Nothing
                             , dragTargetExists = True
                           }
                         , Cmd.none
                         )
 
 
-{-| Changes timestamp of dropped todo
-Causes it to be re-rendered in a different List.
-NOTE: Decided to avoid ugly model updates "locally" to client to represent the drop;
-when a successful API request will make the change anyway on response + re-render
+{-| Changes timestamp of dropped todo; causes it to be re-rendered in a different List.
+-- Docs: HTTP.1.1
 -- FIXME: todo drop order is broken? Yes, within the same list it seems.
 -}
 drop : Model -> Todo -> ( Model, Cmd Msgs.Msg )
