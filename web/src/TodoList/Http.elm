@@ -2,22 +2,24 @@ module TodoList.Http exposing (..)
 
 import Http
 import Json.Decode as Decode
-import Json.Decode.Extra
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
+import Json.Encode as Encode
 import Models as Models exposing (Model, initialModel, Todo)
-import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists)
+import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists, createDefaultTodoList)
 import RemoteData exposing (RemoteData, WebData, map)
 import Date exposing (Date)
-import Time exposing (Time)
 import Msgs exposing (Msg)
+
+
+-- ENCODERS / DECODERS ---------------------------------------------------------
 
 
 customListsDecoder : Decode.Decoder (List TodoListDB)
 customListsDecoder =
-    Decode.list customList
+    Decode.list customListDecoder
 
 
-customList =
+customListDecoder =
     JsonPipe.decode TodoListDB
         |> JsonPipe.required "hasTodos" Decode.bool
         |> JsonPipe.required "name" Decode.string
@@ -26,8 +28,23 @@ customList =
         |> JsonPipe.required "listType" Decode.string
 
 
+customListEncoder : TodoList -> Encode.Value
+customListEncoder todoList =
+    let
+        attributes =
+            [ ( "id", Encode.string todoList.id )
+            , ( "name", Encode.string todoList.name )
+            , ( "ts", Encode.float todoList.ts )
+            , ( "listType", Encode.string todoList.listType )
+            ]
+    in
+        Encode.object attributes
 
--- Public Reqs
+
+
+-- Requests
+-- REQUESTS / HANDLERS ---------------------------------------------------------
+-- 1. Fetch All --
 
 
 fetchAllCmd : Cmd Msg
@@ -39,18 +56,45 @@ fetchAllCmd =
 
 onFetchAll : Model -> WebData (List TodoListDB) -> ( Model, Cmd a )
 onFetchAll model res =
-    let
-        constructLists l =
-            { hasTodos = False
-            , inputField = ""
-            , date = (Date.fromTime l.ts)
-            , name = l.name
-            , ts = l.ts
-            , listType = l.listType
-            , id = l.id
-            }
-    in
-        { model
-            | customLists = RemoteData.succeed (List.map constructLists (maybeTodoLists res))
+    { model
+        | customLists = RemoteData.succeed (List.map createDefaultTodoList (maybeTodoLists res))
+    }
+        ! []
+
+
+
+-- 2. Create
+
+
+createReq : TodoList -> Http.Request TodoListDB
+createReq todoList =
+    Http.request
+        { body = customListEncoder todoList |> Http.jsonBody
+        , expect = Http.expectJson customListDecoder
+        , headers = []
+        , method = "POST"
+        , timeout = Nothing
+        , url = "http://localhost:4000/todos"
+        , withCredentials = False
         }
-            ! []
+
+
+createCmd : TodoList -> Cmd Msg
+createCmd todoList =
+    createReq todoList
+        |> Http.send Msgs.HttpOnCustomListSave
+
+
+onCreate : Model -> Result Http.Error TodoListDB -> ( Model, Cmd Msg )
+onCreate model res =
+    case res of
+        Ok res ->
+            let
+                newCustomLists =
+                    RemoteData.map (\d -> d ++ [ (createDefaultTodoList res) ]) model.customLists
+            in
+                { model | customLists = newCustomLists } ! []
+
+        Err err ->
+            -- FIXME - handle error.
+            model ! []

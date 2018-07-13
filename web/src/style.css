@@ -162,8 +162,10 @@ body {
 /* misc */
 
 .list-divider {
-  height: 8px;
-  background-color: #dfdfdf;
+  justify-content: flex-end;
+  display: flex;
+  padding: 2px 16px;
+  background-color: #efefef;
   width: 100%;
   
 }

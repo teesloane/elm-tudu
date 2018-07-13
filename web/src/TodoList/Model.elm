@@ -1,4 +1,4 @@
-module TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists)
+module TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists, createDefaultTodoList)
 
 import RemoteData exposing (WebData, map)
 import Date exposing (Date)
@@ -27,6 +27,17 @@ type alias TodoListDB =
     }
 
 
+createDefaultTodoList opts =
+    { hasTodos = False
+    , inputField = ""
+    , date = (Date.fromTime opts.ts)
+    , name = opts.name
+    , ts = opts.ts
+    , id = opts.id
+    , listType = opts.listType
+    }
+
+
 maybeTodoLists response =
     case response of
         RemoteData.NotAsked ->
@@ -41,12 +52,3 @@ maybeTodoLists response =
         RemoteData.Failure error ->
             -- FIXME HANDLE THIS CASE
             []
-
-
-createDefaultTodoList opts =
-    { hasTodos = False
-    , inputField = ""
-    , date = opts.date
-    , name = opts.name
-    , ts = opts.ts
-    }

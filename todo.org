@@ -1,11 +1,11 @@
 * -- CURRENT / ON DECK ---------------------------------------------------------
 
 * [ ] Generic Lists at the bottom                                               :feature:
-- add model item: customLists = List TodoLists
-- add default "someday" list maybe.
 - ability to create these lists
 - ability to delete them
+- ability to drag / reorder 
 - rename name
+- add default "someday" list maybe.
 - HTTP for all the above
 * WAITING Fix order in Drag + patch all todos that changed                      :bug:
 - on drop, it should update the order for EVERY todo in a list.
@@ -38,6 +38,7 @@ https://github.com/elm-community/elm-datepicker
 ** [ ] Only show dropzone WHEN you hover OVER a slot.                          :annoying:
 ** [ ] truncate todo long lines / display on hover                             :uiux:
 ** [ ] Disable creating new todos on past days                                 :uiux:
+** [ ] maxRows should be min rows, and we should have as many rows as the greatest length todolist
 * Done
 ** [X] [#A] Delete Todos
 CLOSED: [2018-07-07 Sat 13:55]

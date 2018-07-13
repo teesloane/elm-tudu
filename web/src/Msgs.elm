@@ -31,6 +31,7 @@ type Msg
     | HttpOnTodoDelete (Result Http.Error Todo)
       -- customlists https
     | HttpOnFetchTodoLists (WebData (List TodoListDB))
+    | HttpOnCustomListSave (Result Http.Error TodoListDB)
     | OffsetDay Int
       -- Drag stuff
     | DragStart Todo

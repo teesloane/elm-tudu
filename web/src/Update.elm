@@ -193,6 +193,9 @@ update msg model =
             in
                 TodoList.Http.onFetchAll model res
 
+        Msgs.HttpOnCustomListSave res ->
+            TodoList.Http.onCreate model res
+
         Msgs.OffsetDay day ->
             let
                 newOffset =

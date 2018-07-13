@@ -8,7 +8,7 @@ import Todo.Http
 import TodoList.Http
 import Msgs exposing (Msg)
 import Update as Msgs exposing (update)
-import View exposing (topView)
+import View exposing (appView)
 
 
 -- Boot up, on load commands
@@ -36,7 +36,7 @@ main : Program Never Model Msg
 main =
     program
         { init = init
-        , view = topView
+        , view = appView
         , update = update
         , subscriptions = subscriptions
         }
