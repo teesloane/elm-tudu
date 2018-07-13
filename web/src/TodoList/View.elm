@@ -62,8 +62,21 @@ list model todoList =
                 }
 
         todoListName =
-            if todoList.listType == "custom" then
-                [ div [ class styles.day ] [ text todoList.name ] ]
+            if todoList.listType == "custom" && todoList.isEditingName == True then
+                [ input
+                    [ onInput (Msgs.CustomListUpdateName todoList)
+                    , onEnter (Msgs.CustomListStopEditing todoList)
+                    , value (todoList.name)
+                    ]
+                    []
+                ]
+            else if todoList.listType == "custom" then
+                [ div
+                    [ class styles.day
+                    , onDoubleClick (Msgs.CustomListToggleEditing todoList)
+                    ]
+                    [ text todoList.name ]
+                ]
             else
                 [ div [ class styles.day ] [ text (parseDate todoList.date "DayOfWeek") ]
                 , div [ class styles.moDayYear ] [ text (parseDate todoList.date "MoDayYear") ]

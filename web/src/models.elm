@@ -44,7 +44,7 @@ type alias Todo =
     , isEditing : Bool
     , name : String
     , complete : Bool
-    , parentList : String
+    , parentList : Int
     , order : Int
     , created_at : Time
     , originalDay : Time

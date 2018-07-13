@@ -11,7 +11,8 @@ type alias TodoList =
     , date : Date
     , name : String
     , ts : Time
-    , id : String
+    , id : Int
+    , isEditingName : Bool
 
     -- NOTE:  could use a union type for this? "custom" or "day" ?
     , listType : String
@@ -19,10 +20,9 @@ type alias TodoList =
 
 
 type alias TodoListDB =
-    { hasTodos : Bool
-    , name : String
+    { name : String
     , ts : Time
-    , id : String
+    , id : Int
     , listType : String
     }
 
@@ -35,6 +35,7 @@ createDefaultTodoList opts =
     , ts = opts.ts
     , id = opts.id
     , listType = opts.listType
+    , isEditingName = False
     }
 
 

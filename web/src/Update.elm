@@ -7,6 +7,7 @@ import Time exposing (Time)
 import Task exposing (Task)
 import Utils exposing (..)
 import Todo.Drag as Drag exposing (..)
+import Date exposing (Date)
 import TodoList.Model exposing (maybeTodoLists)
 import Msgs exposing (Msg)
 import Todo.Http
@@ -27,6 +28,9 @@ update msg model =
                 }
                     ! []
 
+        -- ============================================================================
+        -- T0D0 UPDATE FUNCTIONS ------------------------------------------------
+        -- ============================================================================
         Msgs.TodoToggleComplete todo isCompleted ->
             let
                 todoNew t =
@@ -187,11 +191,82 @@ update msg model =
             Todo.Http.onDelete model res
 
         Msgs.HttpOnFetchTodoLists res ->
+            TodoList.Http.onFetchAll model res
+
+        -- ============================================================================
+        -- CUSTOM LIST UPDATE FUNCTIONS ------------------------------------------------
+        -- ============================================================================
+        Msgs.CustomListToggleEditing todoList ->
             let
-                _ =
-                    Debug.log "res is " res
+                updateCustomLists t =
+                    if t.id == todoList.id then
+                        { t | isEditingName = (not todoList.isEditingName) }
+                    else
+                        t
+
+                newCustomLists =
+                    RemoteData.map (\d -> List.map updateCustomLists d) model.customLists
             in
-                TodoList.Http.onFetchAll model res
+                { model | customLists = newCustomLists }
+                    ! []
+
+        Msgs.CustomListUpdateName todoList newChar ->
+            let
+                update t =
+                    if t.id == todoList.id then
+                        { t | name = newChar }
+                    else
+                        t
+            in
+                { model | customLists = RemoteData.map (\l -> List.map update l) model.customLists }
+                    ! []
+
+        Msgs.CustomListStopEditing todoList ->
+            let
+                isEmpty =
+                    String.isEmpty todoList.name
+
+                updateTodos t =
+                    if t.id == todoList.id then
+                        { t | isEditingName = not todoList.isEditingName }
+                    else
+                        t
+
+                -- FIXME: refactor final model/this with something less verbose.
+                finalUpdate cl =
+                    if isEmpty then
+                        List.filter (\t -> t.id /= todoList.id) cl
+                    else
+                        List.map updateTodos cl
+
+                finalModel =
+                    { model | customLists = RemoteData.map (\d -> (finalUpdate d)) model.customLists }
+
+                pickCmd =
+                    if isEmpty then
+                        TodoList.Http.updateCmd { todoList | isEditingName = False }
+                    else
+                        TodoList.Http.updateCmd { todoList | isEditingName = False }
+            in
+                ( finalModel, pickCmd )
+
+        Msgs.CustomListCreate ->
+            let
+                newList =
+                    TodoList.Model.createDefaultTodoList
+                        { date = (Date.fromTime model.timeAtLoad)
+                        , name = "New List"
+                        , ts = model.timeAtLoad
+
+                        -- id is 5 because the current Week has id's 0-4
+                        , id = 5 + (List.length (TodoList.Model.maybeTodoLists model.customLists))
+                        , listType = "custom"
+                        }
+            in
+                ( model, TodoList.Http.createCmd newList )
+
+        Msgs.HttpOnCustomListUpdate res ->
+            TodoList.Http.onUpdate model res
 
         Msgs.HttpOnCustomListSave res ->
             TodoList.Http.onCreate model res

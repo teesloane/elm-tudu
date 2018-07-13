@@ -3,16 +3,14 @@ module Msgs exposing (..)
 import Dom exposing (focus)
 import RemoteData exposing (WebData, map)
 import Models exposing (..)
-import Date exposing (Date)
 import Time exposing (Time)
-import Task exposing (Task)
-import Utils exposing (..)
 import TodoList.Model exposing (TodoList, TodoListDB)
 import Http
 
 
 type Msg
     = SetTimeAndWeek Time
+    | OffsetDay Int
       -- Todo client state
     | TodoToggleComplete Todo Bool
     | TodoToggleEditing Int Bool
@@ -24,15 +22,18 @@ type Msg
     | TodoCreate TodoList
     | TodoCreateWithTime Todo Time
     | TodoUpdateNewField TodoList String
-      -- todo https
     | HttpOnFetchTodos (WebData (List Todo))
     | HttpOnTodoSave (Result Http.Error Todo)
     | HttpOnTodoUpdate (Result Http.Error Todo)
     | HttpOnTodoDelete (Result Http.Error Todo)
       -- customlists https
+    | CustomListToggleEditing TodoList
+    | CustomListCreate
+    | CustomListUpdateName TodoList String
+    | CustomListStopEditing TodoList
     | HttpOnFetchTodoLists (WebData (List TodoListDB))
+    | HttpOnCustomListUpdate (Result Http.Error TodoListDB)
     | HttpOnCustomListSave (Result Http.Error TodoListDB)
-    | OffsetDay Int
       -- Drag stuff
     | DragStart Todo
     | DragEnd Todo

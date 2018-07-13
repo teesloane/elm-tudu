@@ -7,7 +7,6 @@ import Json.Encode as Encode
 import Models as Models exposing (Model, initialModel, Todo)
 import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists, createDefaultTodoList)
 import RemoteData exposing (RemoteData, WebData, map)
-import Date exposing (Date)
 import Msgs exposing (Msg)
 
 
@@ -19,12 +18,12 @@ customListsDecoder =
     Decode.list customListDecoder
 
 
+customListDecoder : Decode.Decoder TodoListDB
 customListDecoder =
     JsonPipe.decode TodoListDB
-        |> JsonPipe.required "hasTodos" Decode.bool
         |> JsonPipe.required "name" Decode.string
         |> JsonPipe.required "ts" Decode.float
-        |> JsonPipe.required "id" Decode.string
+        |> JsonPipe.required "id" Decode.int
         |> JsonPipe.required "listType" Decode.string
 
 
@@ -32,7 +31,7 @@ customListEncoder : TodoList -> Encode.Value
 customListEncoder todoList =
     let
         attributes =
-            [ ( "id", Encode.string todoList.id )
+            [ ( "id", Encode.int todoList.id )
             , ( "name", Encode.string todoList.name )
             , ( "ts", Encode.float todoList.ts )
             , ( "listType", Encode.string todoList.listType )
@@ -74,7 +73,7 @@ createReq todoList =
         , headers = []
         , method = "POST"
         , timeout = Nothing
-        , url = "http://localhost:4000/todos"
+        , url = "http://localhost:4000/customlists"
         , withCredentials = False
         }
 
@@ -97,4 +96,56 @@ onCreate model res =
 
         Err err ->
             -- FIXME - handle error.
+            model ! []
+
+
+
+-- 3. Update
+
+
+updateSingleUrl : TodoList -> String
+updateSingleUrl todoList =
+    let
+        _ =
+            Debug.log "thing is " todoList.id
+    in
+        "http://localhost:4000/customlists/" ++ (toString todoList.id)
+
+
+updateReq : TodoList -> Http.Request TodoListDB
+updateReq todo =
+    Http.request
+        { body = customListEncoder todo |> Http.jsonBody
+        , expect = Http.expectJson customListDecoder
+        , headers = []
+        , method = "PATCH"
+        , timeout = Nothing
+        , url = updateSingleUrl todo
+        , withCredentials = False
+        }
+
+
+updateCmd : TodoList -> Cmd Msg
+updateCmd todoList =
+    updateReq todoList
+        |> Http.send Msgs.HttpOnCustomListUpdate
+
+
+onUpdate : Model -> Result Http.Error TodoListDB -> ( Model, Cmd Msg )
+onUpdate model res =
+    case res of
+        Ok todoList ->
+            -- loops through all todos and replaces the one with id with the updated.
+            let
+                updateTodoList t =
+                    if t.id == todoList.id then
+                        createDefaultTodoList todoList
+                    else
+                        t
+            in
+                { model | customLists = RemoteData.map (\l -> List.map updateTodoList l) model.customLists }
+                    ! []
+
+        Err error ->
+            -- TODO!
             model ! []

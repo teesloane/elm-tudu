@@ -26,7 +26,7 @@ todoDecoder =
         |> JsonPipe.required "isEditing" Decode.bool
         |> JsonPipe.required "name" Decode.string
         |> JsonPipe.required "complete" Decode.bool
-        |> JsonPipe.required "parentList" Decode.string
+        |> JsonPipe.required "parentList" Decode.int
         |> JsonPipe.required "order" Decode.int
         |> JsonPipe.required "created_at" Decode.float
         |> JsonPipe.required "originalDay" Decode.float
@@ -42,7 +42,7 @@ todoEncoder todo =
             , ( "isEditing", Encode.bool todo.isEditing )
             , ( "name", Encode.string todo.name )
             , ( "complete", Encode.bool todo.complete )
-            , ( "parentList", Encode.string todo.parentList )
+            , ( "parentList", Encode.int todo.parentList )
             , ( "order", Encode.int todo.order )
             , ( "created_at", Encode.float todo.created_at )
             , ( "originalDay", Encode.float todo.originalDay )

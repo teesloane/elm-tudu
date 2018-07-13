@@ -48,7 +48,11 @@ customListView model =
     in
         div []
             [ div [ class "list-divider" ]
-                [ div [ class "pointer" ] [ text "+" ]
+                [ div
+                    [ class "pointer"
+                    , onClick Msgs.CustomListCreate
+                    ]
+                    [ text "+" ]
                 ]
             , div [ class "flex flex-auto justify-around" ]
                 (List.map (TodoList.View.list model) customLists)

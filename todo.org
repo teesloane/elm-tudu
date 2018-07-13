@@ -1,12 +1,17 @@
 * -- CURRENT / ON DECK ---------------------------------------------------------
 
 * [ ] Generic Lists at the bottom                                               :feature:
+** [ ] make custom list names editable
+** [ ] on creation, focus on input and set it to editable
+** [ ] on edit submit to server
+** Overview
 - ability to create these lists
 - ability to delete them
 - ability to drag / reorder 
 - rename name
 - add default "someday" list maybe.
 - HTTP for all the above
+
 * WAITING Fix order in Drag + patch all todos that changed                      :bug:
 - on drop, it should update the order for EVERY todo in a list.
   - figure out sort
