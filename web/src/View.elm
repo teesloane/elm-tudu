@@ -54,7 +54,7 @@ customListView model =
                     ]
                     [ text "+" ]
                 ]
-            , div [ class "flex flex-auto justify-around" ]
+            , div [ class " customListWrapper" ]
                 (List.map (TodoList.View.list model) customLists)
             ]
 

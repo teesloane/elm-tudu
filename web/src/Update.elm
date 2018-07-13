@@ -226,25 +226,36 @@ update msg model =
                 isEmpty =
                     String.isEmpty todoList.name
 
+                defaultName =
+                    "Untitled"
+
                 updateTodos t =
                     if t.id == todoList.id then
-                        { t | isEditingName = not todoList.isEditingName }
+                        { t
+                            | isEditingName = not todoList.isEditingName
+                            , name =
+                                if isEmpty then
+                                    defaultName
+                                else
+                                    t.name
+                        }
                     else
                         t
 
                 -- FIXME: refactor final model/this with something less verbose.
                 finalUpdate cl =
-                    if isEmpty then
-                        List.filter (\t -> t.id /= todoList.id) cl
-                    else
-                        List.map updateTodos cl
+                    List.map updateTodos cl
 
                 finalModel =
                     { model | customLists = RemoteData.map (\d -> (finalUpdate d)) model.customLists }
 
                 pickCmd =
                     if isEmpty then
-                        TodoList.Http.updateCmd { todoList | isEditingName = False }
+                        TodoList.Http.updateCmd
+                            { todoList
+                                | isEditingName = False
+                                , name = defaultName
+                            }
                     else
                         TodoList.Http.updateCmd { todoList | isEditingName = False }
             in

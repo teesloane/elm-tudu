@@ -66,6 +66,7 @@ list model todoList =
                 [ input
                     [ onInput (Msgs.CustomListUpdateName todoList)
                     , onEnter (Msgs.CustomListStopEditing todoList)
+                    , class "date-dayOfWeek--input"
                     , value (todoList.name)
                     ]
                     []
@@ -82,7 +83,7 @@ list model todoList =
                 , div [ class styles.moDayYear ] [ text (parseDate todoList.date "MoDayYear") ]
                 ]
     in
-        div [ class "todoListColumn flex flex-auto" ]
+        div [ class "todoListColumn" ]
             [ div [ class "flex flex-auto flex-column m1" ]
                 [ div [ class "todoListName" ] todoListName
                 , div [] (List.map (single model) todosSortedAndFiltered)

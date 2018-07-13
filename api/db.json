@@ -5,8 +5,14 @@
   "customlists": [
     {
       "id": 5,
-      "name": "1234ddd",
+      "name": "hihello",
       "ts": 1531520893168,
+      "listType": "custom"
+    },
+    {
+      "id": 6,
+      "name": "ted",
+      "ts": 1531521137463,
       "listType": "custom"
     }
   ],
@@ -16,12 +22,12 @@
       "isEditing": false,
       "name": "test",
       "complete": false,
-      "parentList": "Fri 13 Jul123",
+      "parentList": 2,
       "order": 0,
-      "created_at": 1531517500279,
-      "originalDay": 1531517498369,
-      "currentDay": 1531517505037,
-      "hasRolledOver": true
+      "created_at": 1531521733567,
+      "originalDay": 1531694521455,
+      "currentDay": 1531694521455,
+      "hasRolledOver": false
     }
   ]
 }

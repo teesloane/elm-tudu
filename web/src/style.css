@@ -115,10 +115,23 @@ body {
 
 /* TodoList styles  ------------------------------------------------------------------ */
 
+.customListWrapper {
+  display: flex;
+  flex: 1 1 auto;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-x: scroll;
+}
+
 .todoListColumn {
   /* border-right: 1px solid #efefef; */
+  display: flex;
   border-left: 1px solid #efefef;
   margin: 24px 4px;
+  /* max-width: 400px; */
+  min-width: 250px;
+  /* width: 100% */
+  flex: 1 1 auto
 }
 
 .todoListName {
@@ -133,6 +146,21 @@ body {
   letter-spacing: 4px;
   text-transform: uppercase;
   color: #555;
+}
+
+
+.date-dayOfWeek--input {
+  font-size: 28px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #555;
+  outline: none;
+  font-weight: 700;
+  border: none;
+  font-family: "Oswald", arial;
+  text-align: center;
+  background: #efefef;
+  width: 100%;
 }
 
 .date-dayOfWeek--active {
