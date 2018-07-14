@@ -1,9 +1,14 @@
 * -- CURRENT / ON DECK ---------------------------------------------------------
 
 * [ ] Generic Lists at the bottom                                               :feature:
-** [ ] make custom list names editable
-** [ ] on creation, focus on input and set it to editable
-** [ ] on edit submit to server
+** [X] make custom list names editable
+CLOSED: [2018-07-14 Sat 12:48]
+** [X] on creation, focus on input and set it to editable
+CLOSED: [2018-07-14 Sat 12:48]
+** [X] on edit submit to server
+CLOSED: [2018-07-14 Sat 12:48]
+** [X] Double clicking to edit should focus the list
+CLOSED: [2018-07-14 Sat 12:55]
 ** Overview
 - ability to create these lists
 - ability to delete them

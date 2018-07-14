@@ -1,13 +1,15 @@
 module TodoList.Http exposing (..)
 
+import Dom exposing (focus)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
 import Json.Encode as Encode
 import Models as Models exposing (Model, initialModel, Todo)
-import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists, createDefaultTodoList)
-import RemoteData exposing (RemoteData, WebData, map)
 import Msgs exposing (Msg)
+import RemoteData exposing (RemoteData, WebData, map)
+import Task exposing (Task)
+import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists, createDefaultTodoList)
 
 
 -- ENCODERS / DECODERS ---------------------------------------------------------
@@ -22,6 +24,7 @@ customListDecoder : Decode.Decoder TodoListDB
 customListDecoder =
     JsonPipe.decode TodoListDB
         |> JsonPipe.required "name" Decode.string
+        |> JsonPipe.required "originalName" Decode.string
         |> JsonPipe.required "ts" Decode.float
         |> JsonPipe.required "id" Decode.int
         |> JsonPipe.required "listType" Decode.string
@@ -33,6 +36,7 @@ customListEncoder todoList =
         attributes =
             [ ( "id", Encode.int todoList.id )
             , ( "name", Encode.string todoList.name )
+            , ( "originalName", Encode.string todoList.originalName )
             , ( "ts", Encode.float todoList.ts )
             , ( "listType", Encode.string todoList.listType )
             ]
@@ -87,12 +91,26 @@ createCmd todoList =
 onCreate : Model -> Result Http.Error TodoListDB -> ( Model, Cmd Msg )
 onCreate model res =
     case res of
+        -- Creates a new todolist and starts editing the name immediately.
         Ok res ->
             let
+                buildNewList r =
+                    -- annoying hacking around the use of createDefaultTodoList
+                    let
+                        new =
+                            createDefaultTodoList r
+                    in
+                        { new | isEditingName = True }
+
                 newCustomLists =
-                    RemoteData.map (\d -> d ++ [ (createDefaultTodoList res) ]) model.customLists
+                    RemoteData.map (\d -> d ++ [ (buildNewList res) ]) model.customLists
+
+                focusId =
+                    res.name ++ toString res.id
             in
-                { model | customLists = newCustomLists } ! []
+                ( { model | customLists = newCustomLists }
+                , Task.attempt Msgs.CustomListFocusName (focus focusId)
+                )
 
         Err err ->
             -- FIXME - handle error.

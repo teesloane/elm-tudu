@@ -15,6 +15,7 @@ msInADay =
 
 
 buildWeek dayOffset timestamp =
+    -- TODO FIX THIS
     --TODO: Move to Model for todo.
     let
         days =
@@ -32,6 +33,7 @@ buildWeek dayOffset timestamp =
                     { hasTodos = False
                     , inputField = ""
                     , name = (parseDate n_date "Full")
+                    , originalName = (parseDate n_date "Full")
                     , date = n_date
                     , ts = (Date.toTime n_date)
                     , listType = "day"

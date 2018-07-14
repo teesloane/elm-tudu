@@ -116,7 +116,7 @@ update msg model =
                             , parentList = todoList
                             , order =
                                 (Models.maybeTodos model.todos)
-                                    |> List.filter (\t -> t.parentList == todoList.id)
+                                    |> List.filter (\t -> t.parentList == todoList.originalName)
                                     |> List.length
                             }
 
@@ -204,11 +204,15 @@ update msg model =
                     else
                         t
 
+                focusId =
+                    todoList.name ++ toString todoList.id
+
                 newCustomLists =
                     RemoteData.map (\d -> List.map updateCustomLists d) model.customLists
             in
-                { model | customLists = newCustomLists }
-                    ! []
+                ( { model | customLists = newCustomLists }
+                , Task.attempt Msgs.CustomListFocusName (focus focusId)
+                )
 
         Msgs.CustomListUpdateName todoList newChar ->
             let
@@ -232,7 +236,7 @@ update msg model =
                 updateTodos t =
                     if t.id == todoList.id then
                         { t
-                            | isEditingName = not todoList.isEditingName
+                            | isEditingName = False
                             , name =
                                 if isEmpty then
                                     defaultName
@@ -263,18 +267,30 @@ update msg model =
 
         Msgs.CustomListCreate ->
             let
+                -- id is 5 because the current Week has id's 0-4  ಥ_ಥ
+                newListId =
+                    5 + (List.length (TodoList.Model.maybeTodoLists model.customLists))
+
                 newList =
                     TodoList.Model.createDefaultTodoList
                         { date = (Date.fromTime model.timeAtLoad)
                         , name = "New List"
                         , ts = model.timeAtLoad
-
-                        -- id is 5 because the current Week has id's 0-4
-                        , id = 5 + (List.length (TodoList.Model.maybeTodoLists model.customLists))
+                        , originalName = "New List" ++ toString newListId
+                        , id = newListId
                         , listType = "custom"
                         }
             in
                 ( model, TodoList.Http.createCmd newList )
+
+        Msgs.CustomListFocusName res ->
+            case res of
+                -- could do error handling here.
+                Err (Dom.NotFound id) ->
+                    model ! []
+
+                Ok () ->
+                    model ! []
 
         Msgs.HttpOnCustomListUpdate res ->
             TodoList.Http.onUpdate model res

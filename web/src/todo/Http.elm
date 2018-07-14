@@ -5,7 +5,6 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
 import Models as Models exposing (Model, initialModel, Todo)
-import TodoList.Model exposing (TodoList)
 import RemoteData exposing (RemoteData, WebData, map)
 import Msgs exposing (Msg)
 import Utils exposing (buildWeek)
@@ -26,7 +25,7 @@ todoDecoder =
         |> JsonPipe.required "isEditing" Decode.bool
         |> JsonPipe.required "name" Decode.string
         |> JsonPipe.required "complete" Decode.bool
-        |> JsonPipe.required "parentList" Decode.int
+        |> JsonPipe.required "parentList" Decode.string
         |> JsonPipe.required "order" Decode.int
         |> JsonPipe.required "created_at" Decode.float
         |> JsonPipe.required "originalDay" Decode.float
@@ -42,7 +41,7 @@ todoEncoder todo =
             , ( "isEditing", Encode.bool todo.isEditing )
             , ( "name", Encode.string todo.name )
             , ( "complete", Encode.bool todo.complete )
-            , ( "parentList", Encode.int todo.parentList )
+            , ( "parentList", Encode.string todo.parentList )
             , ( "order", Encode.int todo.order )
             , ( "created_at", Encode.float todo.created_at )
             , ( "originalDay", Encode.float todo.originalDay )

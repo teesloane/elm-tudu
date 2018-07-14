@@ -31,6 +31,7 @@ type Msg
     | CustomListCreate
     | CustomListUpdateName TodoList String
     | CustomListStopEditing TodoList
+    | CustomListFocusName (Result Dom.Error ())
     | HttpOnFetchTodoLists (WebData (List TodoListDB))
     | HttpOnCustomListUpdate (Result Http.Error TodoListDB)
     | HttpOnCustomListSave (Result Http.Error TodoListDB)

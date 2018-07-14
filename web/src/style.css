@@ -153,6 +153,7 @@ body {
   font-size: 28px;
   letter-spacing: 4px;
   text-transform: uppercase;
+  padding: 0;
   color: #555;
   outline: none;
   font-weight: 700;

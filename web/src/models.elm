@@ -44,7 +44,7 @@ type alias Todo =
     , isEditing : Bool
     , name : String
     , complete : Bool
-    , parentList : Int
+    , parentList : String
     , order : Int
     , created_at : Time
     , originalDay : Time
@@ -58,7 +58,7 @@ createDefaultTodo opts =
     , isEditing = False
     , name = opts.parentList.inputField
     , complete = False
-    , parentList = opts.parentList.id
+    , parentList = opts.parentList.originalName
     , order = opts.order
     , originalDay = (Date.toTime opts.parentList.date)
     , currentDay = (Date.toTime opts.parentList.date)
@@ -81,10 +81,3 @@ maybeTodos response =
         RemoteData.Failure error ->
             -- FIXME HANDLE THIS CASE
             []
-
-
-
--- getTodosInList : TodoList -> Model -> List Todo
--- getTodosInList todoList model =
---     -- FIXME: move this to TodoList
---     List.filter (\t -> t.parentList == todoList.id) (maybeTodos model.todos)

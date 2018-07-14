@@ -47,7 +47,7 @@ list model todoList =
         todosSortedAndFiltered =
             model.todos
                 |> Models.maybeTodos
-                |> List.filter (\t -> t.parentList == todoList.id)
+                |> List.filter (\t -> t.parentList == todoList.originalName)
                 |> List.sortBy .order
 
         -- if todolist is currentDay style it nicely.
@@ -67,6 +67,7 @@ list model todoList =
                     [ onInput (Msgs.CustomListUpdateName todoList)
                     , onEnter (Msgs.CustomListStopEditing todoList)
                     , class "date-dayOfWeek--input"
+                    , id (todoList.name ++ toString todoList.id)
                     , value (todoList.name)
                     ]
                     []

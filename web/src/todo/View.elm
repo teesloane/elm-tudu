@@ -135,7 +135,7 @@ dropZoneEmpty model todoList idx =
         lastItem =
             -- (Models.getTodosInList todoList model)
             (maybeTodos model.todos)
-                |> List.filter (\t -> t.parentList == todoList.id)
+                |> List.filter (\t -> t.parentList == todoList.originalName)
                 |> List.sortBy .order
                 |> List.reverse
                 |> List.head
