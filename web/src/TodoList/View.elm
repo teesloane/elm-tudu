@@ -61,6 +61,13 @@ list model todoList =
                 , moDayYear = "date-moDayYear"
                 }
 
+        deleteListBtn =
+            if todoList.listType == "custom" then
+                div [ class "right p1 pointer", onClick (Msgs.CustomListDelete todoList) ]
+                    [ text "x" ]
+            else
+                div [] []
+
         todoListName =
             if todoList.listType == "custom" && todoList.isEditingName == True then
                 [ input
@@ -86,7 +93,10 @@ list model todoList =
     in
         div [ class "todoListColumn" ]
             [ div [ class "flex flex-auto flex-column m1" ]
-                [ div [ class "todoListName" ] todoListName
+                [ div []
+                    [ deleteListBtn
+                    , div [ class "todoListName" ] todoListName
+                    ]
                 , div [] (List.map (single model) todosSortedAndFiltered)
                 , newInput model todoList
                 , emptyTodos model todoList -- make a bunch of empty ones of this

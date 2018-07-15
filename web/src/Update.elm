@@ -283,6 +283,18 @@ update msg model =
             in
                 ( model, TodoList.Http.createCmd newList )
 
+        Msgs.CustomListDelete todoList ->
+            -- Loop over the custom lists; filtering out that to be deleted.
+            -- Run a command to do so on the api.
+            let
+                filterLists lists =
+                    List.filter (\t -> t.id /= todoList.id) lists
+            in
+                ( { model | customLists = RemoteData.map filterLists model.customLists }
+                  -- , Todo.Http.deleteCmd todo
+                , Cmd.none
+                )
+
         Msgs.CustomListFocusName res ->
             case res of
                 -- could do error handling here.

@@ -29,6 +29,7 @@ type Msg
       -- customlists https
     | CustomListToggleEditing TodoList
     | CustomListCreate
+    | CustomListDelete TodoList
     | CustomListUpdateName TodoList String
     | CustomListStopEditing TodoList
     | CustomListFocusName (Result Dom.Error ())

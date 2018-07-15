@@ -9,7 +9,27 @@
       "originalName": "New List5",
       "ts": 1531587300523,
       "listType": "custom"
+    },
+    {
+      "id": 6,
+      "name": "New List",
+      "originalName": "New List6",
+      "ts": 1531666130047,
+      "listType": "custom"
     }
   ],
-  "todos": []
+  "todos": [
+    {
+      "id": 2,
+      "isEditing": false,
+      "name": "dfdfd",
+      "complete": false,
+      "parentList": "New List5",
+      "order": 0,
+      "created_at": 1531666179206,
+      "originalDay": 1531587300523,
+      "currentDay": 1531587300523,
+      "hasRolledOver": false
+    }
+  ]
 }
