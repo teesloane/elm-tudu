@@ -1,7 +1,0 @@
-[package]
-name = "api"
-version = "0.1.0"
-authors = ["teesloane <tylersloane@gmail.com>"]
-
-[dependencies]
-actix-web = "0.6"

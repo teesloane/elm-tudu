@@ -4,3 +4,9 @@
 - install elm packages probably
 - install json-server
 - make develop
+
+** API
+- golang
+- sqlite3
+- gorm
+- some other stuff.
