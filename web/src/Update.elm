@@ -114,7 +114,7 @@ update msg model =
                         Models.createDefaultTodo
                             { id = model.uuid + 1
                             , parentList = todoList
-                            , order =
+                            , position =
                                 (Models.maybeTodos model.todos)
                                     |> List.filter (\t -> t.parentList == todoList.originalName)
                                     |> List.length
@@ -140,7 +140,7 @@ update msg model =
                     ( newModel, Task.perform (Msgs.TodoCreateWithTime newTodo) Time.now )
 
         Msgs.TodoCreateWithTime todo time ->
-            ( model, Todo.Http.createCmd { todo | created_at = time } )
+            ( model, Todo.Http.createCmd { todo | createdAt = time } )
 
         Msgs.TodoFocusInputFromEmpty todoList ->
             let

@@ -52,7 +52,7 @@ customListEncoder todoList =
 
 fetchAllCmd : Cmd Msg
 fetchAllCmd =
-    Http.get "http://localhost:4000/customlists" customListsDecoder
+    Http.get "http://localhost:8001/customlists" customListsDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.HttpOnFetchTodoLists
 
@@ -77,7 +77,7 @@ createReq todoList =
         , headers = []
         , method = "POST"
         , timeout = Nothing
-        , url = "http://localhost:4000/customlists"
+        , url = "http://localhost:8001/customlists"
         , withCredentials = False
         }
 
@@ -127,7 +127,7 @@ updateSingleUrl todoList =
         _ =
             Debug.log "thing is " todoList.id
     in
-        "http://localhost:4000/customlists/" ++ (toString todoList.id)
+        "http://localhost:8001/customlists/" ++ (toString todoList.id)
 
 
 updateReq : TodoList -> Http.Request TodoListDB

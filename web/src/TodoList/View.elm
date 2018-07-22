@@ -48,7 +48,7 @@ list model todoList =
             model.todos
                 |> Models.maybeTodos
                 |> List.filter (\t -> t.parentList == todoList.originalName)
-                |> List.sortBy .order
+                |> List.sortBy .position
 
         -- if todolist is currentDay style it nicely.
         styles =

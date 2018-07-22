@@ -81,7 +81,7 @@ end model todoTarget =
                         ! []
 
 
-{-| On dragging over, we copy the dragTarget's order to the draggedTodo's order
+{-| On dragging over, we copy the dragTarget's position to the draggedTodo's position
 This way, when it's dropped we can just have every item after it in the list update + 1.
 FIXME: use maybe.map instead of having two switch cases.
 -}
@@ -98,11 +98,11 @@ over model targetTodo =
 
                 Just targetTodo_ ->
                     let
-                        todoWithNewOrder =
-                            { draggedTodo_ | order = targetTodo_.order }
+                        todoWithNewPosition =
+                            { draggedTodo_ | position = targetTodo_.position }
                     in
                         ( { model
-                            | draggedTodo = (Just todoWithNewOrder)
+                            | draggedTodo = (Just todoWithNewPosition)
                             , dragTarget =
                                 if targetTodo_.id /= draggedTodo_.id then
                                     (Just targetTodo_)
@@ -126,7 +126,7 @@ drop model todo =
                 updatedTodo =
                     { draggedTodo_
                         | currentDay = dragTarget_.currentDay
-                        , order = dragTarget_.order
+                        , position = dragTarget_.position
                         , parentList = dragTarget_.parentList
                     }
             in

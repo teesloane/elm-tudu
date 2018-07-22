@@ -136,7 +136,7 @@ dropZoneEmpty model todoList idx =
             -- (Models.getTodosInList todoList model)
             (maybeTodos model.todos)
                 |> List.filter (\t -> t.parentList == todoList.originalName)
-                |> List.sortBy .order
+                |> List.sortBy .position
                 |> List.reverse
                 |> List.head
 
@@ -144,14 +144,14 @@ dropZoneEmpty model todoList idx =
             Models.createDefaultTodo
                 { id = model.uuid + 1
                 , parentList = todoList
-                , order = n
+                , position = n
                 }
 
-        dropZone order =
+        dropZone position =
             div
                 [ class "todo todo-dropzone"
-                , Drag.onOver (Msgs.DragOver (buildNewTodo order))
-                , Drag.onDrop (Msgs.Drop (buildNewTodo order))
+                , Drag.onOver (Msgs.DragOver (buildNewTodo position))
+                , Drag.onDrop (Msgs.Drop (buildNewTodo position))
                 ]
                 []
     in
@@ -163,7 +163,7 @@ dropZoneEmpty model todoList idx =
             Just lastItem_ ->
                 div []
                     -- hack
-                    [ (dropZone (lastItem_.order + 1)) ]
+                    [ (dropZone (lastItem_.position + 1)) ]
 
 
 {-| for dropping todos on top of other todos and replacing them.

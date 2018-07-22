@@ -1,6 +1,6 @@
 module Todo.Http exposing (..)
 
-import Http
+import Http exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
@@ -11,6 +11,10 @@ import Utils exposing (buildWeek)
 
 
 -- DECODERS / ENCODERS ---------------------------------------------------------
+
+
+prefix =
+    "http://localhost:3000/api/todos"
 
 
 todosDecoder : Decode.Decoder (List Todo)
@@ -26,8 +30,8 @@ todoDecoder =
         |> JsonPipe.required "name" Decode.string
         |> JsonPipe.required "complete" Decode.bool
         |> JsonPipe.required "parentList" Decode.string
-        |> JsonPipe.required "order" Decode.int
-        |> JsonPipe.required "created_at" Decode.float
+        |> JsonPipe.required "position" Decode.int
+        |> JsonPipe.required "createdAt" Decode.float
         |> JsonPipe.required "originalDay" Decode.float
         |> JsonPipe.required "currentDay" Decode.float
         |> JsonPipe.required "hasRolledOver" Decode.bool
@@ -42,8 +46,8 @@ todoEncoder todo =
             , ( "name", Encode.string todo.name )
             , ( "complete", Encode.bool todo.complete )
             , ( "parentList", Encode.string todo.parentList )
-            , ( "order", Encode.int todo.order )
-            , ( "created_at", Encode.float todo.created_at )
+            , ( "position", Encode.int todo.position )
+            , ( "createdAt", Encode.float todo.createdAt )
             , ( "originalDay", Encode.float todo.originalDay )
             , ( "currentDay", Encode.float todo.currentDay )
             , ( "hasRolledOver", Encode.bool todo.hasRolledOver )
@@ -64,32 +68,37 @@ createReq todo =
         , headers = []
         , method = "POST"
         , timeout = Nothing
-        , url = "http://localhost:4000/todos"
+        , url = prefix
         , withCredentials = False
         }
 
 
 updateSingleUrl : Todo -> String
 updateSingleUrl todo =
-    "http://localhost:4000/todos/" ++ (toString todo.id)
+    prefix ++ (toString todo.id)
 
 
-updateReq : Todo -> Http.Request Todo
-updateReq todo =
-    Http.request
-        { body = todoEncoder todo |> Http.jsonBody
-        , expect = Http.expectJson todoDecoder
-        , headers = []
-        , method = "PATCH"
-        , timeout = Nothing
-        , url = updateSingleUrl todo
-        , withCredentials = False
-        }
+
+-- updateReq : Todo -> Http.Request Todo
+Http.send
+    { timeout = 0
+    , desiredResponseType = Http.expectJson todoDecoder
+    , withCredentials = False
+    }
+    { verb = "GET"
+    , headers =
+        [ ( "Origin", "http://elm-lang.org" )
+        , ( "Access-Control-Request-Method", "POST" )
+        , ( "Access-Control-Request-Headers", "X-Custom-Header" )
+        ]
+    , url = updateSingleUrl todo
+    , body = todoEncoder todo |> Http.jsonBody
+    }
 
 
 deleteSingleUrl : Todo -> String
 deleteSingleUrl todo =
-    "http://localhost:4000/todos/" ++ (toString todo.id)
+    prefix ++ (toString todo.id)
 
 
 deleteReq : Todo -> Http.Request Todo
@@ -112,7 +121,7 @@ deleteReq todo =
 
 fetchAllCmd : Cmd Msg
 fetchAllCmd =
-    Http.get "http://localhost:4000/todos" todosDecoder
+    Http.get prefix todosDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.HttpOnFetchTodos
 

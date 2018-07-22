@@ -45,8 +45,8 @@ type alias Todo =
     , name : String
     , complete : Bool
     , parentList : String
-    , order : Int
-    , created_at : Time
+    , position : Int
+    , createdAt : Time
     , originalDay : Time
     , currentDay : Time
     , hasRolledOver : Bool
@@ -59,11 +59,11 @@ createDefaultTodo opts =
     , name = opts.parentList.inputField
     , complete = False
     , parentList = opts.parentList.originalName
-    , order = opts.order
+    , position = opts.position
     , originalDay = (Date.toTime opts.parentList.date)
     , currentDay = (Date.toTime opts.parentList.date)
     , hasRolledOver = False
-    , created_at = (Date.toTime opts.parentList.date)
+    , createdAt = (Date.toTime opts.parentList.date)
     }
 
 

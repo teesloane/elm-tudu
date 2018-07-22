@@ -66,7 +66,7 @@ appView model =
     div [ class "flex flex-column flex-auto justify-center" ]
         -- hack to add a stylesheet for elm reactor.
         [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
-        , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "https://cdnjs.cloudflare.com/ajax/libs/basscss/8.0.4/css/basscss.min.css" ] []
+        , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "basscss.min.css" ] []
         , div [ class "tudu-nav" ] [ text "Tudu" ]
         , div [ class "flex" ]
             [ dateNavigationLeft
