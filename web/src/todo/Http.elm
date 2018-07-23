@@ -14,7 +14,7 @@ import Utils exposing (buildWeek)
 
 
 prefix =
-    "/api/todos"
+    "/api/todos/"
 
 
 todosDecoder : Decode.Decoder (List Todo)
@@ -189,22 +189,26 @@ updateCmd todo =
 
 onUpdate : Model -> Result Http.Error Todo -> ( Model, Cmd Msg )
 onUpdate model res =
-    case res of
-        Ok todo ->
-            -- loops through all todos and replaces the one with id with the updated.
-            let
-                updateTodos t =
-                    if t.id == todo.id then
-                        todo
-                    else
-                        t
-            in
-                { model | todos = RemoteData.map (\l -> List.map updateTodos l) model.todos }
-                    ! []
+    let
+        _ =
+            Debug.log "onupdate" res
+    in
+        case res of
+            Ok todo ->
+                -- loops through all todos and replaces the one with id with the updated.
+                let
+                    updateTodos t =
+                        if t.id == todo.id then
+                            todo
+                        else
+                            t
+                in
+                    { model | todos = RemoteData.map (\l -> List.map updateTodos l) model.todos }
+                        ! []
 
-        Err error ->
-            -- TODO!
-            model ! []
+            Err error ->
+                -- TODO!
+                model ! []
 
 
 

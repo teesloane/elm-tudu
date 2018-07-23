@@ -35,43 +35,11 @@
       (let []
         (ok (todo/get-all))))
 
-
-    (OPTIONS "/:id" req :middleware [cors] :body [new-todo todo/Todo] :summary "Cors Preflight" (ok {}))
     (PATCH "/:id" [id]
       :path-params [id :- Long]
       :body [updated-todo todo/Todo]
       :summary "Updates a subscription"
       (ok (todo/update! id (todo/deserialize updated-todo ))))
-
-
-    ;; ;; DELETE works, but only if there is an OPTIONS. Also, it still registers a 500 on the client :(
-    ;; ;; But............................ IT WORKS.
-
-    ;; (OPTIONS "/:id" req :middleware [cors] :summary "Cors Preflight" (ok {}))
-    ;; (DELETE "/:id" [id]
-    ;;   :path-params [id :- Long]
-    ;;   :middleware [cors]
-    ;;   (db/delete-subscription id)
-    ;;   (ok {:id id}))
-
-
-    ;; ;; FIXME: see todo.org/refactors/POST requests need OPTIONS
-    ;; (OPTIONS "/" request
-    ;;   :return Subscription
-    ;;   :body [new-subscription NewSubscription]
-    ;;   :middleware [cors]
-    ;;   :summary "Creates a New Subscription"
-    ;;   (ok {}))
-
-    ;; (POST "/" request
-    ;;   :return Subscription
-    ;;   :body [new-subscription NewSubscription]
-    ;;   :middleware [cors]
-    ;;   :summary "Creates a New Subscription"
-    ;;   (ok (db/create-subscription new-subscription)))
-    ;; ))
-    ))
-
 
 
 ;; --- Routes: Custom List ---
@@ -90,9 +58,6 @@
 (def app
   (routes
    api-all
-   #_(GET "/" [] (resp/resource-response "index.html" {:root ""
-                                                     :allow-symlinks? true
-                                                     }))
    (GET "/" [] (io/resource "public/index.html"))
    (route/resources "/")
    (route/not-found "You lost?")))

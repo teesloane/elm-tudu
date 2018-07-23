@@ -81,7 +81,7 @@ update msg model =
                     if isEmpty then
                         Todo.Http.deleteCmd { todo | isEditing = False }
                     else
-                        Todo.Http.createCmd { todo | isEditing = False }
+                        Todo.Http.updateCmd { todo | isEditing = False }
             in
                 ( finalModel, pickCmd )
 

@@ -7,32 +7,21 @@
             [tudu.db :refer [db]]
             [tudu.util :refer [time-now int->bool]]))
 
-;; Examples And Serializers
-#_(s/defschema Todo
-    {:name s/Str
-     (s/optional-key :description) s/Str
-     :size (s/enum :L :M :S)
-     :origin {:country (s/enum :FI :PO)
-              :city s/Str}})
-
 (s/defschema Todo
-  {:id              s/Int 
-   :is_editing      s/Bool
-   :name            s/Str
-   :complete        s/Bool
-   :parent_list     s/Str
-   :position        s/Int
-   :current_day     s/Int
-   :has_rolled_over s/Bool
-   :original_day    s/Bool}
-  )
-
-#_(transform-keys ->camelCaseString {:first-name "John", :last-name "Smith"})
+  {:id            s/Int
+   :isEditing     s/Bool
+   :name          s/Str
+   :complete      s/Bool
+   :parentList    s/Str
+   :position      s/Int
+   :currentDay    s/Int
+   :createdAt     s/Int
+   :hasRolledOver s/Bool
+   :originalDay   s/Int})
 
 (defn deserialize
   [todo]
-  (transform-keys ->Camel_Snake_Case_Keyword todo)
-  )
+  (transform-keys ->Camel_Snake_Case_Keyword todo))
 
 (defn serialize-row
   "Paints a happy todo to send over the wire."
@@ -40,9 +29,7 @@
   (-> (transform-keys ->camelCaseString todo)
       (update "isEditing" int->bool)
       (update "hasRolledOver" int->bool)
-      (update "complete" int->bool)
-
-      ))
+      (update "complete" int->bool)))
 
 (defn ex-todo
   []
@@ -64,7 +51,6 @@
 
 (get-all)
 
-
 ;; (get-all)
 
 (defn create
@@ -72,13 +58,12 @@
   (let [n-todo (merge todo {:createdAt (time-now)})]
     (sql/insert! db :todos n-todo)))
 
-
 (defn update!
   "TODO: build updated_at."
   [id u-todo]
-  (sql/update! db :todos u-todo ["id = ?" id]))
+  (sql/update! db :todos u-todo ["id = ?" id])
+  (first (sql/query db ["SELECT * FROM todos WHERE id = ?" id] {:row-fn serialize-row}))
+  )
 
 ;; (create (ex-todo))
-
-
 
