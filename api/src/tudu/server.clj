@@ -3,8 +3,10 @@
             [compojure.route :as route]
             [ring.util.response :as resp]
             [ring.util.http-response :refer :all]
+            [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.cors :refer [wrap-cors]]
             [tudu.models.todo :as todo]
+            [clojure.java.io :as io]
             ))
 
 ;; api setup
@@ -35,7 +37,7 @@
 
 
     (OPTIONS "/:id" req :middleware [cors] :body [new-todo todo/Todo] :summary "Cors Preflight" (ok {}))
-    (PUT "/:id" [id]
+    (PATCH "/:id" [id]
       :path-params [id :- Long]
       :body [updated-todo todo/Todo]
       :summary "Updates a subscription"
@@ -88,8 +90,13 @@
 (def app
   (routes
    api-all
-   (GET "/" [] (resp/resource-response "index.html" {:root "public"}))
+   #_(GET "/" [] (resp/resource-response "index.html" {:root ""
+                                                     :allow-symlinks? true
+                                                     }))
+   (GET "/" [] (io/resource "public/index.html"))
    (route/resources "/")
    (route/not-found "You lost?")))
+
+
 
 

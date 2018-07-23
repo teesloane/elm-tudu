@@ -1,6 +1,6 @@
 module Todo.Http exposing (..)
 
-import Http exposing (..)
+import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
@@ -14,7 +14,7 @@ import Utils exposing (buildWeek)
 
 
 prefix =
-    "http://localhost:3000/api/todos"
+    "/api/todos"
 
 
 todosDecoder : Decode.Decoder (List Todo)
@@ -78,22 +78,17 @@ updateSingleUrl todo =
     prefix ++ (toString todo.id)
 
 
-
--- updateReq : Todo -> Http.Request Todo
-Http.send
-    { timeout = 0
-    , desiredResponseType = Http.expectJson todoDecoder
-    , withCredentials = False
-    }
-    { verb = "GET"
-    , headers =
-        [ ( "Origin", "http://elm-lang.org" )
-        , ( "Access-Control-Request-Method", "POST" )
-        , ( "Access-Control-Request-Headers", "X-Custom-Header" )
-        ]
-    , url = updateSingleUrl todo
-    , body = todoEncoder todo |> Http.jsonBody
-    }
+updateReq : Todo -> Http.Request Todo
+updateReq todo =
+    Http.request
+        { body = todoEncoder todo |> Http.jsonBody
+        , expect = Http.expectJson todoDecoder
+        , headers = []
+        , method = "PATCH"
+        , timeout = Nothing
+        , url = updateSingleUrl todo
+        , withCredentials = False
+        }
 
 
 deleteSingleUrl : Todo -> String
@@ -132,6 +127,9 @@ Also, if a todo is overdue and incomplete, move it into current day.
 onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
 onFetchAll model res =
     let
+        _ =
+            Debug.log "shit is" res
+
         newWeek =
             (buildWeek model.dayOffset model.timeAtLoad)
 

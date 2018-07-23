@@ -1,0 +1,214 @@
+/* @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700'); */
+@import url('https://fonts.googleapis.com/css?family=Oswald:400,500|Roboto');
+
+/* colours
+   backgrounds: #ddd
+   primary: #54a0ff
+
+ */
+
+body {
+  background: #fff;
+  color: black;
+  font-family: "Roboto", arial;
+  padding: 0;
+  margin: 0;
+}
+
+
+/* viewTodo Styles ; ie: a single todo entry.*/
+
+.todo {
+  min-width: 160px;
+  background: #fff;
+  border-bottom: 1px dotted #bfbfbf;
+  font-size: 13px;
+  height: 24px;
+  display: flex;
+  padding: 2px 0;
+  align-items: center;
+  margin: 2px 0;
+}
+
+.todo:hover {
+  background: aliceblue;
+}
+
+
+.todo-dropzone {
+  /* padding: 0px 6px; */
+  border: 1px dotted #3fabcd;
+}
+
+.todo-input  {
+  margin: 2px 0;
+  border: none;
+  outline: none;
+  min-width: 160px;
+  background: #fff;
+  border-bottom: 1px dotted #bfbfbf;
+  font-size: 13px;
+  height: 24px;
+  display: flex;
+  width: 98%; /* what */
+  padding: 2px;
+  align-items: center;
+}
+
+.todo-completed {
+  text-decoration: line-through;
+  color: #dfdfdf;
+}
+
+.todo-draggable {
+  cursor: drag;
+  display: flex;
+  flex: auto;
+  padding: 2px 4px;
+}
+
+
+.todo-edit-btn, .todo-delete-btn {
+  opacity: 0.1;
+  padding: 0 3px;
+  cursor: pointer; 
+}
+
+.todo-edit-btn:hover {
+  opacity: 0.5;
+  padding-left: 4px;
+  cursor: pointer; 
+}
+
+/* Days / Day Pickers + Other stuff  ---------------------------------------------------------------- */
+
+.advancer-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-align: center;
+  padding: 8px;
+  margin-top: 32px;
+  min-width: 48px;
+}
+
+.day-advance {
+  /* font-size: 40px; */
+  /* width: 10px; */
+  cursor: pointer;
+}
+
+.week-advance {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Tudu Header ----------------------------------------------------------------------- */
+
+.tudu-nav {
+  padding: 4px 64px;
+  color: white;
+  text-transform: uppercase;
+  display: flex;
+  font-weight: 700;
+  letter-spacing: 4px;
+  background: #54a0ff;
+}
+
+/* TodoList styles  ------------------------------------------------------------------ */
+
+.customListWrapper {
+  display: flex;
+  flex: 1 1 auto;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-x: scroll;
+}
+
+.todoListColumn {
+  /* border-right: 1px solid #efefef; */
+  display: flex;
+  border-left: 1px solid #efefef;
+  margin: 24px 4px;
+  /* max-width: 400px; */
+  min-width: 250px;
+  /* width: 100% */
+  flex: 1 1 auto
+}
+
+.todoListName {
+  text-align: center;
+  padding: 8px 0;
+  font-family: "Oswald", arial;
+  font-weight: 700;
+}
+
+.date-dayOfWeek {
+  font-size: 28px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #555;
+}
+
+
+.date-dayOfWeek--input {
+  font-size: 28px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 0;
+  color: #555;
+  outline: none;
+  font-weight: 700;
+  border: none;
+  font-family: "Oswald", arial;
+  text-align: center;
+  background: #efefef;
+  width: 100%;
+}
+
+.date-dayOfWeek--active {
+  letter-spacing: 4px;
+  font-size: 28px;
+  text-transform: uppercase;
+  color: #54a0ff;
+}
+
+.date-moDayYear {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #555;
+  font-family: "Oswald", arial;
+  font-weight: 400;
+}
+
+.date-moDayYear--active {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #54a0ff;
+}
+
+
+/* misc */
+
+.list-divider {
+  justify-content: flex-end;
+  display: flex;
+  padding: 2px 16px;
+  background-color: #efefef;
+  width: 100%;
+  
+}
+
+/* ---------------------------------------------------------------------------*/
+
+/* utilities */
+.pointer {
+  cursor: pointer;
+}
+
+.cursor-drag {
+  cursor: move;
+  cursor: drag;
+}

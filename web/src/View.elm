@@ -23,11 +23,11 @@ dateNavigationLeft : Html Msg
 dateNavigationLeft =
     div [ class "advancer-wrapper" ]
         [ div [ class "day-advance", onClick (Msgs.OffsetDay -1) ]
-            [ Html.img [ iconBig, src "imgs/arrow-left-circle.svg" ] [] ]
+            [ Html.img [ iconBig, src "public/imgs/arrow-left-circle.svg" ] [] ]
         , div [ class "week-advance", onClick (Msgs.OffsetDay -5) ]
-            [ Html.img [ iconSmall, src "imgs/arrow-left.svg" ] [] ]
+            [ Html.img [ iconSmall, src "public/imgs/arrow-left.svg" ] [] ]
         , div [ class "go-home-week", onClick (Msgs.OffsetDay 0) ]
-            [ Html.img [ iconSmall, src "imgs/home.svg" ] [] ]
+            [ Html.img [ iconSmall, src "public/imgs/home.svg" ] [] ]
         ]
 
 
@@ -35,9 +35,9 @@ dateNavigationRight : Html Msg
 dateNavigationRight =
     div [ class "advancer-wrapper" ]
         [ div [ class "day-advance", onClick (Msgs.OffsetDay 1) ]
-            [ Html.img [ iconBig, src "imgs/arrow-right-circle.svg" ] [] ]
+            [ Html.img [ iconBig, src "public/imgs/arrow-right-circle.svg" ] [] ]
         , div [ class "week-advance", onClick (Msgs.OffsetDay 5) ]
-            [ Html.img [ iconSmall, src "imgs/arrow-right.svg" ] [] ]
+            [ Html.img [ iconSmall, src "public/imgs/arrow-right.svg" ] [] ]
         ]
 
 
@@ -64,10 +64,7 @@ customListView model =
 appView : Model -> Html Msg
 appView model =
     div [ class "flex flex-column flex-auto justify-center" ]
-        -- hack to add a stylesheet for elm reactor.
-        [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
-        , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "basscss.min.css" ] []
-        , div [ class "tudu-nav" ] [ text "Tudu" ]
+        [ div [ class "tudu-nav" ] [ text "Tudu" ]
         , div [ class "flex" ]
             [ dateNavigationLeft
             , div [ class "flex flex-auto flex-column" ]
