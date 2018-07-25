@@ -20,6 +20,11 @@ trash-web:
 move-web-to-api:
 	cd $(ROOT); cp -R web/build/ api/resources/public
 
+run-api:
 
-# compile front end and move it to the resources folder for the api to serve
+	cd $(API); lein ring server 
+
+
+# Combined Tasks.
+
 compile: compile-elm move-web-to-api

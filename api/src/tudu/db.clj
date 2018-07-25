@@ -15,7 +15,7 @@
                      [:complete      :boolean]
                      [:parent_list    "varchar(253)"]
                      [:position     :int]
-                     [:createdAt    :int]
+                     [:created_at    :int]
                      [:current_day    :int]
                      [:has_rolled_over :boolean]
                      [:original_day   :int]]

@@ -127,9 +127,6 @@ Also, if a todo is overdue and incomplete, move it into current day.
 onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
 onFetchAll model res =
     let
-        _ =
-            Debug.log "shit is" res
-
         newWeek =
             (buildWeek model.dayOffset model.timeAtLoad)
 

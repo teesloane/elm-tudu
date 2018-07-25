@@ -29,17 +29,25 @@
 
 (def routes-todo
   (context "/todos" [] :tags ["Todos"]
-    (GET "/" request
-      :summary "Returns all todos"
-      :middleware [cors]
-      (let []
-        (ok (todo/get-all))))
+           (GET "/" request
+                :summary "Returns all todos"
+                :middleware [cors]
+                (let []
+                  (ok (todo/get-all))))
 
-    (PATCH "/:id" [id]
-      :path-params [id :- Long]
-      :body [updated-todo todo/Todo]
-      :summary "Updates a subscription"
-      (ok (todo/update! id (todo/deserialize updated-todo ))))
+           (PATCH "/:id" [id]
+                  :path-params [id :- Long]
+                  :body [updated-todo todo/Todo]
+                  :summary "Update a todo"
+                  (ok (todo/update! id (todo/deserialize updated-todo ))))
+
+           (POST "/" request
+                 ;; :return todo/Todo
+                 :body [n-todo todo/Todo]
+                 :middleware [cors]
+                 :summary "Creates a New Subscription"
+                 (ok (todo/create! (todo/deserialize n-todo))))
+           ))
 
 
 ;; --- Routes: Custom List ---
@@ -61,7 +69,6 @@
    (GET "/" [] (io/resource "public/index.html"))
    (route/resources "/")
    (route/not-found "You lost?")))
-
 
 
 

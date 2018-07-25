@@ -3,7 +3,6 @@
             [camel-snake-kebab.extras :refer [transform-keys]]
             [clojure.java.jdbc :as sql]
             [schema.core :as s]
-
             [tudu.db :refer [db]]
             [tudu.util :refer [time-now int->bool]]))
 
@@ -31,39 +30,23 @@
       (update "hasRolledOver" int->bool)
       (update "complete" int->bool)))
 
-(defn ex-todo
-  []
-  {:id              3
-   :is_editing      false
-   :name            "my todo"
-   :complete        false
-   :parent_list     "thelist"
-   :position        35
-   :current_day     (time-now)
-   :has_rolled_over true
-   :original_day    (time-now)})
-
 ;; DB Opts
 
 (defn get-all
   []
   (sql/query db ["SELECT * FROM todos"] {:row-fn serialize-row}))
 
-(get-all)
-
-;; (get-all)
-
-(defn create
+(defn create!
+  "TODO try catch?"
   [todo]
-  (let [n-todo (merge todo {:createdAt (time-now)})]
-    (sql/insert! db :todos n-todo)))
+  (let [n-todo (-> todo deserialize (merge {:created_at (time-now)}))]
+    (sql/insert! db :todos n-todo)
+    (serialize-row n-todo)))
 
 (defn update!
-  "TODO: build updated_at."
+  "TODO: build updated_at. do try-catch?"
   [id u-todo]
   (sql/update! db :todos u-todo ["id = ?" id])
-  (first (sql/query db ["SELECT * FROM todos WHERE id = ?" id] {:row-fn serialize-row}))
-  )
-
-;; (create (ex-todo))
+  (let [r-data (sql/query db ["SELECT * FROM todos WHERE id = ?" id] {:row-fn serialize-row})]
+    (first r-data)))
 
