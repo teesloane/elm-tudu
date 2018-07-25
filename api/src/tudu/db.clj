@@ -9,17 +9,16 @@
 
 ;; -- tables --
 
-(def tables {:todos [[:id            :int]
-                     [:is_editing     :boolean]
-                     [:name          "varchar(32)"]
-                     [:complete      :boolean]
-                     [:parent_list    "varchar(253)"]
-                     [:position     :int]
-                     [:created_at    :int]
-                     [:current_day    :int]
+(def tables {:todos [[:id              :int]
+                     [:is_editin       :boolean]
+                     [:name            "varchar(32)"]
+                     [:complete        :boolean]
+                     [:parent_list     "varchar(253)"]
+                     [:position        :int]
+                     [:created_at      :int]
+                     [:current_day     :int]
                      [:has_rolled_over :boolean]
-                     [:original_day   :int]]
-             })
+                     [:original_day    :int]]})
 
 ;; -- table commands --
 
@@ -31,7 +30,6 @@
 
 #(do (drop-tables tables)
      (create-tables tables))
-
 
 (when-not (.exists (clojure.java.io/as-file "data.db"))
   (create-tables tables))

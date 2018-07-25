@@ -1,6 +1,7 @@
 * -- CURRENT / ON DECK ---------------------------------------------------------
 
 * [ ] Generic Lists at the bottom                                               :feature:
+** [ ] bulid todo api for this
 ** [X] make custom list names editable
 CLOSED: [2018-07-14 Sat 12:48]
 ** [X] on creation, focus on input and set it to editable

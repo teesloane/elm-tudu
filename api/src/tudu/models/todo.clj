@@ -50,3 +50,7 @@
   (let [r-data (sql/query db ["SELECT * FROM todos WHERE id = ?" id] {:row-fn serialize-row})]
     (first r-data)))
 
+
+(defn delete!
+  [id]
+  (sql/delete! db :todos ["id = ?" id]))

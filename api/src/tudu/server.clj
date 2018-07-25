@@ -47,6 +47,13 @@
                  :middleware [cors]
                  :summary "Creates a New Subscription"
                  (ok (todo/create! (todo/deserialize n-todo))))
+
+           (DELETE "/:id" [id]
+                   :path-params [id :- Long]
+                   :middleware [cors]
+                   (todo/delete! id)
+                   (ok {:id id}))
+
            ))
 
 
