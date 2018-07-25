@@ -7,7 +7,8 @@ import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
 import Models as Models exposing (Model, initialModel, Todo)
 import RemoteData exposing (RemoteData, WebData, map)
 import Msgs exposing (Msg)
-import Utils exposing (buildWeek)
+import Utils exposing (buildWeek, parseDate)
+import Date exposing (Date)
 
 
 -- DECODERS / ENCODERS ---------------------------------------------------------
@@ -123,6 +124,7 @@ fetchAllCmd =
 
 {-| On fetching all todos, we set them into state, and set the currentWeek.
 Also, if a todo is overdue and incomplete, move it into current day.
+-- TODO - move this to the server?
 -}
 onFetchAll : Model -> WebData (List Todo) -> ( Model, Cmd a )
 onFetchAll model res =
@@ -131,11 +133,11 @@ onFetchAll model res =
             (buildWeek model.dayOffset model.timeAtLoad)
 
         rolledOverTodos t =
-            if t.currentDay <= model.timeAtLoad && t.complete == False then
+            if t.currentDay < model.timeAtLoad && t.complete == False then
                 { t
+                  -- FIXME this is not persisting on the backend until the todo is updated or saved.
                     | currentDay = model.timeAtLoad
-
-                    -- this is not persisting on the backend until the todo is updated or saved...
+                    , parentList = (parseDate (Date.fromTime model.timeAtLoad) "Full")
                     , hasRolledOver = True
                 }
             else
