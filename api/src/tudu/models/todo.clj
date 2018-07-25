@@ -4,7 +4,7 @@
             [clojure.java.jdbc :as sql]
             [schema.core :as s]
             [tudu.db :refer [db]]
-            [tudu.util :refer [time-now int->bool]]))
+            [tudu.util :as util :refer [time-now int->bool]]))
 
 (s/defschema Todo
   {:id            s/Int
@@ -39,7 +39,11 @@
 (defn create!
   "TODO try catch?"
   [todo]
-  (let [n-todo (-> todo deserialize (merge {:created_at (time-now)}))]
+  (let [n-todo (-> todo deserialize 
+                 (merge {:created_at (time-now)})
+                 (assoc :Id (util/time-now-ms))
+                 )]
+    (prn "n-todo is " n-todo)
     (sql/insert! db :todos n-todo)
     (serialize-row n-todo)))
 
@@ -49,7 +53,6 @@
   (sql/update! db :todos u-todo ["id = ?" id])
   (let [r-data (sql/query db ["SELECT * FROM todos WHERE id = ?" id] {:row-fn serialize-row})]
     (first r-data)))
-
 
 (defn delete!
   [id]
