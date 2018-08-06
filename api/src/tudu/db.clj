@@ -9,16 +9,21 @@
 
 ;; -- tables --
 
-(def tables {:todos [[:id              :int]
-                     [:is_editin       :boolean]
-                     [:name            "varchar(32)"]
-                     [:complete        :boolean]
-                     [:parent_list     "varchar(253)"]
-                     [:position        :int]
-                     [:created_at      :int]
-                     [:current_day     :int]
-                     [:has_rolled_over :boolean]
-                     [:original_day    :int]]})
+(def tables {:todos     [[:id              :int]
+                         [:is_editing      :boolean]
+                         [:name            "varchar(32)"]
+                         [:complete        :boolean]
+                         [:parent_list     "varchar(253)"]
+                         [:position        :int]
+                         [:created_at      :int]
+                         [:current_day     :int]
+                         [:has_rolled_over :boolean]
+                         [:original_day    :int]]
+             :todolists [[:id             :int]
+                         [:name          "varchar(256)"]
+                         [:ts            :int]
+                         [:list_type     "varchar(256)"]
+                         [:original_name "varchar(256)"]]})
 
 ;; -- table commands --
 

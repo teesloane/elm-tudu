@@ -284,15 +284,13 @@ update msg model =
                 ( model, TodoList.Http.createCmd newList )
 
         Msgs.CustomListDelete todoList ->
-            -- Loop over the custom lists; filtering out that to be deleted.
-            -- Run a command to do so on the api.
+            -- Runs an optimistic delete (local state first regardless of server.)
             let
                 filterLists lists =
                     List.filter (\t -> t.id /= todoList.id) lists
             in
                 ( { model | customLists = RemoteData.map filterLists model.customLists }
-                  -- , Todo.Http.deleteCmd todo
-                , Cmd.none
+                , TodoList.Http.deleteCmd todoList
                 )
 
         Msgs.CustomListFocusName res ->
@@ -309,6 +307,9 @@ update msg model =
 
         Msgs.HttpOnCustomListSave res ->
             TodoList.Http.onCreate model res
+
+        Msgs.HttpOnCustomListDelete res ->
+            TodoList.Http.onDelete model res
 
         Msgs.OffsetDay day ->
             let

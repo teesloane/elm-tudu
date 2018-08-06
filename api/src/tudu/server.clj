@@ -6,8 +6,9 @@
             [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.cors :refer [wrap-cors]]
             [tudu.models.todo :as todo]
-            [clojure.java.io :as io]
-            ))
+            [tudu.models.todolists :as todolists]
+            [clojure.java.io :as io]))
+            
 
 ;; api setup
 
@@ -39,7 +40,7 @@
              :path-params [id :- Long]
              :body [updated-todo todo/Todo]
              :summary "Update a todo"
-             (ok (todo/update! id (todo/deserialize updated-todo ))))
+             (ok (todo/update! id (todo/deserialize updated-todo))))
 
            (POST "/" request
              ;; :return todo/Todo
@@ -52,17 +53,42 @@
              :path-params [id :- Long]
              :middleware [cors]
              (todo/delete! id)
-             (ok {:id id}))
-           ))
+             (ok {:id id}))))
 
 
 ;; --- Routes: Custom List ---
+(def routes-todolists
+  (context "/lists" [] :tags ["Todos"]
+           (GET "/" request
+             :summary "Returns all todolists"
+             :middleware [cors]
+             (let []
+               (ok (todolists/get-all))))
+
+           (PATCH "/:id" [id]
+             :path-params [id :- Long]
+             :body [updated-list todolists/TodoList]
+             :summary "Update a todolist"
+             (ok (todolists/update! id (todolists/deserialize updated-list))))
+
+           (POST "/" request
+             :body [n-lst todolists/TodoList]
+             :middleware [cors]
+             :summary "Creates a New List"
+             (ok (todolists/create! (todolists/deserialize n-lst))))
+
+           (DELETE "/:id" [id]
+             :path-params [id :- Long]
+             :middleware [cors]
+             (todolists/delete! id)
+             (ok {:id id}))))
 
 (def api-all 
   (api api-config
     (context "/api" [] :tags ["api"] 
              routes-todo
-             )))
+             routes-todolists)))
+             
 
 
 ;; -- All e'rythin' --

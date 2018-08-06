@@ -36,6 +36,7 @@ type Msg
     | HttpOnFetchTodoLists (WebData (List TodoListDB))
     | HttpOnCustomListUpdate (Result Http.Error TodoListDB)
     | HttpOnCustomListSave (Result Http.Error TodoListDB)
+    | HttpOnCustomListDelete (Result Http.Error TodoListDB)
       -- Drag stuff
     | DragStart Todo
     | DragEnd Todo

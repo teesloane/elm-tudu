@@ -12,6 +12,11 @@ import Task exposing (Task)
 import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists, createDefaultTodoList)
 
 
+prefix =
+    "/api/lists/"
+
+
+
 -- ENCODERS / DECODERS ---------------------------------------------------------
 
 
@@ -52,7 +57,7 @@ customListEncoder todoList =
 
 fetchAllCmd : Cmd Msg
 fetchAllCmd =
-    Http.get "http://localhost:8001/customlists" customListsDecoder
+    Http.get prefix customListsDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.HttpOnFetchTodoLists
 
@@ -77,7 +82,7 @@ createReq todoList =
         , headers = []
         , method = "POST"
         , timeout = Nothing
-        , url = "http://localhost:8001/customlists"
+        , url = prefix
         , withCredentials = False
         }
 
@@ -127,7 +132,7 @@ updateSingleUrl todoList =
         _ =
             Debug.log "thing is " todoList.id
     in
-        "http://localhost:8001/customlists/" ++ (toString todoList.id)
+        prefix ++ (toString todoList.id)
 
 
 updateReq : TodoList -> Http.Request TodoListDB
@@ -164,6 +169,55 @@ onUpdate model res =
                 { model | customLists = RemoteData.map (\l -> List.map updateTodoList l) model.customLists }
                     ! []
 
+        Err error ->
+            -- TODO!
+            model ! []
+
+
+
+-- 4. Delete
+
+
+deleteCmd : TodoList -> Cmd Msg
+deleteCmd todoList =
+    deleteReq todoList
+        |> Http.send Msgs.HttpOnCustomListDelete
+
+
+deleteSingleUrl : TodoList -> String
+deleteSingleUrl lst =
+    prefix ++ (toString lst.id)
+
+
+deleteReq : TodoList -> Http.Request TodoListDB
+deleteReq lst =
+    Http.request
+        { body = customListEncoder lst |> Http.jsonBody
+        , expect = Http.expectJson customListDecoder
+        , headers = []
+        , method = "DELETE"
+        , timeout = Nothing
+        , url = deleteSingleUrl lst
+        , withCredentials = False
+        }
+
+
+onDelete : Model -> Result Http.Error TodoListDB -> ( Model, Cmd Msg )
+onDelete model res =
+    case res of
+        Ok todoList ->
+            model ! []
+
+        -- loops through all todos and replaces the one with id with the updated.
+        -- let
+        --     updateTodoList t =
+        --         if t.id == todoList.id then
+        --             createDefaultTodoList todoList
+        --         else
+        --             t
+        -- in
+        --     { model | customLists = RemoteData.map (\l -> List.map updateTodoList l) model.customLists }
+        --         ! []
         Err error ->
             -- TODO!
             model ! []
