@@ -31,7 +31,7 @@ customListDecoder =
         |> JsonPipe.required "name" Decode.string
         |> JsonPipe.required "originalName" Decode.string
         |> JsonPipe.required "ts" Decode.float
-        |> JsonPipe.required "id" Decode.int
+        |> JsonPipe.required "id" Decode.string
         |> JsonPipe.required "listType" Decode.string
 
 
@@ -39,7 +39,7 @@ customListEncoder : TodoList -> Encode.Value
 customListEncoder todoList =
     let
         attributes =
-            [ ( "id", Encode.int todoList.id )
+            [ ( "id", Encode.string todoList.id )
             , ( "name", Encode.string todoList.name )
             , ( "originalName", Encode.string todoList.originalName )
             , ( "ts", Encode.float todoList.ts )
@@ -64,10 +64,14 @@ fetchAllCmd =
 
 onFetchAll : Model -> WebData (List TodoListDB) -> ( Model, Cmd a )
 onFetchAll model res =
-    { model
-        | customLists = RemoteData.succeed (List.map createDefaultTodoList (maybeTodoLists res))
-    }
-        ! []
+    let
+        _ =
+            Debug.log "the load is " res
+
+        loadedLists =
+            RemoteData.succeed (List.map createDefaultTodoList (maybeTodoLists res))
+    in
+        { model | customLists = loadedLists } ! []
 
 
 
@@ -118,8 +122,13 @@ onCreate model res =
                 )
 
         Err err ->
-            -- FIXME - handle error.
-            model ! []
+            let
+                _ =
+                    Debug.log "there was an error creating!" err
+
+                -- FIXME - handle error.
+            in
+                model ! []
 
 
 
@@ -128,11 +137,7 @@ onCreate model res =
 
 updateSingleUrl : TodoList -> String
 updateSingleUrl todoList =
-    let
-        _ =
-            Debug.log "thing is " todoList.id
-    in
-        prefix ++ (toString todoList.id)
+    prefix ++ todoList.id
 
 
 updateReq : TodoList -> Http.Request TodoListDB

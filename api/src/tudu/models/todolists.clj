@@ -8,7 +8,7 @@
             [tudu.util :as util :refer [time-now int->bool]]))
 
 (s/defschema TodoList
-  {:id            s/Int
+  {:id            s/Str
    :name          s/Str
    :originalName  s/Str
    :ts            s/Int
@@ -35,8 +35,8 @@
 (defn create!
   "TODO try catch?"
   [todo-list]
-  (let [n-todo-list (-> todo-list deserialize 
-                        (assoc :Id (util/time-now-ms)))]
+  (let [new-id      (str "cl-" (util/time-now-ms))
+        n-todo-list (-> todo-list deserialize (assoc :Id new-id))]
     (sql/insert! db :todolists n-todo-list)
     (serialize-row n-todo-list)))
 

@@ -5,7 +5,6 @@ import Html.Events as Events exposing (..)
 import Json.Decode as Json
 import Models exposing (..)
 import Msgs
-import RemoteData exposing (WebData, map)
 import Todo.Http
 
 

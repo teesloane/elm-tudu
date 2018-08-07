@@ -9,7 +9,7 @@ develop:
 ## FRONTEND
 
 compile-elm:
-	 cd $(WEB); elm-make main.elm --yes --warn --output\=elm.js; mv elm.js $(WEBOUT) ; cd $(ROOT) 
+	 cd $(WEB); elm-make main.elm --yes --debug --warn --output\=elm.js; mv elm.js $(WEBOUT) ; cd $(ROOT) 
 
 trash-web:
 	trash $(WEBOUT)/public/js/elm.js; trash $(API)/resources/public/build

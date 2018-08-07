@@ -1,7 +1,6 @@
 module Utils exposing (..)
 
 import Date exposing (Date)
-import Time exposing (Time)
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events exposing (..)
 import Models exposing (Model, initialModel, Todo)
@@ -37,7 +36,7 @@ buildWeek dayOffset timestamp =
                     , date = n_date
                     , ts = (Date.toTime n_date)
                     , listType = "day"
-                    , id = num
+                    , id = toString num
                     , isEditingName = False
                     }
             in

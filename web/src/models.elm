@@ -58,7 +58,13 @@ createDefaultTodo opts =
     , isEditing = False
     , name = opts.parentList.inputField
     , complete = False
-    , parentList = opts.parentList.originalName
+
+    -- , parentList = opts.parentList.originalName
+    , parentList =
+        if opts.parentList.listType == "custom" then
+            toString opts.parentList.id
+        else
+            opts.parentList.originalName
     , position = opts.position
     , originalDay = (Date.toTime opts.parentList.date)
     , currentDay = (Date.toTime opts.parentList.date)

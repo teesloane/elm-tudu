@@ -267,7 +267,7 @@ update msg model =
 
         Msgs.CustomListCreate ->
             let
-                -- id is 5 because the current Week has id's 0-4  ಥ_ಥ
+                -- FIXME id is 5 because the current Week has id's 0-4  ಥ_ಥ
                 newListId =
                     5 + (List.length (TodoList.Model.maybeTodoLists model.customLists))
 
@@ -277,7 +277,7 @@ update msg model =
                         , name = "New List"
                         , ts = model.timeAtLoad
                         , originalName = "New List" ++ toString newListId
-                        , id = newListId
+                        , id = toString newListId
                         , listType = "custom"
                         }
             in

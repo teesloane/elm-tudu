@@ -11,7 +11,7 @@ type alias TodoList =
     , date : Date
     , name : String
     , ts : Time
-    , id : Int
+    , id : String
     , isEditingName : Bool
 
     -- BEHOLD! Some complection!
@@ -33,7 +33,7 @@ type alias TodoListDB =
     { name : String
     , originalName : String
     , ts : Time
-    , id : Int
+    , id : String
     , listType : String
     }
 

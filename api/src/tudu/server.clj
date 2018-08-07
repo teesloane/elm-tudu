@@ -66,7 +66,7 @@
                (ok (todolists/get-all))))
 
            (PATCH "/:id" [id]
-             :path-params [id :- Long]
+             :path-params [id :- String]
              :body [updated-list todolists/TodoList]
              :summary "Update a todolist"
              (ok (todolists/update! id (todolists/deserialize updated-list))))

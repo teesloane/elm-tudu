@@ -47,10 +47,9 @@ list model todoList =
         todosSortedAndFiltered =
             model.todos
                 |> Models.maybeTodos
-                |> List.filter (\t -> t.parentList == todoList.originalName)
+                |> List.filter (\t -> (t.parentList == todoList.originalName || t.parentList == (toString todoList.id)))
                 |> List.sortBy .position
 
-        -- if todolist is currentDay style it nicely.
         styles =
             if todoList.date == (Date.fromTime model.timeAtLoad) then
                 { day = "date-dayOfWeek--active"
