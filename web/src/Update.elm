@@ -1,17 +1,18 @@
 module Update exposing (..)
 
-import Dom exposing (focus)
-import RemoteData exposing (WebData, map)
-import Models exposing (..)
-import Time exposing (Time)
-import Task exposing (Task)
-import Utils exposing (..)
-import Todo.Drag as Drag exposing (..)
 import Date exposing (Date)
-import TodoList.Model exposing (maybeTodoLists)
+import Dom exposing (focus)
+import Models exposing (..)
 import Msgs exposing (Msg)
+import RemoteData exposing (WebData, map)
+import Task exposing (Task)
+import Time exposing (Time)
+import Todo.Drag as Drag exposing (..)
 import Todo.Http
+import Todo.Model exposing (Todo)
 import TodoList.Http
+import TodoList.Model exposing (maybeTodoLists)
+import Utils exposing (..)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -111,14 +112,17 @@ update msg model =
             else
                 let
                     newTodo =
-                        Models.createDefaultTodo
+                        Todo.Model.createDefaultTodo
                             { id = model.uuid + 1
                             , parentList = todoList
                             , position =
-                                (Models.maybeTodos model.todos)
-                                    |> List.filter (\t -> t.parentList == todoList.originalName)
+                                (Todo.Model.maybeTodos model.todos)
+                                    |> List.filter (Todo.Model.getTodoInParent todoList)
                                     |> List.length
                             }
+
+                    _ =
+                        Debug.log "new todo is " newTodo
 
                     -- clear the dom input after saving the input.
                     cleartodoListField d =
@@ -276,7 +280,6 @@ update msg model =
                         { date = (Date.fromTime model.timeAtLoad)
                         , name = "New List"
                         , ts = model.timeAtLoad
-                        , originalName = "New List" ++ toString newListId
                         , id = toString newListId
                         , listType = "custom"
                         }

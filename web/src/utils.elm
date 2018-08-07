@@ -3,7 +3,8 @@ module Utils exposing (..)
 import Date exposing (Date)
 import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events exposing (..)
-import Models exposing (Model, initialModel, Todo)
+import Models exposing (Model, initialModel)
+import Todo.Model exposing (Todo)
 import Json.Decode as Json
 import Date exposing (Date)
 
@@ -32,7 +33,6 @@ buildWeek dayOffset timestamp =
                     { hasTodos = False
                     , inputField = ""
                     , name = (parseDate n_date "Full")
-                    , originalName = (parseDate n_date "Full")
                     , date = n_date
                     , ts = (Date.toTime n_date)
                     , listType = "day"
@@ -64,11 +64,6 @@ taskInDate date todo =
             True
         else
             False
-
-
-
--- getTodosInList listName model =
---     List.filter (\t -> t.parentList == listName) model.todos
 
 
 parseDate : Date -> String -> String

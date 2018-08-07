@@ -5,11 +5,12 @@ import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
 import Json.Encode as Encode
-import Models as Models exposing (Model, initialModel, Todo)
+import Models as Models exposing (Model, initialModel)
 import Msgs exposing (Msg)
 import RemoteData exposing (RemoteData, WebData, map)
 import Task exposing (Task)
 import TodoList.Model exposing (TodoList, TodoListDB, maybeTodoLists, createDefaultTodoList)
+import Todo.Model exposing (Todo)
 
 
 prefix =
@@ -29,7 +30,6 @@ customListDecoder : Decode.Decoder TodoListDB
 customListDecoder =
     JsonPipe.decode TodoListDB
         |> JsonPipe.required "name" Decode.string
-        |> JsonPipe.required "originalName" Decode.string
         |> JsonPipe.required "ts" Decode.float
         |> JsonPipe.required "id" Decode.string
         |> JsonPipe.required "listType" Decode.string
@@ -41,7 +41,6 @@ customListEncoder todoList =
         attributes =
             [ ( "id", Encode.string todoList.id )
             , ( "name", Encode.string todoList.name )
-            , ( "originalName", Encode.string todoList.originalName )
             , ( "ts", Encode.float todoList.ts )
             , ( "listType", Encode.string todoList.listType )
             ]
@@ -213,16 +212,6 @@ onDelete model res =
         Ok todoList ->
             model ! []
 
-        -- loops through all todos and replaces the one with id with the updated.
-        -- let
-        --     updateTodoList t =
-        --         if t.id == todoList.id then
-        --             createDefaultTodoList todoList
-        --         else
-        --             t
-        -- in
-        --     { model | customLists = RemoteData.map (\l -> List.map updateTodoList l) model.customLists }
-        --         ! []
         Err error ->
             -- TODO!
             model ! []

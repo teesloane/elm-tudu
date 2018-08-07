@@ -1,12 +1,13 @@
 module Todo.View exposing (single, newInput, dropZoneEmpty)
 
 import Html exposing (Html, button, input, div, ul, text, program, span)
-import Html.Events as Events exposing (..)
 import Html.Attributes exposing (..)
-import Models exposing (Model, Todo, maybeTodos)
-import TodoList.Model exposing (TodoList)
+import Html.Events as Events exposing (..)
+import Models exposing (Model)
 import Msgs exposing (Msg)
 import Todo.Drag as Drag exposing (..)
+import Todo.Model exposing (Todo, maybeTodos, getTodoInParent)
+import TodoList.Model exposing (TodoList)
 import Utils exposing (onEnter, taskInDate, parseDate)
 
 
@@ -76,35 +77,6 @@ complete model todo =
         ]
 
 
-{-| Fill empty todo space up to max (N).
-For the current todoList , see how many todos (t) there are, and then add N - t empty todos.
--}
-emptyTodos : Model -> TodoList -> Html Msg
-emptyTodos model todolist =
-    let
-        maxRows =
-            7
-
-        todosPerTodoList =
-            model.todos
-                |> Models.maybeTodos
-                |> List.filter (taskInDate todolist.date)
-                |> List.length
-
-        rowsToCreate =
-            (List.range 0 (maxRows - todosPerTodoList))
-
-        renderRow _ idx =
-            if model.beingDragged then
-                dropZoneEmpty model todolist idx
-            else
-                div
-                    [ class "todo", onClick (Msgs.TodoFocusInputFromEmpty todolist) ]
-                    [ text "" ]
-    in
-        div [] (List.indexedMap renderRow rowsToCreate)
-
-
 newInput : Model -> TodoList -> Html Msg
 newInput model todoList =
     if model.beingDragged then
@@ -133,15 +105,14 @@ dropZoneEmpty model todoList idx =
 
         lastItem : Maybe Todo
         lastItem =
-            -- (Models.getTodosInList todoList model)
             (maybeTodos model.todos)
-                |> List.filter (\t -> t.parentList == todoList.originalName)
+                |> List.filter (Todo.Model.getTodoInParent todoList)
                 |> List.sortBy .position
                 |> List.reverse
                 |> List.head
 
         buildNewTodo n =
-            Models.createDefaultTodo
+            Todo.Model.createDefaultTodo
                 { id = model.uuid + 1
                 , parentList = todoList
                 , position = n

@@ -4,7 +4,8 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Json.Decode.Pipeline as JsonPipe exposing (decode, required)
-import Models as Models exposing (Model, initialModel, Todo)
+import Models as Models exposing (Model, initialModel)
+import Todo.Model exposing (Todo)
 import RemoteData exposing (RemoteData, WebData, map)
 import Msgs exposing (Msg)
 import Utils exposing (buildWeek, parseDate)
@@ -130,8 +131,8 @@ onFetchAll model res =
             (buildWeek model.dayOffset model.timeAtLoad)
     in
         { model
-            | todos = RemoteData.succeed (Models.maybeTodos res)
-            , uuid = List.length (Models.maybeTodos res) + 1
+            | todos = RemoteData.succeed (Todo.Model.maybeTodos res)
+            , uuid = List.length (Todo.Model.maybeTodos res) + 1
             , currentWeek = newWeek
         }
             ! []

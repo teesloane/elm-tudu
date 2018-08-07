@@ -1,13 +1,15 @@
 module TodoList.View exposing (..)
 
-import Html exposing (Html, button, input, div, ul, text, program, span)
-import Msgs exposing (Msg)
 import Date exposing (..)
-import Html.Events as Events exposing (..)
+import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Attributes exposing (..)
-import TodoList.Model exposing (TodoList)
+import Html.Events as Events exposing (..)
+import Models exposing (Model)
+import Msgs exposing (Msg)
+import Todo.Model exposing (..)
+import Todo.Model exposing (Todo, maybeTodos)
 import Todo.View exposing (single, newInput, dropZoneEmpty)
-import Models exposing (Model, Todo)
+import TodoList.Model exposing (TodoList)
 import Utils exposing (onEnter, taskInDate, parseDate)
 
 
@@ -21,8 +23,8 @@ emptyTodos model todolist =
 
         todosPerTodoList =
             model.todos
-                |> Models.maybeTodos
-                |> List.filter (taskInDate todolist.date)
+                |> Todo.Model.maybeTodos
+                |> List.filter (Todo.Model.getTodoInParent todolist)
                 |> List.length
 
         rowsToCreate =
@@ -46,8 +48,8 @@ list model todoList =
     let
         todosSortedAndFiltered =
             model.todos
-                |> Models.maybeTodos
-                |> List.filter (\t -> (t.parentList == todoList.originalName || t.parentList == (toString todoList.id)))
+                |> Todo.Model.maybeTodos
+                |> List.filter (Todo.Model.getTodoInParent todoList)
                 |> List.sortBy .position
 
         styles =

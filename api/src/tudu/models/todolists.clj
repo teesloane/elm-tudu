@@ -10,7 +10,6 @@
 (s/defschema TodoList
   {:id            s/Str
    :name          s/Str
-   :originalName  s/Str
    :ts            s/Int
    :listType      s/Str})
 

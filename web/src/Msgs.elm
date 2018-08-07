@@ -5,6 +5,7 @@ import RemoteData exposing (WebData, map)
 import Models exposing (..)
 import Time exposing (Time)
 import TodoList.Model exposing (TodoList, TodoListDB)
+import Todo.Model exposing (Todo)
 import Http
 
 

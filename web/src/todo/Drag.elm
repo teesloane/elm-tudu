@@ -4,6 +4,7 @@ import Html exposing (Html, button, input, div, ul, text, program, span)
 import Html.Events as Events exposing (..)
 import Json.Decode as Json
 import Models exposing (..)
+import Todo.Model exposing (Todo)
 import Msgs
 import Todo.Http
 
