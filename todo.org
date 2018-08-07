@@ -1,41 +1,13 @@
 * -- CURRENT / ON DECK ---------------------------------------------------------
-
-* [ ] Generic Lists at the bottom                                               :feature:
-** [ ] bulid todo api for this
-** [X] make custom list names editable
-CLOSED: [2018-07-14 Sat 12:48]
-** [X] on creation, focus on input and set it to editable
-CLOSED: [2018-07-14 Sat 12:48]
-** [X] on edit submit to server
-CLOSED: [2018-07-14 Sat 12:48]
-** [X] Double clicking to edit should focus the list
-CLOSED: [2018-07-14 Sat 12:55]
-** [ ] Enable deleting lists.
-** Overview
-- ability to create these lists
-- [ ] ability to delete them
-- ability to drag / reorder 
-- rename name
-- add default "someday" list maybe.
-- HTTP for all the above
 * WAITING Fix order in Drag + patch all todos that changed                      :bug:
 - on drop, it should update the order for EVERY todo in a list.
-  - figure out sort
-  - something like:
-  - on drop, everything after the dropped todo gets incremented
-  - but also, mapIndex over them and replace order with index?
-  - probably a better way than this.
-- when you do this, you need to save them all
-- batch send the todosInList to the back end and save all.
-- This will need a real API, as I don't think json-server can handle it.
-  
+- when you do this, you need to *save* them all
+- *batch send* the todosInList to the back end and save all.
   
 * -- LOW PRIORITY --------------------------------------------------------------
-
 * DEV X / Refactoring
 ** [ ] Refactor scss.                                                          :dx:
 ** [ ] Refactor all the RemoteData.maps                                        :refactor:
-** [ ] replace todo id with uuid.                                              :refactor:
 * Features
 ** [ ] Feature: Themes                                                         :n2h:
 ** [ ] Feature: Markdown parsing                                               :stretch:
@@ -104,9 +76,31 @@ actually need correct timestamps.
 **** [ ] so "createTodoGetTime" -> "createTodoWithTime"
 *** [X] When rendering a list in which todos are < date.now, change the date.
 CLOSED: [2018-07-11 Wed 14:10]
-
+** [X] Generic Lists at the bottom                                             :feature:
+CLOSED: [2018-08-06 Mon 23:11]
+*** [X] bulid todo api for this
+CLOSED: [2018-08-06 Mon 23:08]
+*** [X] make custom list names editable
+CLOSED: [2018-07-14 Sat 12:48]
+*** [X] on creation, focus on input and set it to editable
+CLOSED: [2018-07-14 Sat 12:48]
+*** [X] on edit submit to server
+CLOSED: [2018-07-14 Sat 12:48]
+*** [X] Double clicking to edit should focus the list
+CLOSED: [2018-07-14 Sat 12:55]
+*** [X] Enable deleting lists.
+CLOSED: [2018-08-06 Mon 23:10]
+*** Overview
+- ability to create these lists
+- [ ] ability to delete them
+- ability to drag / reorder 
+- rename name
+- add default "someday" list maybe.
+- HTTP for all the above
+** [X] replace todo id with uuid.                                              :refactor:
+CLOSED: [2018-08-06 Mon 23:12]
+Ended up using timestamp... works.
 * -- DOCS / ETC ----------------------------------------------------------------
-
 * NOTES
 ** Comparable Dict.fromList 
 interesting: https://github.com/elm/compiler/issues/774
@@ -159,3 +153,4 @@ the user re-refreshes (seems dicey...)
     actions are ending up making minimal changes, and then running an HTTP
     command who's handler (another update) will be responsible for triggering
     the necessary re-renders
+  - EDIT: this is a "pessimistic" update vs optimistic [[https://purelyfunctional.tv/guide/optimistic-update-in-re-frame/][link]]
