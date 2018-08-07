@@ -78,7 +78,7 @@
              (ok (todolists/create! (todolists/deserialize n-lst))))
 
            (DELETE "/:id" [id]
-             :path-params [id :- Long]
+             :path-params [id :- String]
              :middleware [cors]
              (todolists/delete! id)
              (ok {:id id}))))

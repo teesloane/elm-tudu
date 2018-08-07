@@ -190,7 +190,7 @@ deleteCmd todoList =
 
 deleteSingleUrl : TodoList -> String
 deleteSingleUrl lst =
-    prefix ++ (toString lst.id)
+    prefix ++ lst.id
 
 
 deleteReq : TodoList -> Http.Request TodoListDB
