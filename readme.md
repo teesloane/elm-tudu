@@ -1,6 +1,6 @@
 > Half Finished clone of [teux deux] with elm and clojure.
 
-![]("https://github.com/teesloane/elm-tudu/blob/master/screenshot.png?raw=true")
+![](https://raw.githubusercontent.com/teesloane/elm-tudu/master/screenshot.png)
 
 This was built to play around with Elm. I got a prototype working, but grew a
 little dis-interested, and also found my Elm code getting progressively harder
