@@ -1,8 +1,10 @@
 > Half Finished clone of [teux deux] with elm and clojure.
 
+![]('./screenshot.png')
+
 This was built to play around with Elm. I got a prototype working, but grew a
 little dis-interested, and also found my Elm code getting progressively harder
-to read and reason about. ¯\_(ツ)_/¯ 
+to read and reason about. ¯\\_(ツ)_/¯ 
 
 Tossing this up in case it might be useful for those getting into Elm.
 
