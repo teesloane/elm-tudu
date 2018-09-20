@@ -1,6 +1,6 @@
 > Half Finished clone of [teux deux] with elm and clojure.
 
-![]('./screenshot.png')
+![]("https://github.com/teesloane/elm-tudu/blob/master/screenshot.png?raw=true")
 
 This was built to play around with Elm. I got a prototype working, but grew a
 little dis-interested, and also found my Elm code getting progressively harder
