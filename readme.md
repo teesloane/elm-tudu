@@ -8,7 +8,7 @@ to read and reason about. ¯\\_(ツ)_/¯
 
 Tossing this up in case it might be useful for those getting into Elm.
 
-You can read more about the project / process [here](https://tylersloane.com/posts/2018-09-elm-floundering/)
+You can read more about the project / process [here](https://tylersloane.com/posts/2018-09-elm-stuck/)
 
 **Development:**
 
